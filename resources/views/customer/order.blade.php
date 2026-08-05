@@ -98,7 +98,9 @@
                                     <select name="table_id" id="table_id" required class="block w-full bg-dark-950 border border-dark-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500">
                                         <option value="">-- Pilih Nomor Meja --</option>
                                         @foreach($tables as $table)
-                                            <option value="{{ $table->id }}" {{ $table->status == 'occupied' ? 'disabled class=text-dark-600' : '' }}>
+                                            <option value="{{ $table->id }}" 
+                                                {{ (isset($selectedTable) && $selectedTable->id == $table->id) || old('table_id') == $table->id ? 'selected' : '' }}
+                                                {{ $table->status == 'occupied' && (!isset($selectedTable) || $selectedTable->id != $table->id) ? 'disabled class=text-dark-600' : '' }}>
                                                 Meja {{ $table->table_number }} ({{ $table->status == 'occupied' ? 'Sedang Digunakan' : 'Tersedia' }})
                                             </option>
                                         @endforeach

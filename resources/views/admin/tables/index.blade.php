@@ -40,6 +40,14 @@
                 <h3 class="text-3xl font-bold text-white">{{ $table->table_number }}</h3>
             </div>
 
+            <!-- QR Code Visual -->
+            <div class="mb-4 flex flex-col items-center justify-center p-3 bg-dark-800 rounded-xl border border-dark-700/50">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ urlencode(route('order.qr', ['branch_id' => $table->branch_id, 'table' => $table->table_number])) }}" class="w-24 h-24 bg-white p-1 rounded-lg shadow-inner mb-2 animate-fade-in" alt="QR Meja {{ $table->table_number }}">
+                <a href="https://api.qrserver.com/v1/create-qr-code/?size=500x500&data={{ urlencode(route('order.qr', ['branch_id' => $table->branch_id, 'table' => $table->table_number])) }}" target="_blank" class="text-[10px] text-brand-400 hover:text-brand-300 font-bold uppercase tracking-wider flex items-center gap-1">
+                    🔍 Cetak / Buka QR
+                </a>
+            </div>
+
             <div class="bg-dark-800 rounded-xl p-3 mb-4 border border-dark-700/50 flex-1">
                 <p class="text-dark-400 text-[10px] uppercase mb-1">QR Token</p>
                 <div class="flex items-center justify-between">

@@ -11,6 +11,11 @@
         </a>
         
         <div class="flex space-x-2">
+            <a href="{{ route('kasir.orders.receipt', $order) }}" target="_blank" class="bg-dark-800 border border-dark-700 hover:bg-dark-700 text-dark-200 hover:text-white font-semibold px-4 py-2 rounded-xl transition-all flex items-center">
+                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                Cetak Struk
+            </a>
+
             @if($order->payment_status == 'unpaid')
                 <form action="{{ route('kasir.orders.pay', $order) }}" method="POST">
                     @csrf

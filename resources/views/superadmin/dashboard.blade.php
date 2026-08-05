@@ -67,6 +67,25 @@
     </div>
 </div>
 
+<!-- Charts Section -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in-up delay-300">
+    <!-- Monthly Global Revenue Trend -->
+    <div class="bg-dark-800 border border-dark-700 rounded-2xl p-6 shadow-sm flex flex-col">
+        <h3 class="text-base font-bold text-white mb-4">Tren Pendapatan Bulanan Global</h3>
+        <div class="relative w-full h-[260px]">
+            <canvas id="globalRevenueChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Revenue Comparison per Branch -->
+    <div class="bg-dark-800 border border-dark-700 rounded-2xl p-6 shadow-sm flex flex-col">
+        <h3 class="text-base font-bold text-white mb-4">Perbandingan Pendapatan Antar Cabang</h3>
+        <div class="relative w-full h-[260px]">
+            <canvas id="branchRevenueChart"></canvas>
+        </div>
+    </div>
+</div>
+
 <!-- Header Action -->
 <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 animate-fade-in-up delay-400">
     <h2 class="text-lg font-semibold text-white">Daftar Cabang Aktif</h2>
@@ -189,3 +208,105 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // 1. Monthly global trend line chart
+    const globalCtx = document.getElementById('globalRevenueChart').getContext('2d');
+    new Chart(globalCtx, {
+        type: 'line',
+        data: {
+            labels: {!! json_encode($monthlyLabels ?? []) !!},
+            datasets: [{
+                label: 'Omzet Bulanan (Rp)',
+                data: {!! json_encode($monthlyValues ?? []) !!},
+                borderColor: '#e85824',
+                backgroundColor: 'rgba(232, 88, 36, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    grid: {
+                        color: '#282b30'
+                    },
+                    ticks: {
+                        color: '#72767d',
+                        callback: function(value) {
+                            return 'Rp ' + value.toLocaleString('id-ID');
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        color: '#72767d'
+                    }
+                }
+            }
+        }
+    });
+
+    // 2. Bar chart comparing branches
+    const branchCtx = document.getElementById('branchRevenueChart').getContext('2d');
+    const branchNames = {!! json_encode($branchRevenues ? $branchRevenues->pluck('name') : []) !!};
+    const branchTotals = {!! json_encode($branchRevenues ? $branchRevenues->map(fn($b) => (float)($b->orders_sum_total_price ?? 0)) : []) !!};
+
+    new Chart(branchCtx, {
+        type: 'bar',
+        data: {
+            labels: branchNames,
+            datasets: [{
+                label: 'Total Pendapatan (Rp)',
+                data: branchTotals,
+                backgroundColor: '#3b82f6',
+                borderRadius: 8,
+                maxBarThickness: 40
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    grid: {
+                        color: '#282b30'
+                    },
+                    ticks: {
+                        color: '#72767d',
+                        callback: function(value) {
+                            return 'Rp ' + value.toLocaleString('id-ID');
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        color: '#72767d'
+                    }
+                }
+            }
+        }
+    });
+</script>
+@endpush

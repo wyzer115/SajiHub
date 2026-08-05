@@ -18,6 +18,7 @@ class CustomerOrderController extends Controller
         $selectedBranch = null;
         $menus = collect();
         $tables = collect();
+        $selectedTable = null;
 
         if ($request->filled('branch_id')) {
             $selectedBranch = Branch::find($request->branch_id);
@@ -27,6 +28,17 @@ class CustomerOrderController extends Controller
                     ->with('category')
                     ->get();
                 $tables = Table::where('branch_id', $selectedBranch->id)->get();
+
+                if ($request->filled('table')) {
+                    $tableNum = $request->table;
+                    $selectedTable = Table::where('branch_id', $selectedBranch->id)
+                        ->where(function($query) use ($tableNum) {
+                            $query->where('table_number', $tableNum)
+                                  ->orWhere('table_number', 'Table ' . $tableNum)
+                                  ->orWhere('table_number', 'Meja ' . $tableNum)
+                                  ->orWhere('table_number', ltrim($tableNum, '0'));
+                        })->first();
+                }
             }
         }
 
@@ -36,7 +48,7 @@ class CustomerOrderController extends Controller
             ->latest()
             ->paginate(5);
 
-        return view('customer.order', compact('branches', 'selectedBranch', 'menus', 'tables', 'myOrders'));
+        return view('customer.order', compact('branches', 'selectedBranch', 'menus', 'tables', 'myOrders', 'selectedTable'));
     }
 
     public function store(Request $request)

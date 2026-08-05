@@ -19,13 +19,10 @@ class DashboardController extends Controller
         
         $recentOrders = $branch->orders()->with(['items.menu', 'table', 'user'])->latest()->take(10)->get();
         
-        $popularMenus = DB::table('order_items')
-            ->join('orders', 'order_items.order_id', '=', 'orders.id')
-            ->join('menus', 'order_items.menu_id', '=', 'menus.id')
-            ->where('orders.branch_id', $branch->id)
-            ->select('menus.name', DB::raw('SUM(order_items.quantity) as total_quantity'))
-            ->groupBy('menus.id', 'menus.name')
-            ->orderByDesc('total_quantity')
+        $popularMenus = \App\Models\Menu::where('branch_id', $branch->id)
+            ->with('category')
+            ->withSum('orderItems as count', 'quantity')
+            ->orderByDesc('count')
             ->limit(5)
             ->get();
 
