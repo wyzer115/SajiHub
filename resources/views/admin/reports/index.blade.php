@@ -7,23 +7,23 @@
     
     <!-- Filter Date Range -->
     <div class="bg-dark-900 border border-dark-700 rounded-2xl p-6 shadow-sm animate-fade-in-up">
-        <form action="{{ route('admin.reports') }}" method="GET" class="flex flex-col md:flex-row gap-4 items-end">
-            <div class="flex-1 w-full grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <label for="start_date" class="block text-dark-300 text-xs font-semibold uppercase tracking-wider mb-2">Tanggal Mulai</label>
-                    <input type="date" name="start_date" id="start_date" value="{{ $startDateInput }}"
-                        class="w-full bg-dark-800 border border-dark-600 text-white rounded-xl px-4 py-2.5 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition-all text-sm">
-                </div>
-                <div>
-                    <label for="end_date" class="block text-dark-300 text-xs font-semibold uppercase tracking-wider mb-2">Tanggal Selesai</label>
-                    <input type="date" name="end_date" id="end_date" value="{{ $endDateInput }}"
-                        class="w-full bg-dark-800 border border-dark-600 text-white rounded-xl px-4 py-2.5 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition-all text-sm">
-                </div>
+        <form action="{{ route('admin.reports') }}" method="GET" class="flex flex-col sm:flex-row gap-4 items-end">
+            <div class="flex-grow w-full max-w-xs">
+                <label for="preset" class="block text-dark-300 text-xs font-semibold uppercase tracking-wider mb-2">Rentang Waktu Laporan</label>
+                <select name="preset" id="preset" class="w-full bg-dark-800 border border-dark-600 text-white rounded-xl px-4 py-3 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 focus:outline-none transition-all text-sm cursor-pointer" onchange="this.form.submit()">
+                    <option value="today" {{ $preset == 'today' ? 'selected' : '' }}>Harian (Hari Ini)</option>
+                    <option value="weekly" {{ $preset == 'weekly' ? 'selected' : '' }}>Mingguan (7 Hari Terakhir)</option>
+                    <option value="monthly" {{ $preset == 'monthly' ? 'selected' : '' }}>Bulanan (30 Hari Terakhir)</option>
+                    <option value="yearly" {{ $preset == 'yearly' ? 'selected' : '' }}>Tahunan (1 Tahun Terakhir)</option>
+                    <option value="all" {{ $preset == 'all' ? 'selected' : '' }}>Semua Transaksi (Seluruh Waktu)</option>
+                </select>
             </div>
-            <button type="submit" class="w-full md:w-auto bg-brand-500 hover:bg-brand-600 text-white font-semibold px-6 py-3 rounded-xl transition-all hover:shadow-lg hover:shadow-brand-500/25 flex items-center justify-center gap-2 shrink-0">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-                Filter Laporan
-            </button>
+            <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto shrink-0">
+                <a href="{{ route('admin.reports.export', ['preset' => $preset]) }}" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-3 rounded-xl transition-all hover:shadow-lg hover:shadow-emerald-600/25 flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    Ekspor Excel
+                </a>
+            </div>
         </form>
     </div>
 
@@ -242,5 +242,6 @@
             cutout: '75%'
         }
     });
+
 </script>
 @endpush

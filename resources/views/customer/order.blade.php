@@ -13,12 +13,7 @@
     <header class="border-b border-dark-800 bg-dark-900/50 backdrop-blur-md sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-6 lg:px-8 h-16 flex items-center justify-between">
             <a href="{{ route('landing') }}" class="flex items-center gap-2 group">
-                <div class="w-8 h-8 rounded-lg bg-brand-500/20 text-brand-500 flex items-center justify-center border border-brand-500/30">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.559-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clip-rule="evenodd"/>
-                    </svg>
-                </div>
-                <span class="text-lg font-bold text-white uppercase tracking-tight">Waroeng Saji<span class="text-brand-500">HUB</span></span>
+                <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-9 w-auto">
             </a>
             
             <div class="flex items-center gap-4">
@@ -122,10 +117,14 @@
                                 <div class="grid sm:grid-cols-2 gap-6">
                                     @foreach($menus as $menu)
                                         <div class="p-4 bg-dark-900 border border-dark-800 rounded-2xl flex gap-4 items-start group hover:border-brand-500/10 transition-colors">
-                                            {{-- Menu Image Placeholder --}}
-                                            <div class="w-20 h-20 rounded-xl border border-dashed border-dark-700 flex flex-col items-center justify-center bg-dark-950 text-dark-500 flex-shrink-0">
-                                                <span class="text-[8px] font-semibold text-center">[ Foto ]</span>
-                                            </div>
+                                             {{-- Menu Image --}}
+                                             @if($menu->image)
+                                                 <img src="{{ asset('storage/' . $menu->image) }}" alt="{{ $menu->name }}" class="w-20 h-20 rounded-xl object-cover flex-shrink-0">
+                                             @else
+                                                 <div class="w-20 h-20 rounded-xl border border-dashed border-dark-700 flex flex-col items-center justify-center bg-dark-950 text-dark-500 flex-shrink-0">
+                                                     <span class="text-[8px] font-semibold text-center">[ Foto ]</span>
+                                                 </div>
+                                             @endif
                                             <div class="flex-grow">
                                                 <span class="text-[10px] font-semibold bg-brand-500/10 text-brand-400 px-2 py-0.5 rounded">{{ $menu->category->name ?? 'Menu' }}</span>
                                                 <h4 class="text-white font-bold text-sm mt-1.5">{{ $menu->name }}</h4>

@@ -34,8 +34,13 @@ class MenuController extends Controller
             'category_id' => 'required|exists:categories,id',
             'price' => 'required|numeric|min:0',
             'status' => 'required|in:available,sold_out',
-            'image' => 'nullable|string'
+            'image' => 'nullable|image|max:2048'
         ]);
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('menus', 'public');
+            $validated['image'] = $path;
+        }
 
         $validated['branch_id'] = auth()->user()->branch_id;
         Menu::create($validated);
@@ -63,8 +68,18 @@ class MenuController extends Controller
             'category_id' => 'required|exists:categories,id',
             'price' => 'required|numeric|min:0',
             'status' => 'required|in:available,sold_out',
-            'image' => 'nullable|string'
+            'image' => 'nullable|image|max:2048'
         ]);
+
+        if ($request->hasFile('image')) {
+            if ($menu->image) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($menu->image);
+            }
+            $path = $request->file('image')->store('menus', 'public');
+            $validated['image'] = $path;
+        } else {
+            $validated['image'] = $menu->image;
+        }
 
         $menu->update($validated);
 

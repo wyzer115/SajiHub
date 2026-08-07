@@ -66,8 +66,8 @@
                     @csrf
                     @method('PUT')
                     <input type="hidden" name="status" value="{{ $table->status == 'empty' ? 'occupied' : 'empty' }}">
-                    <button type="submit" class="w-full bg-dark-700 hover:bg-dark-600 text-dark-200 px-3 py-2 rounded-xl transition-all text-xs font-medium">
-                        Ubah Status
+                    <button type="submit" class="w-full {{ $table->status == 'empty' ? 'bg-brand-500/10 text-brand-400 hover:bg-brand-500/20' : 'bg-green-500/10 text-green-400 hover:bg-green-500/20' }} px-3 py-2 rounded-xl transition-all text-xs font-bold uppercase tracking-wider">
+                        {{ $table->status == 'empty' ? 'Set Terisi' : 'Set Kosong' }}
                     </button>
                 </form>
 

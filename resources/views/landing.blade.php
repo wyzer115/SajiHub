@@ -13,51 +13,48 @@
             background-color: #020617;
             color: #cbd5e1;
         }
+        .scrollbar-none::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-none {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
     </style>
 </head>
 <body class="antialiased overflow-x-hidden bg-dark-950 text-dark-300">
 
-    {{-- 1. TOP PREMIUM BANNER --}}
-    <div class="bg-dark-950 text-dark-400 text-xs py-2.5 px-6 flex justify-between items-center z-50 relative font-medium border-b border-dark-800/80">
-        <div>SajiHUB — Portal Sistem Manajemen Restoran Multi-Branch</div>
-        <div class="hidden sm:block text-dark-500">★★★★★ Review Kualitas Pelayanan 9.8 / 10</div>
-    </div>
 
     {{-- 2. CENTERED NAVBAR --}}
     <nav class="bg-dark-950/90 backdrop-blur-md border-b border-dark-800 sticky top-0 z-40 shadow-lg">
         <div class="max-w-7xl mx-auto px-6 lg:px-8">
-            <div class="flex items-center justify-between h-20">
-                {{-- Left Logo (SajiHUB Flame emblem style) --}}
-                <a href="#" class="flex items-center gap-2.5">
-                    <div class="w-10 h-10 rounded-xl bg-brand-500/10 text-brand-500 flex items-center justify-center border border-brand-500/20 shadow-sm">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.559-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clip-rule="evenodd"/>
-                        </svg>
-                    </div>
-                    <span class="text-xl font-extrabold text-white tracking-tight">Saji<span class="text-brand-500">HUB</span></span>
+            <div class="flex items-center justify-between h-24">
+                {{-- Left Logo --}}
+                <a href="#" class="flex items-center gap-3 group">
+                    <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-16 w-auto group-hover:scale-105 transition-transform duration-300">
                 </a>
 
                 {{-- Center links --}}
-                <div class="hidden lg:flex items-center gap-8 text-xs font-bold text-dark-300 uppercase tracking-wider">
-                    <a href="#beranda" class="nav-link text-brand-500 border-brand-500 py-1 border-b-2 transition-all">Beranda</a>
-                    <a href="#menu-favorit" class="nav-link border-transparent py-1 border-b-2 hover:text-brand-500 transition-all">Menu Favorit</a>
-                    <a href="#testimoni" class="nav-link border-transparent py-1 border-b-2 hover:text-brand-500 transition-all">Testimoni</a>
+                <div class="hidden lg:flex items-center gap-10 text-[13.5px] sm:text-[14.5px] font-black uppercase tracking-widest text-dark-300">
+                    <a href="#beranda" class="nav-link text-brand-500 border-brand-500 py-1.5 border-b-2 hover:text-brand-500 transition-all">Beranda</a>
+                    <a href="#menu-favorit" class="nav-link border-transparent py-1.5 border-b-2 hover:text-brand-500 transition-all">Menu Favorit</a>
+                    <a href="#testimoni" class="nav-link border-transparent py-1.5 border-b-2 hover:text-brand-500 transition-all">Testimoni</a>
                 </div>
 
                 {{-- Right Actions --}}
                 <div class="flex items-center gap-4">
                     @auth
-                        <div class="flex items-center gap-3">
-                            <span class="text-xs font-semibold text-dark-400 hidden sm:inline">Halo, <span class="text-brand-500 font-bold">{{ auth()->user()->name }}</span></span>
+                        <div class="flex items-center gap-4">
+                            <span class="text-sm font-extrabold text-dark-300 hidden sm:inline">Halo, <span class="text-brand-500 font-black">{{ auth()->user()->name }}</span></span>
                             <form action="{{ route('logout') }}" method="POST" class="inline">
                                 @csrf
-                                <button type="submit" class="px-4 py-2 text-xs font-bold text-white bg-brand-500 hover:bg-brand-600 rounded-xl transition-colors cursor-pointer">
+                                <button type="submit" class="px-6 py-3 text-xs sm:text-[13.5px] font-black uppercase tracking-wider text-white bg-brand-500 hover:bg-brand-600 rounded-xl transition-colors cursor-pointer">
                                     Logout
                                 </button>
                             </form>
                         </div>
                     @else
-                        <a href="{{ route('login') }}" class="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-brand-500 hover:bg-brand-600 transition-all shadow-md">
+                        <a href="{{ route('login') }}" class="px-6 py-3 rounded-xl text-xs sm:text-[13.5px] font-black text-white bg-brand-500 hover:bg-brand-600 transition-all shadow-md hover:shadow-brand-500/20 hover:scale-105 transform">
                             MASUK PORTAL
                         </a>
                     @endauth
@@ -73,11 +70,11 @@
         {{-- Smooth diagonal dark gradient overlay for organic text blending and color preservation on the right --}}
         <div class="absolute inset-0 bg-gradient-to-tr from-black/95 via-black/45 to-transparent z-10"></div>
 
-        {{-- Left & Right Arrow Navigation (Cyan color matching reference photo) --}}
-        <button id="hero-btn-prev" class="absolute left-6 top-1/2 -translate-y-1/2 z-20 text-[#00c5ff] hover:scale-110 transition-transform bg-black/40 p-2 rounded-full border border-dark-800 cursor-pointer">
+        {{-- Left & Right Arrow Navigation (Orange branding color and z-30 clickable index) --}}
+        <button id="hero-btn-prev" class="absolute left-6 top-1/2 -translate-y-1/2 z-30 text-brand-500 hover:scale-110 transition-transform bg-black/40 p-2.5 rounded-full border border-dark-800 cursor-pointer">
             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg>
         </button>
-        <button id="hero-btn-next" class="absolute right-6 top-1/2 -translate-y-1/2 z-20 text-[#00c5ff] hover:scale-110 transition-transform bg-black/40 p-2 rounded-full border border-dark-800 cursor-pointer">
+        <button id="hero-btn-next" class="absolute right-6 top-1/2 -translate-y-1/2 z-30 text-brand-500 hover:scale-110 transition-transform bg-black/40 p-2.5 rounded-full border border-dark-800 cursor-pointer">
             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
         </button>
 
@@ -104,31 +101,37 @@
                 <h2 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight">
                     Menu Favorit SajiHUB
                 </h2>
-                <div class="flex items-center gap-2">
-                    <button class="w-8 h-8 rounded-full border border-dark-800 text-brand-500 hover:bg-dark-900 flex items-center justify-center font-bold">&lt;</button>
-                    <button class="w-8 h-8 rounded-full border border-dark-800 text-brand-500 hover:bg-dark-900 flex items-center justify-center font-bold">&gt;</button>
+                <div class="flex items-center gap-2 relative z-20">
+                    <button id="favorit-btn-prev" class="w-8 h-8 rounded-full border border-dark-800 text-brand-500 hover:bg-dark-900 flex items-center justify-center font-bold cursor-pointer transition-colors">&lt;</button>
+                    <button id="favorit-btn-next" class="w-8 h-8 rounded-full border border-dark-800 text-brand-500 hover:bg-dark-900 flex items-center justify-center font-bold cursor-pointer transition-colors">&gt;</button>
                 </div>
             </div>
 
-            <!-- Grid Menu -->
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+            <!-- Slider Menu Container -->
+            <div id="favorit-scroll-container" class="flex gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory scrollbar-none pb-4">
                 @php
                     $menuFavorites = [
-                        ['name' => 'NASI GORENG SPESIAL', 'price' => 35000, 'category' => 'Makanan Utama'],
-                        ['name' => 'MIE GORENG SEAFOOD', 'price' => 38000, 'category' => 'Makanan Utama'],
-                        ['name' => 'AYAM BAKAR MADU', 'price' => 42000, 'category' => 'Makanan Utama'],
-                        ['name' => 'ES TEH MANIS', 'price' => 8000, 'category' => 'Minuman'],
-                        ['name' => 'JUS ALPUKAT', 'price' => 18000, 'category' => 'Minuman'],
-                        ['name' => 'ES CAMPUR', 'price' => 20000, 'category' => 'Dessert'],
+                        ['name' => 'NASI GORENG SPESIAL', 'price' => 35000, 'category' => 'Makanan Utama', 'image' => 'nasi-goreng.jpg'],
+                        ['name' => 'MIE GORENG SEAFOOD', 'price' => 38000, 'category' => 'Makanan Utama', 'image' => 'seafood.jpg'],
+                        ['name' => 'AYAM BAKAR MADU', 'price' => 42000, 'category' => 'Makanan Utama', 'image' => 'ayam-bakar.jpg'],
+                        ['name' => 'ES TEH MANIS', 'price' => 8000, 'category' => 'Minuman', 'image' => 'es-teh.jpg'],
+                        ['name' => 'JUS ALPUKAT', 'price' => 18000, 'category' => 'Minuman', 'image' => 'jus-alpukat.jpg'],
+                        ['name' => 'ES CAMPUR', 'price' => 20000, 'category' => 'Dessert', 'image' => 'es-campur.jpg'],
                     ];
                 @endphp
 
                 @foreach($menuFavorites as $menu)
-                    <div class="bg-dark-900 border border-dark-800 rounded-2xl p-4 hover:border-brand-500/20 hover:scale-[1.02] transition-all flex flex-col justify-between group">
-                        <!-- Image Container: Empty Placeholder (As requested: "gw aja yang ngisi") -->
-                        <div class="aspect-square rounded-xl border border-dashed border-dark-700 bg-dark-950 flex flex-col items-center justify-center p-3 relative overflow-hidden group-hover:border-brand-500 transition-colors">
-                            <span class="text-[9px] font-bold text-dark-500 uppercase tracking-widest text-center">Tarik Foto Ke Sini</span>
-                            <span class="text-[8px] text-dark-600 text-center mt-1 font-mono italic">{{ $menu['category'] }}</span>
+                    <div class="w-[85%] sm:w-[45%] md:w-[30%] lg:w-[23.5%] flex-shrink-0 bg-dark-900 border border-dark-800 rounded-2xl p-4 hover:border-brand-500/20 hover:scale-[1.02] transition-all flex flex-col justify-between group snap-start">
+                        <!-- Image Container -->
+                        <div class="aspect-square rounded-xl border border-dark-800 bg-dark-950 flex items-center justify-center relative overflow-hidden group-hover:border-brand-500 transition-colors mb-4">
+                            <img src="{{ asset('images/landing/' . $menu['image']) }}" alt="{{ $menu['name'] }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            
+                            <!-- Category Badge -->
+                            <div class="absolute top-2 left-2 z-10">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[8px] font-extrabold uppercase tracking-wider bg-dark-950/80 text-dark-400 border border-dark-800/80 backdrop-blur-sm">
+                                    {{ $menu['category'] }}
+                                </span>
+                            </div>
 
                             <!-- "LIHAT MENU" Button Overlay -->
                             <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10">
@@ -139,7 +142,7 @@
                         </div>
 
                         <!-- Menu details -->
-                        <div class="mt-4">
+                        <div>
                             <h3 class="font-extrabold text-sm text-brand-500 leading-tight truncate uppercase mb-1">{{ $menu['name'] }}</h3>
                             <p class="text-xs text-white font-bold">MULAI DARI RP {{ number_format($menu['price'], 0, ',', '.') }}</p>
                         </div>
@@ -181,13 +184,13 @@
     {{-- 6. PREMIUM FOUR-COLUMN FOOTER (SajiHUB Dark Branding - Gacoan Structured) --}}
     <footer class="bg-dark-950 text-dark-300 text-lg py-20 border-t border-dark-900">
         <div class="max-w-7xl mx-auto px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-14 pb-12 border-b border-dark-900">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-24 pb-12 border-b border-dark-900">
                 
                 {{-- Column 1: Newsletter signup (4 cols) --}}
                 <div class="lg:col-span-4 space-y-6">
                     <h3 class="font-black text-white text-lg sm:text-[21px] uppercase tracking-wider mb-2">BERGABUNG BERSAMA SAJIHUB</h3>
                     <p class="text-gray-300 leading-relaxed text-[15px] sm:text-[16px]">Masukkan email Anda untuk berlangganan info promo terbaru dan penawaran khusus dari SajiHUB Resto.</p>
-                    <div class="relative w-full max-w-[340px]">
+                    <div class="relative w-full max-w-[300px]">
                         <input type="email" placeholder="Enter Email Address" class="w-full bg-dark-900 border border-dark-800 text-white rounded-none px-4 py-4 text-base focus:outline-none focus:border-brand-500 transition-colors">
                         <button class="absolute right-0 top-0 bottom-0 px-5 bg-brand-500 hover:bg-brand-600 text-white flex items-center justify-center transition-colors">
                             &rarr;
@@ -346,6 +349,25 @@
                     link.classList.remove('border-transparent');
                     link.classList.add('text-brand-500', 'border-brand-500');
                 }
+            });
+        }
+
+        // Favorite Menu Slider Navigation (Scroll behavior)
+        const favoritContainer = document.getElementById('favorit-scroll-container');
+        const favoritBtnPrev = document.getElementById('favorit-btn-prev');
+        const favoritBtnNext = document.getElementById('favorit-btn-next');
+
+        if (favoritContainer && favoritBtnPrev && favoritBtnNext) {
+            favoritBtnPrev.addEventListener('click', () => {
+                const card = favoritContainer.querySelector('.snap-start');
+                const scrollAmount = card ? card.offsetWidth + 24 : 320; // card width + flex gap
+                favoritContainer.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            });
+
+            favoritBtnNext.addEventListener('click', () => {
+                const card = favoritContainer.querySelector('.snap-start');
+                const scrollAmount = card ? card.offsetWidth + 24 : 320; // card width + flex gap
+                favoritContainer.scrollBy({ left: scrollAmount, behavior: 'smooth' });
             });
         }
 

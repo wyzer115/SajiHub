@@ -50,6 +50,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin_cabang'])->name('admin.'
     Route::post('tables/{table}/regenerate-qr', [TableController::class, 'regenerateQr'])->name('tables.regenerate-qr');
     Route::resource('users', AdminUserController::class);
     Route::get('/reports', [ReportController::class, 'index'])->name('reports');
+    Route::get('/reports/export', [ReportController::class, 'export'])->name('reports.export');
 });
 
 // Kasir Routes

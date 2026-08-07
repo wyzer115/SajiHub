@@ -135,7 +135,18 @@
                     <td class="px-6 py-4 text-sm text-dark-300">{{ $branch->orders_count ?? 0 }}</td>
                     <td class="px-6 py-4">
                         <div class="flex items-center gap-2">
-                            <button class="p-1.5 bg-dark-700 hover:bg-dark-600 text-dark-200 hover:text-white rounded-lg transition-colors" title="Lihat Detail">
+                            <button class="show-branch-btn p-1.5 bg-dark-700 hover:bg-dark-600 text-dark-200 hover:text-white rounded-lg transition-colors cursor-pointer" 
+                                    title="Lihat Detail"
+                                    data-id="BR-{{ str_pad($branch->id, 3, '0', STR_PAD_LEFT) }}"
+                                    data-name="{{ $branch->name }}"
+                                    data-address="{{ $branch->address }}"
+                                    data-phone="{{ $branch->phone ?? '-' }}"
+                                    data-admin-name="{{ $branch->admin->name ?? '-' }}"
+                                    data-admin-username="{{ $branch->admin->username ?? '-' }}"
+                                    data-admin-email="{{ $branch->admin->email ?? '-' }}"
+                                    data-users-count="{{ $branch->users_count ?? 0 }}"
+                                    data-orders-count="{{ $branch->orders_count ?? 0 }}"
+                                    data-revenue="Rp {{ number_format($branchRevenues->firstWhere('id', $branch->id)->orders_sum_total_price ?? 0, 0, ',', '.') }}">
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                             </button>
                             <a href="{{ route('superadmin.branches.edit', $branch->id) }}" class="p-1.5 bg-dark-700 hover:bg-brand-500 text-dark-200 hover:text-white rounded-lg transition-colors" title="Edit">
@@ -204,6 +215,80 @@
                 @endforelse
             </tbody>
         </table>
+    </div>
+</div>
+
+<!-- Modal Detail Cabang -->
+<div id="branch-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden animate-fade-in">
+    <div class="bg-dark-900 border border-dark-700 rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl relative animate-scale-up">
+        <!-- Header -->
+        <div class="px-6 py-5 border-b border-dark-800 flex justify-between items-center bg-dark-950/50">
+            <h3 class="text-xl font-bold text-white uppercase tracking-tight flex items-center gap-2">
+                🏢 Detail Cabang
+            </h3>
+            <button id="close-modal-btn" class="text-dark-400 hover:text-white hover:bg-dark-800 p-1.5 rounded-lg transition-colors cursor-pointer">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        
+        <!-- Content -->
+        <div class="p-6 space-y-6">
+            <div>
+                <div class="text-[10px] uppercase font-bold tracking-widest text-brand-500 mb-1">Nama Cabang</div>
+                <h4 id="modal-branch-name" class="text-2xl font-black text-white">Nama Cabang</h4>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <div class="text-[10px] uppercase font-bold tracking-widest text-dark-500 mb-1">ID Cabang</div>
+                    <div id="modal-branch-id" class="text-sm font-semibold text-white">BR-001</div>
+                </div>
+                <div>
+                    <div class="text-[10px] uppercase font-bold tracking-widest text-dark-500 mb-1">Telepon</div>
+                    <div id="modal-branch-phone" class="text-sm font-semibold text-white">-</div>
+                </div>
+            </div>
+
+            <div>
+                <div class="text-[10px] uppercase font-bold tracking-widest text-dark-500 mb-1">Alamat Lengkap</div>
+                <p id="modal-branch-address" class="text-sm text-dark-300 leading-relaxed font-medium">Alamat</p>
+            </div>
+
+            <!-- PJ Admin Info -->
+            <div class="bg-dark-950/40 border border-dark-800 rounded-2xl p-4">
+                <div class="text-[10px] uppercase font-bold tracking-widest text-brand-500 mb-2">Penanggung Jawab (PJ)</div>
+                <div class="space-y-2">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-dark-400">Nama Admin:</span>
+                        <span id="modal-branch-admin-name" class="text-white font-bold">-</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-dark-400">Username:</span>
+                        <span id="modal-branch-admin-username" class="text-dark-300 font-mono">-</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-dark-400">Email:</span>
+                        <span id="modal-branch-admin-email" class="text-dark-300 font-mono">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-3 gap-3">
+                <div class="bg-dark-950/40 border border-dark-800 rounded-xl p-3 text-center">
+                    <div class="text-xs text-dark-500 font-semibold mb-1">Karyawan</div>
+                    <div id="modal-branch-users-count" class="text-lg font-black text-white">0</div>
+                </div>
+                <div class="bg-dark-950/40 border border-dark-800 rounded-xl p-3 text-center">
+                    <div class="text-xs text-dark-500 font-semibold mb-1">Pesanan</div>
+                    <div id="modal-branch-orders-count" class="text-lg font-black text-white">0</div>
+                </div>
+                <div class="bg-dark-950/40 border border-dark-800 rounded-xl p-3 text-center">
+                    <div class="text-xs text-dark-500 font-semibold mb-1">Total Omset</div>
+                    <div id="modal-branch-revenue" class="text-lg font-black text-brand-400">Rp 0</div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -306,6 +391,53 @@
                     }
                 }
             }
+        }
+    });
+
+    // Modal Detail Cabang Controller
+    document.addEventListener('DOMContentLoaded', () => {
+        const modal = document.getElementById('branch-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        
+        const mName = document.getElementById('modal-branch-name');
+        const mId = document.getElementById('modal-branch-id');
+        const mPhone = document.getElementById('modal-branch-phone');
+        const mAddress = document.getElementById('modal-branch-address');
+        const mAdminName = document.getElementById('modal-branch-admin-name');
+        const mAdminUsername = document.getElementById('modal-branch-admin-username');
+        const mAdminEmail = document.getElementById('modal-branch-admin-email');
+        const mUsersCount = document.getElementById('modal-branch-users-count');
+        const mOrdersCount = document.getElementById('modal-branch-orders-count');
+        const mRevenue = document.getElementById('modal-branch-revenue');
+
+        document.querySelectorAll('.show-branch-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                mName.textContent = btn.dataset.name;
+                mId.textContent = btn.dataset.id;
+                mPhone.textContent = btn.dataset.phone;
+                mAddress.textContent = btn.dataset.address;
+                mAdminName.textContent = btn.dataset.adminName;
+                mAdminUsername.textContent = btn.dataset.adminUsername;
+                mAdminEmail.textContent = btn.dataset.adminEmail;
+                mUsersCount.textContent = btn.dataset.usersCount;
+                mOrdersCount.textContent = btn.dataset.ordersCount;
+                mRevenue.textContent = btn.dataset.revenue;
+
+                modal.classList.remove('hidden');
+            });
+        });
+
+        const closeModal = () => {
+            modal.classList.add('hidden');
+        };
+
+        if (closeModalBtn) {
+            closeModalBtn.addEventListener('click', closeModal);
+        }
+        if (modal) {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
         }
     });
 </script>
