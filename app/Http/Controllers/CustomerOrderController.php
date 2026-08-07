@@ -14,11 +14,19 @@ class CustomerOrderController extends Controller
 {
     public function index(Request $request)
     {
+<<<<<<< HEAD
         $branches        = Branch::all();
         $selectedBranch  = null;
         $selectedTable   = null;
         $menus           = collect();
         $tables          = collect();
+=======
+        $branches = Branch::all();
+        $selectedBranch = null;
+        $menus = collect();
+        $tables = collect();
+        $selectedTable = null;
+>>>>>>> a471717247185442b2b06268d4e157d25322f3c7
 
         // Support Table & Branch detection via URL parameters (e.g. ?branch_id=1&table=01 or ?branch_id=1&table=Table%201 or token)
         if ($request->filled('branch_id')) {
@@ -28,6 +36,7 @@ class CustomerOrderController extends Controller
         if ($request->filled('table')) {
             $tableQuery = Table::query();
             if ($selectedBranch) {
+<<<<<<< HEAD
                 $tableQuery->where('branch_id', $selectedBranch->id);
             }
             
@@ -42,6 +51,24 @@ class CustomerOrderController extends Controller
 
             if ($selectedTable && !$selectedBranch) {
                 $selectedBranch = $selectedTable->branch;
+=======
+                $menus = Menu::where('branch_id', $selectedBranch->id)
+                    ->where('status', 'available')
+                    ->with('category')
+                    ->get();
+                $tables = Table::where('branch_id', $selectedBranch->id)->get();
+
+                if ($request->filled('table')) {
+                    $tableNum = $request->table;
+                    $selectedTable = Table::where('branch_id', $selectedBranch->id)
+                        ->where(function($query) use ($tableNum) {
+                            $query->where('table_number', $tableNum)
+                                  ->orWhere('table_number', 'Table ' . $tableNum)
+                                  ->orWhere('table_number', 'Meja ' . $tableNum)
+                                  ->orWhere('table_number', ltrim($tableNum, '0'));
+                        })->first();
+                }
+>>>>>>> a471717247185442b2b06268d4e157d25322f3c7
             }
         }
 
@@ -53,6 +80,7 @@ class CustomerOrderController extends Controller
             $tables = Table::where('branch_id', $selectedBranch->id)->get();
         }
 
+<<<<<<< HEAD
         // Get past orders for this customer (if logged in)
         $myOrders = collect();
         if (auth()->check()) {
@@ -65,6 +93,9 @@ class CustomerOrderController extends Controller
         return view('customer.order', compact(
             'branches', 'selectedBranch', 'selectedTable', 'menus', 'tables', 'myOrders'
         ));
+=======
+        return view('customer.order', compact('branches', 'selectedBranch', 'menus', 'tables', 'myOrders', 'selectedTable'));
+>>>>>>> a471717247185442b2b06268d4e157d25322f3c7
     }
 
     public function store(Request $request)

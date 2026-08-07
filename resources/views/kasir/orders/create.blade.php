@@ -54,22 +54,22 @@
 
             <div class="space-y-4 mb-4 flex-shrink-0">
                 <div>
-                    <label for="customer_name" class="block text-dark-300 text-xs font-medium mb-1">Nama Pelanggan</label>
+                    <label for="customer_name" class="block text-dark-300 text-xs font-semibold uppercase tracking-wider mb-2">Nama Pelanggan</label>
                     <input type="text" name="customer_name" id="customer_name" required
-                        class="w-full bg-dark-900 border border-dark-600 text-white rounded-xl px-3 py-2 text-sm focus:border-brand-500 focus:outline-none transition-all" placeholder="Nama pemesan">
+                        class="w-full bg-dark-900 border border-dark-600 text-white rounded-xl px-4 py-3 text-base focus:border-brand-500 focus:outline-none transition-all" placeholder="Nama pemesan">
                 </div>
                 <div>
-                    <label class="block text-dark-300 text-xs font-medium mb-2">Pilih Meja</label>
+                    <label class="block text-dark-300 text-xs font-semibold uppercase tracking-wider mb-2">Pilih Meja</label>
                     <input type="hidden" name="table_id" id="selected_table_id" required>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-h-[180px] overflow-y-auto pr-1 scrollbar-thin">
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-h-[220px] overflow-y-auto pr-1 scrollbar-thin">
                         @foreach($tables ?? [] as $table)
-                            <div class="table-box p-3 rounded-xl border text-center transition-all cursor-pointer 
+                            <div class="table-box py-4 px-3 rounded-xl border text-center transition-all cursor-pointer 
                                 {{ $table->status == 'empty' ? 'border-green-500/30 bg-green-500/5 hover:bg-green-500/10 text-green-400' : 'border-red-500/20 bg-dark-900/60 opacity-55 text-dark-500 cursor-not-allowed' }}"
                                 data-id="{{ $table->id }}"
                                 data-status="{{ $table->status }}"
                                 onclick="selectTable(this)">
-                                <p class="font-bold text-sm">Meja {{ $table->table_number }}</p>
-                                <span class="text-[9px] block mt-1 uppercase font-semibold">
+                                <p class="font-extrabold text-base">Meja {{ str_replace('Table ', '', $table->table_number) }}</p>
+                                <span class="text-xs block mt-1 uppercase font-bold">
                                     {{ $table->status == 'empty' ? 'Kosong' : 'Terisi' }}
                                 </span>
                             </div>
@@ -79,7 +79,7 @@
             </div>
 
             <!-- Cart Items -->
-            <div id="cart-container" class="flex-1 overflow-y-auto space-y-3 mb-4 pr-1 min-h-[150px]">
+            <div id="cart-container" class="flex-1 overflow-y-auto space-y-3 mb-4 pr-1 min-h-[180px]">
                 <div class="text-center text-dark-400 py-8 text-sm" id="empty-cart">
                     Belum ada item ditambahkan
                 </div>
@@ -87,14 +87,14 @@
 
             <!-- Total & Submit -->
             <div class="mt-auto border-t border-dark-700 pt-4 flex-shrink-0 space-y-4">
-                <div class="flex justify-between items-center text-lg">
-                    <span class="text-dark-200 font-medium">Total:</span>
-                    <span class="text-brand-400 font-bold" id="cart-total">Rp 0</span>
+                <div class="flex justify-between items-center text-xl font-bold">
+                    <span class="text-dark-200">Total:</span>
+                    <span class="text-brand-400 font-black text-2xl" id="cart-total">Rp 0</span>
                 </div>
                 
                 <div id="hidden-inputs"></div>
 
-                <button type="submit" id="submit-btn" disabled class="w-full bg-brand-500 hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition-all shadow-lg shadow-brand-500/20">
+                <button type="submit" id="submit-btn" disabled class="w-full bg-brand-500 hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-4 text-base rounded-xl transition-all shadow-lg shadow-brand-500/20">
                     Bayar & Kirim Pesanan
                 </button>
             </div>
@@ -161,22 +161,22 @@
             total += subtotal;
 
             container.innerHTML += `
-                <div class="bg-dark-900 border border-dark-700 p-3 rounded-xl flex flex-col gap-2">
+                <div class="bg-dark-900 border border-dark-700 p-4 rounded-xl flex flex-col gap-3">
                     <div class="flex justify-between items-start">
-                        <div class="font-medium text-white text-sm max-w-[150px] leading-tight">${item.name}</div>
-                        <div class="text-brand-400 font-bold text-sm">Rp ${formatRupiah(subtotal)}</div>
+                        <div class="font-bold text-white text-base flex-grow pr-2 leading-snug">${item.name}</div>
+                        <div class="text-brand-400 font-extrabold text-base whitespace-nowrap">Rp ${formatRupiah(subtotal)}</div>
                     </div>
-                    <div class="flex justify-between items-center mt-1">
-                        <div class="flex items-center space-x-2 bg-dark-800 rounded-lg p-1">
-                            <button type="button" onclick="updateQuantity(${index}, -1)" class="w-6 h-6 flex items-center justify-center text-dark-300 hover:text-white bg-dark-700 rounded">-</button>
-                            <span class="text-white text-xs w-4 text-center font-bold">${item.qty}</span>
-                            <button type="button" onclick="updateQuantity(${index}, 1)" class="w-6 h-6 flex items-center justify-center text-dark-300 hover:text-white bg-dark-700 rounded">+</button>
+                    <div class="flex justify-between items-center mt-2">
+                        <div class="flex items-center space-x-2 bg-dark-800 rounded-lg p-1.5">
+                            <button type="button" onclick="updateQuantity(${index}, -1)" class="w-8 h-8 flex items-center justify-center text-dark-300 hover:text-white bg-dark-700 rounded-md font-extrabold text-sm">-</button>
+                            <span class="text-white text-sm w-6 text-center font-black">${item.qty}</span>
+                            <button type="button" onclick="updateQuantity(${index}, 1)" class="w-8 h-8 flex items-center justify-center text-dark-300 hover:text-white bg-dark-700 rounded-md font-extrabold text-sm">+</button>
                         </div>
-                        <button type="button" onclick="removeItem(${index})" class="text-red-400 hover:text-red-300 p-1">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        <button type="button" onclick="removeItem(${index})" class="text-red-400 hover:text-red-300 p-1.5 rounded-lg hover:bg-red-500/10 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                         </button>
                     </div>
-                    <input type="text" placeholder="Catatan (opsional)" class="w-full bg-dark-800 border-none text-white text-xs rounded-lg px-2 py-1 mt-1 focus:ring-1 focus:ring-brand-500" value="${item.notes}" onchange="updateNotes(${index}, this.value)">
+                    <input type="text" placeholder="Catatan (opsional)" class="w-full bg-dark-800 border border-dark-700/60 focus:border-brand-500 text-white text-sm rounded-lg px-3 py-2 mt-1 focus:ring-1 focus:ring-brand-500" value="${item.notes}" onchange="updateNotes(${index}, this.value)">
                 </div>
             `;
 
@@ -214,10 +214,19 @@
 
     // Form Submit verification
     document.getElementById('order-form').addEventListener('submit', function(e) {
-        if(cart.length === 0) {
+        if (cart.length === 0) {
             e.preventDefault();
             alert('Keranjang belanja masih kosong!');
+            return;
         }
+
+        const tableId = document.getElementById('selected_table_id').value;
+        if (!tableId) {
+            e.preventDefault();
+            alert('Silakan pilih meja makan terlebih dahulu!');
+            return;
+        }
+
         // Catatan values are captured via onchange before submit, but let's make sure
         cart.forEach((item, index) => {
             const notesInput = document.querySelector(`input[name="items[${index}][notes]"]`);
@@ -235,11 +244,11 @@
         
         document.querySelectorAll('.table-box').forEach(box => {
             if (box.getAttribute('data-status') === 'empty') {
-                box.className = 'table-box p-3 rounded-xl border text-center transition-all cursor-pointer border-green-500/30 bg-green-500/5 hover:bg-green-500/10 text-green-400';
+                box.className = 'table-box py-4 px-3 rounded-xl border text-center transition-all cursor-pointer border-green-500/30 bg-green-500/5 hover:bg-green-500/10 text-green-400';
             }
         });
         
-        el.className = 'table-box p-3 rounded-xl border text-center transition-all cursor-pointer border-brand-500 bg-brand-500/20 text-white ring-2 ring-brand-500/50';
+        el.className = 'table-box py-4 px-3 rounded-xl border text-center transition-all cursor-pointer border-brand-500 bg-brand-500/20 text-white ring-2 ring-brand-500/50';
         
         document.getElementById('selected_table_id').value = el.getAttribute('data-id');
     }

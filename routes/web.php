@@ -11,13 +11,16 @@ use App\Http\Controllers\AdminCabang\MenuController;
 use App\Http\Controllers\AdminCabang\CategoryController;
 use App\Http\Controllers\AdminCabang\TableController;
 use App\Http\Controllers\AdminCabang\StaffController;
+use App\Http\Controllers\AdminCabang\UserController as AdminUserController;
 use App\Http\Controllers\AdminCabang\ReportController as AdminReportController;
 use App\Http\Controllers\Kasir\OrderController;
 use App\Http\Controllers\Koki\KitchenController;
 use App\Http\Controllers\CustomerOrderController;
 
 // Landing Page
-Route::get('/', fn() => view('landing'))->name('landing');
+Route::get('/', fn() => view('landing', [
+    'branches' => \App\Models\Branch::with('tables')->get()
+]))->name('landing');
 
 // Auth Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -26,7 +29,7 @@ Route::get('/register', [AuthController::class, 'showRegister'])->name('register
 Route::post('/register', [AuthController::class, 'register'])->name('register.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
-// Customer Order / QR Scan Routes (guest or auth can browse menu & order)
+// Customer Order / QR Scan Routes
 Route::get('/order', [CustomerOrderController::class, 'index'])->name('pesan');
 Route::post('/order', [CustomerOrderController::class, 'store'])->name('pesan.store');
 
@@ -47,7 +50,9 @@ Route::prefix('admin')->middleware(['auth', 'role:admin_cabang'])->name('admin.'
     Route::post('tables/{table}/regenerate-qr', [TableController::class, 'regenerateQr'])->name('tables.regenerate-qr');
     Route::get('tables/{table}/qr', [TableController::class, 'showQr'])->name('tables.qr');
     Route::resource('staff', StaffController::class);
+    Route::resource('users', AdminUserController::class);
     Route::get('/reports', [AdminReportController::class, 'index'])->name('reports');
+    Route::get('/reports/export', [AdminReportController::class, 'export'])->name('reports.export');
 });
 
 // Kasir Routes
@@ -56,6 +61,7 @@ Route::prefix('kasir')->middleware(['auth', 'role:kasir'])->name('kasir.')->grou
     Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+    Route::get('/orders/{order}/receipt', [OrderController::class, 'receipt'])->name('orders.receipt');
     Route::patch('/orders/{order}/pay', [OrderController::class, 'pay'])->name('orders.pay');
     Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
 });

@@ -96,6 +96,15 @@ class OrderController extends Controller
         return view('kasir.orders.show', compact('order'));
     }
 
+    public function receipt(Order $order)
+    {
+        if ($order->branch_id !== auth()->user()->branch_id) {
+            abort(403);
+        }
+        $order->load(['items.menu', 'table', 'user', 'branch']);
+        return view('kasir.orders.receipt', compact('order'));
+    }
+
     public function pay(Order $order)
     {
         if ($order->branch_id !== auth()->user()->branch_id) {

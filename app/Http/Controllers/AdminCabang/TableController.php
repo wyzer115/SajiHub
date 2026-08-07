@@ -40,7 +40,7 @@ class TableController extends Controller
         }
 
         $validated = $request->validate([
-            'table_number' => 'required|string|max:50',
+            'table_number' => 'sometimes|required|string|max:50',
             'status' => 'required|in:empty,occupied',
         ]);
 

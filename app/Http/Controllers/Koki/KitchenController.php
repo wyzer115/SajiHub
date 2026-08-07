@@ -27,10 +27,10 @@ class KitchenController extends Controller
         }
 
         $validated = $request->validate([
-            'status' => 'required|in:cooking,served',
+            'order_status' => 'required|in:cooking,served',
         ]);
 
-        $order->update(['order_status' => $validated['status']]);
+        $order->update(['order_status' => $validated['order_status']]);
 
         return redirect()->back()->with('success', 'Status pesanan berhasil diperbarui.');
     }

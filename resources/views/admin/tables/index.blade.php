@@ -40,6 +40,14 @@
                 <h3 class="text-3xl font-bold text-white">{{ $table->table_number }}</h3>
             </div>
 
+            <!-- QR Code Visual -->
+            <div class="mb-4 flex flex-col items-center justify-center p-3 bg-dark-800 rounded-xl border border-dark-700/50">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ urlencode(route('order.qr', ['branch_id' => $table->branch_id, 'table' => $table->table_number])) }}" class="w-24 h-24 bg-white p-1 rounded-lg shadow-inner mb-2 animate-fade-in" alt="QR Meja {{ $table->table_number }}">
+                <a href="https://api.qrserver.com/v1/create-qr-code/?size=500x500&data={{ urlencode(route('order.qr', ['branch_id' => $table->branch_id, 'table' => $table->table_number])) }}" target="_blank" class="text-[10px] text-brand-400 hover:text-brand-300 font-bold uppercase tracking-wider flex items-center gap-1">
+                    🔍 Cetak / Buka QR
+                </a>
+            </div>
+
             <div class="bg-dark-800 rounded-xl p-3 mb-4 border border-dark-700/50 flex-1">
                 <p class="text-dark-400 text-[10px] uppercase mb-1">QR Token</p>
                 <div class="flex items-center justify-between">
@@ -58,8 +66,8 @@
                     @csrf
                     @method('PUT')
                     <input type="hidden" name="status" value="{{ $table->status == 'empty' ? 'occupied' : 'empty' }}">
-                    <button type="submit" class="w-full bg-dark-700 hover:bg-dark-600 text-dark-200 px-3 py-2 rounded-xl transition-all text-xs font-medium">
-                        Ubah Status
+                    <button type="submit" class="w-full {{ $table->status == 'empty' ? 'bg-brand-500/10 text-brand-400 hover:bg-brand-500/20' : 'bg-green-500/10 text-green-400 hover:bg-green-500/20' }} px-3 py-2 rounded-xl transition-all text-xs font-bold uppercase tracking-wider">
+                        {{ $table->status == 'empty' ? 'Set Terisi' : 'Set Kosong' }}
                     </button>
                 </form>
 
