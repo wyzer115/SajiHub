@@ -31,22 +31,19 @@ class DatabaseSeeder extends Seeder
 
         $branchesData = [
             [
-                'name' => 'SajiHUB Jakarta Selatan',
+                'name'    => 'SajiHUB Jakarta Selatan',
                 'address' => 'Jl. Kemang Raya No. 12, Jakarta Selatan',
-                'phone' => '021-7891234',
-                'city' => 'Jakarta',
+                'phone'   => '021-7891234',
             ],
             [
-                'name' => 'SajiHUB Bandung',
+                'name'    => 'SajiHUB Bandung',
                 'address' => 'Jl. Braga No. 45, Bandung',
-                'phone' => '022-4201234',
-                'city' => 'Bandung',
+                'phone'   => '022-4201234',
             ],
             [
-                'name' => 'SajiHUB Surabaya',
+                'name'    => 'SajiHUB Surabaya',
                 'address' => 'Jl. Tunjungan No. 78, Surabaya',
-                'phone' => '031-5311234',
-                'city' => 'Surabaya',
+                'phone'   => '031-5311234',
             ],
         ];
 
@@ -54,9 +51,9 @@ class DatabaseSeeder extends Seeder
 
         foreach ($branchesData as $index => $data) {
             $branch = Branch::create([
-                'name' => $data['name'],
+                'name'    => $data['name'],
                 'address' => $data['address'],
-                'phone' => $data['phone'],
+                'phone'   => $data['phone'],
             ]);
             
             if (!$firstBranch) {
@@ -64,29 +61,29 @@ class DatabaseSeeder extends Seeder
 
                 User::create([
                     'branch_id' => $branch->id,
-                    'name' => 'Admin',
-                    'email' => 'admin@sajihub.com',
-                    'username' => 'admin',
-                    'password' => Hash::make('password'),
-                    'role' => 'admin_cabang',
+                    'name'      => 'Admin Jakarta',
+                    'email'     => 'admin@sajihub.com',
+                    'username'  => 'admin',
+                    'password'  => Hash::make('password'),
+                    'role'      => 'admin_cabang',
                 ]);
 
                 User::create([
                     'branch_id' => $branch->id,
-                    'name' => 'Kasir',
-                    'email' => 'kasir@sajihub.com',
-                    'username' => 'kasir',
-                    'password' => Hash::make('password'),
-                    'role' => 'kasir',
+                    'name'      => 'Kasir Jakarta',
+                    'email'     => 'kasir@sajihub.com',
+                    'username'  => 'kasir',
+                    'password'  => Hash::make('password'),
+                    'role'      => 'kasir',
                 ]);
 
                 User::create([
                     'branch_id' => $branch->id,
-                    'name' => 'Koki',
-                    'email' => 'koki@sajihub.com',
-                    'username' => 'koki',
-                    'password' => Hash::make('password'),
-                    'role' => 'koki',
+                    'name'      => 'Koki Jakarta',
+                    'email'     => 'koki@sajihub.com',
+                    'username'  => 'koki',
+                    'password'  => Hash::make('password'),
+                    'role'      => 'koki',
                 ]);
             }
 

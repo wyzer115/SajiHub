@@ -4,10 +4,14 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboard;
 use App\Http\Controllers\SuperAdmin\BranchController;
+use App\Http\Controllers\SuperAdmin\UserController as SuperAdminUserController;
+use App\Http\Controllers\SuperAdmin\ReportController as SuperAdminReportController;
 use App\Http\Controllers\AdminCabang\DashboardController as AdminDashboard;
 use App\Http\Controllers\AdminCabang\MenuController;
 use App\Http\Controllers\AdminCabang\CategoryController;
 use App\Http\Controllers\AdminCabang\TableController;
+use App\Http\Controllers\AdminCabang\StaffController;
+use App\Http\Controllers\AdminCabang\ReportController as AdminReportController;
 use App\Http\Controllers\Kasir\OrderController;
 use App\Http\Controllers\Koki\KitchenController;
 use App\Http\Controllers\CustomerOrderController;
@@ -22,16 +26,16 @@ Route::get('/register', [AuthController::class, 'showRegister'])->name('register
 Route::post('/register', [AuthController::class, 'register'])->name('register.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
-// Customer Order Routes
-Route::middleware(['auth'])->group(function () {
-    Route::get('/pesan', [CustomerOrderController::class, 'index'])->name('pesan');
-    Route::post('/pesan', [CustomerOrderController::class, 'store'])->name('pesan.store');
-});
+// Customer Order / QR Scan Routes (guest or auth can browse menu & order)
+Route::get('/order', [CustomerOrderController::class, 'index'])->name('pesan');
+Route::post('/order', [CustomerOrderController::class, 'store'])->name('pesan.store');
 
 // Super Admin Routes
 Route::prefix('superadmin')->middleware(['auth', 'role:superadmin'])->name('superadmin.')->group(function () {
     Route::get('/dashboard', [SuperAdminDashboard::class, 'index'])->name('dashboard');
     Route::resource('branches', BranchController::class);
+    Route::resource('users', SuperAdminUserController::class);
+    Route::get('/reports', [SuperAdminReportController::class, 'index'])->name('reports');
 });
 
 // Admin Cabang Routes
@@ -41,6 +45,9 @@ Route::prefix('admin')->middleware(['auth', 'role:admin_cabang'])->name('admin.'
     Route::resource('categories', CategoryController::class)->except(['show', 'create', 'edit']);
     Route::resource('tables', TableController::class)->except(['show', 'create', 'edit']);
     Route::post('tables/{table}/regenerate-qr', [TableController::class, 'regenerateQr'])->name('tables.regenerate-qr');
+    Route::get('tables/{table}/qr', [TableController::class, 'showQr'])->name('tables.qr');
+    Route::resource('staff', StaffController::class);
+    Route::get('/reports', [AdminReportController::class, 'index'])->name('reports');
 });
 
 // Kasir Routes

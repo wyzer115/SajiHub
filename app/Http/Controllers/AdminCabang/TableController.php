@@ -70,4 +70,17 @@ class TableController extends Controller
 
         return redirect()->back()->with('success', 'Token QR Code berhasil dibuat ulang.');
     }
+
+    public function showQr(Table $table)
+    {
+        if ($table->branch_id !== auth()->user()->branch_id) {
+            abort(403);
+        }
+
+        $orderUrl = url('/order') . '?branch_id=' . $table->branch_id . '&table=' . $table->qr_code_token;
+        // Use Google Charts API for QR generation (no extra package needed)
+        $qrImageUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . urlencode($orderUrl);
+
+        return view('admin.tables.qr', compact('table', 'orderUrl', 'qrImageUrl'));
+    }
 }
