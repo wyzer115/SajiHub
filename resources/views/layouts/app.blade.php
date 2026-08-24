@@ -6,8 +6,80 @@
     <title>@yield('title', 'SajiHUB - Manajemen Kuliner Enterprise')</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    @if(session()->has('impersonator_id'))
+    <style>
+        main a, 
+        main button, 
+        main input, 
+        main select, 
+        main textarea, 
+        main [role="button"] {
+            cursor: not-allowed !important;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mainContent = document.querySelector('main');
+            if (mainContent) {
+                const interactiveSelector = 'a, button, input, select, textarea, [role="button"], [type="submit"]';
+                
+                mainContent.addEventListener('click', (e) => {
+                    const target = e.target.closest(interactiveSelector);
+                    if (target) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        showImpersonateAlert();
+                    }
+                }, true);
+
+                mainContent.addEventListener('keydown', (e) => {
+                    const target = e.target.closest('input, select, textarea');
+                    if (target) {
+                        e.preventDefault();
+                        showImpersonateAlert();
+                    }
+                }, true);
+            }
+        });
+
+        function showImpersonateAlert() {
+            let toast = document.getElementById('impersonate-toast');
+            if (toast) {
+                toast.remove();
+            }
+
+            toast = document.createElement('div');
+            toast.id = 'impersonate-toast';
+            toast.className = 'fixed top-20 right-6 z-[9999] flex items-center gap-3 bg-red-500 text-white px-5 py-3.5 rounded-xl shadow-2xl border border-red-400/20 transform translate-y-2 opacity-0 transition-all duration-300 font-medium';
+            toast.innerHTML = `
+                <svg class="w-5 h-5 flex-shrink-0 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                </svg>
+                <span>Mode Intip: Anda tidak dapat mengubah data apapun!</span>
+            `;
+
+            document.body.appendChild(toast);
+
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            });
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 3000);
+        }
+    </script>
+    @endif
 </head>
 <body class="bg-dark-950 text-dark-300 font-sans antialiased overflow-x-hidden">
+    <x-impersonate-banner />
+    <x-branch-status-banner />
 
     @php
         $user = auth()->user();
@@ -149,7 +221,7 @@
                                 @endif
                             </div>
                             <div class="w-9 h-9 rounded-full bg-dark-700 border-2 border-dark-600 flex items-center justify-center text-white font-bold shadow-sm">
-                                {{ substr($user->name, 0, 1) }}
+                                {{ $user->isSuperAdmin() ? 'S' : substr($user->name, 0, 1) }}
                             </div>
                         </button>
 

@@ -7,7 +7,7 @@
     <div class="flex flex-col sm:flex-row items-center justify-between gap-4 animate-fade-in-up">
         <div>
             <h2 class="text-lg font-semibold text-white">Daftar Staf Cabang</h2>
-            <p class="text-sm text-dark-400 mt-1">Kelola akun Kasir dan Dapur (Koki) untuk cabang tempat Anda ditugaskan.</p>
+            <p class="text-sm text-dark-400 mt-1">Kelola akun Kasir, Dapur (Koki), dan Waiter untuk cabang tempat Anda ditugaskan.</p>
         </div>
         <a href="{{ route('admin.users.create') }}" class="inline-flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white px-4 py-2.5 rounded-xl font-medium transition-colors shadow-lg shadow-brand-500/20 whitespace-nowrap">
             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
@@ -50,6 +50,10 @@
                             @elseif($staf->role == 'koki')
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-500/10 text-purple-400 border border-purple-500/20">
                                     🍳 Dapur / Kitchen
+                                </span>
+                            @elseif($staf->role == 'waiter')
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                    💁 Waiter / Pelayan
                                 </span>
                             @endif
                         </td>

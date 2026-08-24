@@ -50,10 +50,26 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
+        $loginInput = $request->input('username_or_email');
+        $isEmail = filter_var($loginInput, FILTER_VALIDATE_EMAIL);
+
+        if ($isEmail) {
+            $request->merge([
+                'email' => $loginInput,
+                'username' => explode('@', $loginInput)[0],
+            ]);
+        } else {
+            $request->merge([
+                'username' => $loginInput,
+                'email' => $loginInput . '@sajihub.local',
+            ]);
+        }
+
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'username' => 'required|string|max:255|unique:users|alpha_dash',
+            'email' => 'required|string|email|max:255|unique:users,email',
+            'username' => 'required|string|max:255|unique:users,username|alpha_dash',
+            'phone' => 'required|string|max:20',
             'password' => 'required|string|min:6|confirmed',
             'role' => 'required|string|in:member,pelanggan',
         ]);
@@ -62,6 +78,7 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'username' => $request->username,
+            'phone' => $request->phone,
             'password' => bcrypt($request->password),
             'role' => $request->role,
         ]);

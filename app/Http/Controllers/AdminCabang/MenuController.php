@@ -23,7 +23,18 @@ class MenuController extends Controller
 
     public function create()
     {
-        $categories = Category::where('branch_id', auth()->user()->branch_id)->get();
+        $branchId = auth()->user()->branch_id;
+        $categories = Category::where('branch_id', $branchId)->get();
+        if ($categories->isEmpty()) {
+            $defaultCategories = ['Makanan Utama', 'Minuman', 'Appetizer', 'Dessert'];
+            foreach ($defaultCategories as $catName) {
+                Category::create([
+                    'branch_id' => $branchId,
+                    'name' => $catName
+                ]);
+            }
+            $categories = Category::where('branch_id', $branchId)->get();
+        }
         return view('admin.menus.create', compact('categories'));
     }
 
@@ -53,7 +64,18 @@ class MenuController extends Controller
         if ($menu->branch_id !== auth()->user()->branch_id) {
             abort(403);
         }
-        $categories = Category::where('branch_id', auth()->user()->branch_id)->get();
+        $branchId = auth()->user()->branch_id;
+        $categories = Category::where('branch_id', $branchId)->get();
+        if ($categories->isEmpty()) {
+            $defaultCategories = ['Makanan Utama', 'Minuman', 'Appetizer', 'Dessert'];
+            foreach ($defaultCategories as $catName) {
+                Category::create([
+                    'branch_id' => $branchId,
+                    'name' => $catName
+                ]);
+            }
+            $categories = Category::where('branch_id', $branchId)->get();
+        }
         return view('admin.menus.edit', compact('menu', 'categories'));
     }
 

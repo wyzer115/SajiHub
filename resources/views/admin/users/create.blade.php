@@ -13,7 +13,7 @@
 <div class="bg-dark-900 rounded-2xl border border-dark-700 overflow-hidden animate-fade-in-up delay-200 shadow-sm max-w-3xl">
     <div class="p-6 border-b border-dark-700">
         <h2 class="text-lg font-semibold text-white">Akun Karyawan Baru</h2>
-        <p class="text-sm text-dark-400 mt-1">Daftarkan akun Kasir atau Dapur (Koki) untuk operasional cabang restoran Anda.</p>
+        <p class="text-sm text-dark-400 mt-1">Daftarkan akun Kasir, Dapur (Koki), atau Waiter untuk operasional cabang restoran Anda.</p>
     </div>
     
     <div class="p-6">
@@ -27,6 +27,7 @@
                     <option value="">-- Pilih Peran / Posisi --</option>
                     <option value="kasir" {{ old('role') == 'kasir' ? 'selected' : '' }}>💵 Kasir (Front Office)</option>
                     <option value="koki" {{ old('role') == 'koki' ? 'selected' : '' }}>🍳 Dapur / Kitchen (Koki)</option>
+                    <option value="waiter" {{ old('role') == 'waiter' ? 'selected' : '' }}>💁 Waiter / Pelayan</option>
                 </select>
                 @error('role')
                     <p class="mt-1.5 text-sm text-red-500">{{ $message }}</p>

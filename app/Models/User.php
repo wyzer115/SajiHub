@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['branch_id', 'name', 'email', 'username', 'password', 'role'])]
+#[Fillable(['branch_id', 'name', 'email', 'username', 'phone', 'password', 'role'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -57,5 +57,10 @@ class User extends Authenticatable
     public function isKoki(): bool
     {
         return $this->role === 'koki';
+    }
+
+    public function isWaiter(): bool
+    {
+        return $this->role === 'waiter';
     }
 }

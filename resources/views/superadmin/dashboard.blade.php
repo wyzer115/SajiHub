@@ -7,26 +7,26 @@
 <!-- Stat Cards -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
     <!-- Card 1 -->
-    <div class="bg-dark-800 border border-dark-700 rounded-2xl p-6 hover:bg-dark-800/80 hover:border-dark-600 transition-all duration-300 animate-fade-in-up delay-100 shadow-sm">
+    <div class="bg-gradient-to-br from-blue-950/40 via-dark-900 to-dark-900 border border-blue-500/25 rounded-2xl p-6 hover:border-blue-500/40 transition-all duration-300 animate-fade-in-up delay-100 shadow-lg shadow-blue-500/5">
         <div class="flex items-start justify-between">
             <div>
                 <p class="text-sm font-medium text-dark-400 mb-1">Total Cabang Aktif</p>
                 <h3 class="text-3xl font-bold text-white">{{ $totalBranches ?? 0 }} <span class="text-base font-normal text-dark-500">cabang</span></h3>
             </div>
-            <div class="p-3 bg-blue-500/10 text-blue-500 rounded-xl">
+            <div class="p-3 bg-blue-500/10 text-blue-400 rounded-xl">
                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
             </div>
         </div>
     </div>
 
     <!-- Card 2 -->
-    <div class="bg-dark-800 border border-dark-700 rounded-2xl p-6 hover:bg-dark-800/80 hover:border-dark-600 transition-all duration-300 animate-fade-in-up delay-200 shadow-sm">
+    <div class="bg-gradient-to-br from-emerald-950/40 via-dark-900 to-dark-900 border border-emerald-500/25 rounded-2xl p-6 hover:border-emerald-500/40 transition-all duration-300 animate-fade-in-up delay-200 shadow-lg shadow-emerald-500/5">
         <div class="flex items-start justify-between">
             <div>
                 <p class="text-sm font-medium text-dark-400 mb-1">Total Pendapatan</p>
                 <h3 class="text-3xl font-bold text-white">Rp {{ number_format($totalRevenue ?? 0, 0, ',', '.') }}</h3>
                 @if(isset($revenueGrowth))
-                <div class="mt-2 flex items-center text-sm {{ $revenueGrowth >= 0 ? 'text-emerald-500' : 'text-red-500' }}">
+                <div class="mt-2 flex items-center text-sm {{ $revenueGrowth >= 0 ? 'text-emerald-450' : 'text-red-450' }}">
                     <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $revenueGrowth >= 0 ? 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' : 'M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6' }}"></path>
                     </svg>
@@ -34,33 +34,33 @@
                 </div>
                 @endif
             </div>
-            <div class="p-3 bg-emerald-500/10 text-emerald-500 rounded-xl">
+            <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-xl">
                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             </div>
         </div>
     </div>
 
     <!-- Card 3 -->
-    <div class="bg-dark-800 border border-dark-700 rounded-2xl p-6 hover:bg-dark-800/80 hover:border-dark-600 transition-all duration-300 animate-fade-in-up delay-300 shadow-sm">
+    <div class="bg-gradient-to-br from-purple-950/40 via-dark-900 to-dark-900 border border-purple-500/25 rounded-2xl p-6 hover:border-purple-500/40 transition-all duration-300 animate-fade-in-up delay-300 shadow-lg shadow-purple-500/5">
         <div class="flex items-start justify-between">
             <div>
                 <p class="text-sm font-medium text-dark-400 mb-1">Total Karyawan</p>
                 <h3 class="text-3xl font-bold text-white">{{ $totalEmployees ?? 0 }} <span class="text-base font-normal text-dark-500">orang</span></h3>
             </div>
-            <div class="p-3 bg-purple-500/10 text-purple-500 rounded-xl">
+            <div class="p-3 bg-purple-500/10 text-purple-400 rounded-xl">
                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
             </div>
         </div>
     </div>
 
     <!-- Card 4 -->
-    <div class="bg-dark-800 border border-dark-700 rounded-2xl p-6 hover:bg-dark-800/80 hover:border-dark-600 transition-all duration-300 animate-fade-in-up delay-400 shadow-sm">
+    <div class="bg-gradient-to-br from-amber-950/40 via-dark-900 to-dark-900 border border-amber-500/25 rounded-2xl p-6 hover:border-amber-500/40 transition-all duration-300 animate-fade-in-up delay-400 shadow-lg shadow-amber-500/5">
         <div class="flex items-start justify-between">
             <div>
                 <p class="text-sm font-medium text-dark-400 mb-1">Total Pesanan</p>
-                <h3 class="text-3xl font-bold text-white">{{ $totalOrders ?? 0 }} <span class="text-base font-normal text-dark-500">pesanan</span></h3>
+                <h3 class="text-3xl font-bold text-white">{{ $totalOrders ?? 0 }} <span class="text-base font-normal text-dark-500">Pesanan</span></h3>
             </div>
-            <div class="p-3 bg-amber-500/10 text-amber-500 rounded-xl">
+            <div class="p-3 bg-amber-500/10 text-amber-400 rounded-xl">
                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
             </div>
         </div>
@@ -101,7 +101,6 @@
         <table class="w-full text-left border-collapse">
             <thead>
                 <tr class="bg-dark-800 border-b border-dark-700">
-                    <th class="px-6 py-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">ID Cabang</th>
                     <th class="px-6 py-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">Nama Cabang</th>
                     <th class="px-6 py-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">Lokasi</th>
                     <th class="px-6 py-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">Status</th>
@@ -113,19 +112,22 @@
             <tbody class="divide-y divide-dark-700/50">
                 @forelse($branches ?? [] as $branch)
                 <tr class="hover:bg-dark-800/50 transition-colors">
-                    <td class="px-6 py-4 text-sm font-medium text-dark-300">BR-{{ str_pad($branch->id, 3, '0', STR_PAD_LEFT) }}</td>
                     <td class="px-6 py-4">
                         <div class="text-sm font-bold text-white">{{ $branch->name }}</div>
                     </td>
                     <td class="px-6 py-4 text-sm text-dark-300 truncate max-w-[200px]">{{ $branch->address }}</td>
                     <td class="px-6 py-4">
-                        @if($branch->status == 'Buka' || true)
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                        @if($branch->status == 'buka')
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                                 Buka
                             </span>
+                        @elseif($branch->status == 'tutup')
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-500/10 text-red-400 border border-red-500/20">
+                                Tutup
+                            </span>
                         @else
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-500/10 text-blue-500 border border-blue-500/20">
-                                Stabil
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                Maintenance
                             </span>
                         @endif
                     </td>
@@ -172,7 +174,6 @@
         <table class="w-full text-left border-collapse">
             <thead>
                 <tr class="bg-dark-800 border-b border-dark-700">
-                    <th class="px-6 py-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">ID Pesanan</th>
                     <th class="px-6 py-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">Cabang</th>
                     <th class="px-6 py-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">Pelanggan</th>
                     <th class="px-6 py-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">Total</th>
@@ -184,7 +185,6 @@
             <tbody class="divide-y divide-dark-700/50">
                 @forelse($recentOrders ?? [] as $order)
                 <tr class="hover:bg-dark-800/50 transition-colors">
-                    <td class="px-6 py-4 text-sm font-medium text-white">#{{ $order->id }}</td>
                     <td class="px-6 py-4 text-sm text-dark-300">{{ $order->branch->name ?? '-' }}</td>
                     <td class="px-6 py-4 text-sm text-dark-300">{{ $order->customer_name }}</td>
                     <td class="px-6 py-4 text-sm font-medium text-white">Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>
@@ -306,11 +306,16 @@
             datasets: [{
                 label: 'Omzet Bulanan (Rp)',
                 data: {!! json_encode($monthlyValues ?? []) !!},
-                borderColor: '#e85824',
-                backgroundColor: 'rgba(232, 88, 36, 0.1)',
+                borderColor: '#14b8a6',
+                backgroundColor: 'rgba(20, 184, 166, 0.1)',
                 borderWidth: 3,
                 fill: true,
-                tension: 0.3
+                tension: 0.4,
+                pointBackgroundColor: '#14b8a6',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 5,
+                pointHoverRadius: 7
             }]
         },
         options: {
@@ -324,10 +329,10 @@
             scales: {
                 y: {
                     grid: {
-                        color: '#282b30'
+                        color: '#1e293b'
                     },
                     ticks: {
-                        color: '#72767d',
+                        color: '#94a3b8',
                         callback: function(value) {
                             return 'Rp ' + value.toLocaleString('id-ID');
                         }
@@ -338,7 +343,7 @@
                         display: false
                     },
                     ticks: {
-                        color: '#72767d'
+                        color: '#94a3b8'
                     }
                 }
             }
@@ -357,9 +362,14 @@
             datasets: [{
                 label: 'Total Pendapatan (Rp)',
                 data: branchTotals,
-                backgroundColor: '#3b82f6',
-                borderRadius: 8,
-                maxBarThickness: 40
+                backgroundColor: function(context) {
+                    // Highlights 'SajiHUB Jakarta Selatan' with blue color, others gray
+                    const label = context.chart.data.labels[context.dataIndex];
+                    return label && label.includes('Jakarta Selatan') ? '#3b82f6' : '#475569';
+                },
+                borderRadius: 12,
+                borderSkipped: false,
+                maxBarThickness: 32
             }]
         },
         options: {
@@ -373,10 +383,10 @@
             scales: {
                 y: {
                     grid: {
-                        color: '#282b30'
+                        color: '#1e293b'
                     },
                     ticks: {
-                        color: '#72767d',
+                        color: '#94a3b8',
                         callback: function(value) {
                             return 'Rp ' + value.toLocaleString('id-ID');
                         }
@@ -387,7 +397,7 @@
                         display: false
                     },
                     ticks: {
-                        color: '#72767d'
+                        color: '#94a3b8'
                     }
                 }
             }

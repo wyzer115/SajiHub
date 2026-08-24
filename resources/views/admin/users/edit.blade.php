@@ -27,6 +27,7 @@
                     class="block w-full px-4 py-3 bg-dark-800 border border-dark-600 rounded-xl text-white focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/50 transition-colors shadow-inner">
                     <option value="kasir" {{ old('role', $user->role) == 'kasir' ? 'selected' : '' }}>💵 Kasir (Front Office)</option>
                     <option value="koki" {{ old('role', $user->role) == 'koki' ? 'selected' : '' }}>🍳 Dapur / Kitchen (Koki)</option>
+                    <option value="waiter" {{ old('role', $user->role) == 'waiter' ? 'selected' : '' }}>💁 Waiter / Pelayan</option>
                 </select>
                 @error('role')
                     <p class="mt-1.5 text-sm text-red-500">{{ $message }}</p>

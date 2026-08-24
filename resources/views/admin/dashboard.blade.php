@@ -79,7 +79,6 @@
                 <table class="w-full text-left">
                     <thead class="bg-dark-800 text-dark-400 text-xs uppercase tracking-wider">
                         <tr>
-                            <th class="px-6 py-4 font-medium">ID</th>
                             <th class="px-6 py-4 font-medium">Pelanggan</th>
                             <th class="px-6 py-4 font-medium">Meja</th>
                             <th class="px-6 py-4 font-medium">Total</th>
@@ -91,7 +90,6 @@
                     <tbody class="divide-y divide-dark-700/50">
                         @forelse($recentOrders ?? [] as $order)
                         <tr class="hover:bg-dark-800/50 transition-colors">
-                            <td class="px-6 py-4 text-white font-medium">#{{ $order->id }}</td>
                             <td class="px-6 py-4 text-dark-300">{{ $order->customer_name }}</td>
                             <td class="px-6 py-4 text-dark-300">{{ $order->table->table_number ?? '-' }}</td>
                             <td class="px-6 py-4 text-white font-medium">Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>
@@ -117,7 +115,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-12 text-center text-dark-400">Belum ada pesanan terbaru</td>
+                            <td colspan="6" class="px-6 py-12 text-center text-dark-400">Belum ada pesanan terbaru</td>
                         </tr>
                         @endforelse
                     </tbody>

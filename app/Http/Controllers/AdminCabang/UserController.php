@@ -14,7 +14,7 @@ class UserController extends Controller
     {
         $branchId = auth()->user()->branch_id;
         $users = User::where('branch_id', $branchId)
-            ->whereIn('role', ['kasir', 'koki'])
+            ->whereIn('role', ['kasir', 'koki', 'waiter'])
             ->get();
             
         return view('admin.users.index', compact('users'));
@@ -32,7 +32,7 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email',
             'username' => 'required|string|max:255|unique:users,username|alpha_dash',
             'password' => 'required|string|min:6',
-            'role' => 'required|string|in:kasir,koki',
+            'role' => 'required|string|in:kasir,koki,waiter',
         ]);
 
         $validated['branch_id'] = auth()->user()->branch_id;
@@ -45,7 +45,7 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        if ($user->branch_id !== auth()->user()->branch_id || !in_array($user->role, ['kasir', 'koki'])) {
+        if ($user->branch_id !== auth()->user()->branch_id || !in_array($user->role, ['kasir', 'koki', 'waiter'])) {
             abort(403);
         }
         return view('admin.users.edit', compact('user'));
@@ -53,7 +53,7 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
-        if ($user->branch_id !== auth()->user()->branch_id || !in_array($user->role, ['kasir', 'koki'])) {
+        if ($user->branch_id !== auth()->user()->branch_id || !in_array($user->role, ['kasir', 'koki', 'waiter'])) {
             abort(403);
         }
 
@@ -74,7 +74,7 @@ class UserController extends Controller
                 Rule::unique('users')->ignore($user->id),
             ],
             'password' => 'nullable|string|min:6',
-            'role' => 'required|string|in:kasir,koki',
+            'role' => 'required|string|in:kasir,koki,waiter',
         ]);
 
         if (!empty($validated['password'])) {
@@ -90,7 +90,7 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
-        if ($user->branch_id !== auth()->user()->branch_id || !in_array($user->role, ['kasir', 'koki'])) {
+        if ($user->branch_id !== auth()->user()->branch_id || !in_array($user->role, ['kasir', 'koki', 'waiter'])) {
             abort(403);
         }
 

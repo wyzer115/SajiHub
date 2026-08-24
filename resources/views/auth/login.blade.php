@@ -70,6 +70,13 @@
                     </button>
                 </div>
             </form>
+            
+            <div class="mt-6 text-center">
+                <p class="text-sm text-dark-400">
+                    Belum punya akun? 
+                    <a href="{{ route('register') }}" class="text-brand-500 hover:text-brand-400 font-bold underline underline-offset-4 ml-1">Daftar di sini</a>
+                </p>
+            </div>
         </div>
         
         <div class="text-center mt-8 text-sm text-dark-500">

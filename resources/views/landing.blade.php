@@ -20,6 +20,12 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+        .custom-option-label input:checked + .option-span {
+            border-color: var(--color-brand-500, #f97316);
+            background-color: rgba(249, 115, 22, 0.15);
+            color: #ffffff;
+            box-shadow: 0 0 12px rgba(249, 115, 22, 0.2);
+        }
     </style>
 </head>
 <body class="antialiased overflow-x-hidden bg-dark-950 text-dark-300">
@@ -55,7 +61,7 @@
                         </div>
                     @else
                         <a href="{{ route('login') }}" class="px-6 py-3 rounded-xl text-xs sm:text-[13.5px] font-black text-white bg-brand-500 hover:bg-brand-600 transition-all shadow-md hover:shadow-brand-500/20 hover:scale-105 transform">
-                            MASUK PORTAL
+                            MASUK AKUN
                         </a>
                     @endauth
                 </div>
@@ -82,7 +88,7 @@
         <div class="w-full px-4 sm:px-8 lg:px-12 pb-8 pt-20 relative z-20">
             <div class="w-full max-w-none drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)]">
                 <h1 class="font-black text-white tracking-tight uppercase mb-4" style="line-height: 0.85;">
-                    <span id="hero-heading-1" class="block whitespace-nowrap animate-fade-in-up transition-all duration-300" style="font-size: clamp(2.5rem, 6vw, 5.5rem);">LOKASI</span>
+                    <span id="hero-heading-1" class="block whitespace-nowrap animate-fade-in-up transition-all duration-300" style="font-size: clamp(2.5rem, 6vw, 5.5rem);"></span>
                     <span id="hero-heading-2" class="block whitespace-nowrap animate-fade-in-up delay-100 transition-all duration-300" style="font-size: clamp(3.2rem, 8vw, 7.2rem);">SAJIHUB RESTO</span>
                 </h1>
                 <!-- Two-line description matching reference photo, enlarged and bolded -->
@@ -121,7 +127,11 @@
                 @endphp
 
                 @foreach($menuFavorites as $menu)
-                    <div class="w-[85%] sm:w-[45%] md:w-[30%] lg:w-[23.5%] flex-shrink-0 bg-dark-900 border border-dark-800 rounded-2xl p-4 hover:border-brand-500/20 hover:scale-[1.02] transition-all flex flex-col justify-between group snap-start">
+                    <div class="menu-card cursor-pointer w-[85%] sm:w-[45%] md:w-[30%] lg:w-[23.5%] flex-shrink-0 bg-dark-900 border border-dark-800 rounded-2xl p-4 hover:border-brand-500/20 hover:scale-[1.02] transition-all flex flex-col justify-between group snap-start"
+                         data-name="{{ $menu['name'] }}"
+                         data-price="{{ $menu['price'] }}"
+                         data-category="{{ $menu['category'] }}"
+                         data-image="{{ asset('images/landing/' . $menu['image']) }}">
                         <!-- Image Container -->
                         <div class="aspect-square rounded-xl border border-dark-800 bg-dark-950 flex items-center justify-center relative overflow-hidden group-hover:border-brand-500 transition-colors mb-4">
                             <img src="{{ asset('images/landing/' . $menu['image']) }}" alt="{{ $menu['name'] }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
@@ -135,9 +145,9 @@
 
                             <!-- "LIHAT MENU" Button Overlay -->
                             <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10">
-                                <a href="#simulator" class="px-4 py-2 bg-brand-500 text-white text-[10px] font-bold uppercase rounded-lg shadow-md hover:scale-105 transform transition-transform">
+                                <button type="button" class="px-4 py-2 bg-brand-500 text-white text-[10px] font-bold uppercase rounded-lg shadow-md hover:scale-105 transform transition-transform cursor-pointer">
                                     LIHAT MENU
-                                </a>
+                                </button>
                             </div>
                         </div>
 
@@ -242,11 +252,59 @@
 
             {{-- Bottom info: copyright (PT. DAVIN GALUH PARTNER) --}}
             <div class="pt-8 text-center space-y-3">
-                <div class="font-bold text-base sm:text-lg text-white tracking-widest uppercase">PT. DAVIN GALUH PARTNER</div>
+                <div class="font-bold text-base sm:text-lg text-white tracking-widest uppercase"></div>
                 <p class="text-xs sm:text-sm text-dark-500 font-medium">Privacy Policy &copy; {{ date('Y') }} SajiHUB Restaurant Systems. Seluruh Hak Cipta Dilindungi.</p>
             </div>
         </div>
     </footer>
+
+    <!-- Menu Detail Modal -->
+    <div id="menu-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300">
+        <!-- Modal Box -->
+        <div id="menu-modal-box" class="w-full max-w-4xl bg-dark-900 border border-dark-800 rounded-3xl overflow-hidden shadow-2xl transform scale-95 opacity-0 transition-all duration-300 flex flex-col md:flex-row max-h-[90vh] md:max-h-[85vh]">
+            <!-- Left: Image Section -->
+            <div class="relative w-full md:w-1/2 h-48 md:h-auto bg-dark-950 flex items-center justify-center overflow-hidden">
+                <img id="modal-item-image" src="" alt="" class="w-full h-full object-cover">
+                <span id="modal-item-category" class="absolute top-4 left-4 inline-flex items-center px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-dark-950/90 text-brand-400 border border-dark-800 backdrop-blur-sm"></span>
+            </div>
+
+            <!-- Right: Detail & Customization Section -->
+            <div class="w-full md:w-1/2 p-6 sm:p-8 flex flex-col justify-between overflow-y-auto max-h-[50vh] md:max-h-none">
+                <div>
+                    <!-- Header -->
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 id="modal-item-name" class="text-xl sm:text-2xl font-black text-white uppercase tracking-tight leading-tight"></h3>
+                            <p id="modal-item-base-price" class="text-sm text-dark-400 font-bold mt-1"></p>
+                        </div>
+                        <button id="close-modal-btn" class="text-dark-400 hover:text-white bg-dark-950 hover:bg-dark-800 p-2 rounded-full border border-dark-800 transition-colors cursor-pointer">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+
+                    <!-- Description -->
+                    <p id="modal-item-desc" class="text-xs sm:text-sm text-dark-300 leading-relaxed mb-6 border-b border-dark-800 pb-4"></p>
+
+                    <!-- Dynamic Customizations -->
+                    <div id="modal-customizations" class="space-y-5">
+                        <!-- Customization options will be injected here by JS -->
+                    </div>
+                </div>
+
+                <!-- Footer / Actions -->
+                <div class="mt-8 pt-4 border-t border-dark-800 flex items-center justify-between gap-4">
+                    <div>
+                        <span class="block text-[10px] font-extrabold uppercase text-dark-400 tracking-wider">Total Harga</span>
+                        <span id="modal-total-price" class="text-lg sm:text-xl font-black text-brand-500"></span>
+                    </div>
+                    <a href="{{ route('pesan') }}" class="px-6 py-3.5 bg-brand-500 hover:bg-brand-600 text-white text-xs sm:text-sm font-black uppercase tracking-wider rounded-xl shadow-lg shadow-brand-500/20 hover:scale-[1.03] transition-all flex items-center gap-2">
+                        Pesan Sekarang
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         // Interactive Hero Banner Slider
@@ -374,6 +432,288 @@
         window.addEventListener('scroll', activateScrollSpy);
         // Run immediately on page load
         activateScrollSpy();
+
+        // Modal & Customization JavaScript
+        const menuDescriptions = {
+            'NASI GORENG SPESIAL': {
+                desc: 'Nasi goreng aromatik khas SajiHUB yang dimasak dengan bumbu racikan rahasia, disajikan lengkap dengan telur mata sapi, ayam suwir, acar segar, dan kerupuk renyah.',
+                customType: 'food'
+            },
+            'MIE GORENG SEAFOOD': {
+                desc: 'Mie telur kenyal digoreng dengan kecap manis premium dan bumbu rempah pilihan, dilengkapi udang segar, bakso ikan, cumi-cumi, tauge, dan sayuran segar.',
+                customType: 'food'
+            },
+            'AYAM BAKAR MADU': {
+                desc: 'Ayam pilihan yang diungkep dengan bumbu rempah tradisional lalu dibakar dengan olesan madu murni hingga terkaramelisasi sempurna. Disajikan dengan sambal terasi pedas manis.',
+                customType: 'food'
+            },
+            'ES TEH MANIS': {
+                desc: 'Minuman penyegar tenggorokan klasik dari seduhan teh melati pilihan yang harum, disajikan dingin dengan tingkat kemanisan yang pas.',
+                customType: 'drink'
+            },
+            'JUS ALPUKAT': {
+                desc: 'Jus alpukat mentega segar bertekstur kental yang diblender halus, dipadukan dengan susu kental manis cokelat premium di sekeliling gelas.',
+                customType: 'drink'
+            },
+            'ES CAMPUR': {
+                desc: 'Sajian penutup dingin nan manis berisikan campuran buah nangka, kelapa muda, kolang-kaling, cincau hitam, jelly, sirup cocopandan, dan susu kental manis.',
+                customType: 'dessert'
+            }
+        };
+
+        const menuModal = document.getElementById('menu-modal');
+        const menuModalBox = document.getElementById('menu-modal-box');
+        const modalImage = document.getElementById('modal-item-image');
+        const modalCategory = document.getElementById('modal-item-category');
+        const modalName = document.getElementById('modal-item-name');
+        const modalBasePrice = document.getElementById('modal-item-base-price');
+        const modalDesc = document.getElementById('modal-item-desc');
+        const modalCustomizations = document.getElementById('modal-customizations');
+        const modalTotalPrice = document.getElementById('modal-total-price');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+
+        let basePrice = 0;
+        let totalPrice = 0;
+
+        function generateCustomizations(type) {
+            let html = '';
+            if (type === 'food') {
+                html += `
+                    <div>
+                        <h4 class="text-xs font-black uppercase text-white tracking-wider mb-2.5">Level Kepedasan</h4>
+                        <div class="grid grid-cols-4 gap-2">
+                            <label class="custom-option-label">
+                                <input type="radio" name="spicy_level" value="0" checked class="sr-only">
+                                <span class="option-span text-[11px] font-bold text-center block py-2 rounded-lg border border-dark-800 bg-dark-950 text-dark-400 cursor-pointer select-none">Lvl 0</span>
+                            </label>
+                            <label class="custom-option-label">
+                                <input type="radio" name="spicy_level" value="1" class="sr-only">
+                                <span class="option-span text-[11px] font-bold text-center block py-2 rounded-lg border border-dark-800 bg-dark-950 text-dark-400 cursor-pointer select-none">Lvl 1</span>
+                            </label>
+                            <label class="custom-option-label">
+                                <input type="radio" name="spicy_level" value="2" class="sr-only">
+                                <span class="option-span text-[11px] font-bold text-center block py-2 rounded-lg border border-dark-800 bg-dark-950 text-dark-400 cursor-pointer select-none">Lvl 2</span>
+                            </label>
+                            <label class="custom-option-label">
+                                <input type="radio" name="spicy_level" value="3" class="sr-only">
+                                <span class="option-span text-[11px] font-bold text-center block py-2 rounded-lg border border-dark-800 bg-dark-950 text-dark-400 cursor-pointer select-none">Lvl 3 🔥</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-xs font-black uppercase text-white tracking-wider mb-2.5">Pilihan Topping</h4>
+                        <div class="space-y-2">
+                            <label class="flex items-center justify-between p-3 rounded-xl border border-dark-800 bg-dark-950 hover:border-dark-700 transition-colors cursor-pointer select-none">
+                                <div class="flex items-center gap-3">
+                                    <input type="checkbox" name="topping" value="telur" data-price="5000" class="w-4 h-4 accent-brand-500 rounded border-dark-800 bg-dark-900">
+                                    <span class="text-xs sm:text-sm font-bold text-white">Ekstra Telur Ceplok</span>
+                                </div>
+                                <span class="text-xs font-extrabold text-brand-500">+Rp 5.000</span>
+                            </label>
+                            <label class="flex items-center justify-between p-3 rounded-xl border border-dark-800 bg-dark-950 hover:border-dark-700 transition-colors cursor-pointer select-none">
+                                <div class="flex items-center gap-3">
+                                    <input type="checkbox" name="topping" value="sosis" data-price="4000" class="w-4 h-4 accent-brand-500 rounded border-dark-800 bg-dark-900">
+                                    <span class="text-xs sm:text-sm font-bold text-white">Sosis Sapi</span>
+                                </div>
+                                <span class="text-xs font-extrabold text-brand-500">+Rp 4.000</span>
+                            </label>
+                            <label class="flex items-center justify-between p-3 rounded-xl border border-dark-800 bg-dark-950 hover:border-dark-700 transition-colors cursor-pointer select-none">
+                                <div class="flex items-center gap-3">
+                                    <input type="checkbox" name="topping" value="bakso" data-price="4000" class="w-4 h-4 accent-brand-500 rounded border-dark-800 bg-dark-900">
+                                    <span class="text-xs sm:text-sm font-bold text-white">Bakso Sapi Slice</span>
+                                </div>
+                                <span class="text-xs font-extrabold text-brand-500">+Rp 4.000</span>
+                            </label>
+                        </div>
+                    </div>
+                `;
+            } else if (type === 'drink') {
+                html += `
+                    <div>
+                        <h4 class="text-xs font-black uppercase text-white tracking-wider mb-2.5">Tingkat Es</h4>
+                        <div class="grid grid-cols-3 gap-2">
+                            <label class="custom-option-label">
+                                <input type="radio" name="ice_level" value="normal" checked class="sr-only">
+                                <span class="option-span text-[11px] font-bold text-center block py-2 rounded-lg border border-dark-800 bg-dark-950 text-dark-400 cursor-pointer select-none">Normal Ice</span>
+                            </label>
+                            <label class="custom-option-label">
+                                <input type="radio" name="ice_level" value="less" class="sr-only">
+                                <span class="option-span text-[11px] font-bold text-center block py-2 rounded-lg border border-dark-800 bg-dark-950 text-dark-400 cursor-pointer select-none">Less Ice</span>
+                            </label>
+                            <label class="custom-option-label">
+                                <input type="radio" name="ice_level" value="none" class="sr-only">
+                                <span class="option-span text-[11px] font-bold text-center block py-2 rounded-lg border border-dark-800 bg-dark-950 text-dark-400 cursor-pointer select-none">No Ice</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 class="text-xs font-black uppercase text-white tracking-wider mb-2.5">Kemanisan</h4>
+                        <div class="grid grid-cols-3 gap-2">
+                            <label class="custom-option-label">
+                                <input type="radio" name="sugar_level" value="normal" checked class="sr-only">
+                                <span class="option-span text-[11px] font-bold text-center block py-2 rounded-lg border border-dark-800 bg-dark-950 text-dark-400 cursor-pointer select-none">Normal Sugar</span>
+                            </label>
+                            <label class="custom-option-label">
+                                <input type="radio" name="sugar_level" value="less" class="sr-only">
+                                <span class="option-span text-[11px] font-bold text-center block py-2 rounded-lg border border-dark-800 bg-dark-950 text-dark-400 cursor-pointer select-none">Less Sugar</span>
+                            </label>
+                            <label class="custom-option-label">
+                                <input type="radio" name="sugar_level" value="extra" class="sr-only">
+                                <span class="option-span text-[11px] font-bold text-center block py-2 rounded-lg border border-dark-800 bg-dark-950 text-dark-400 cursor-pointer select-none">Extra Sugar</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-xs font-black uppercase text-white tracking-wider mb-2.5">Ekstra Tambahan</h4>
+                        <div class="space-y-2">
+                            <label class="flex items-center justify-between p-3 rounded-xl border border-dark-800 bg-dark-950 hover:border-dark-700 transition-colors cursor-pointer select-none">
+                                <div class="flex items-center gap-3">
+                                    <input type="checkbox" name="drink_addon" value="cincau" data-price="3000" class="w-4 h-4 accent-brand-500 rounded border-dark-800 bg-dark-900">
+                                    <span class="text-xs sm:text-sm font-bold text-white">Ekstra Cincau</span>
+                                </div>
+                                <span class="text-xs font-extrabold text-brand-500">+Rp 3.000</span>
+                            </label>
+                            <label class="flex items-center justify-between p-3 rounded-xl border border-dark-800 bg-dark-950 hover:border-dark-700 transition-colors cursor-pointer select-none">
+                                <div class="flex items-center gap-3">
+                                    <input type="checkbox" name="drink_addon" value="jelly" data-price="3000" class="w-4 h-4 accent-brand-500 rounded border-dark-800 bg-dark-900">
+                                    <span class="text-xs sm:text-sm font-bold text-white">Ekstra Jelly</span>
+                                </div>
+                                <span class="text-xs font-extrabold text-brand-500">+Rp 3.000</span>
+                            </label>
+                        </div>
+                    </div>
+                `;
+            } else if (type === 'dessert') {
+                html += `
+                    <div>
+                        <h4 class="text-xs font-black uppercase text-white tracking-wider mb-2.5">Pilihan Porsi</h4>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="custom-option-label">
+                                <input type="radio" name="portion_size" value="regular" checked data-price="0" class="sr-only">
+                                <span class="option-span text-[11px] font-bold text-center block py-2 rounded-lg border border-dark-800 bg-dark-950 text-dark-400 cursor-pointer select-none">Porsi Biasa</span>
+                            </label>
+                            <label class="custom-option-label">
+                                <input type="radio" name="portion_size" value="sharing" data-price="10000" class="sr-only">
+                                <span class="option-span text-[11px] font-bold text-center block py-2 rounded-lg border border-dark-800 bg-dark-950 text-dark-400 cursor-pointer select-none">Sharing Size (+Rp 10.000)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 class="text-xs font-black uppercase text-white tracking-wider mb-2.5">Ekstra Topping</h4>
+                        <div class="space-y-2">
+                            <label class="flex items-center justify-between p-3 rounded-xl border border-dark-800 bg-dark-950 hover:border-dark-700 transition-colors cursor-pointer select-none">
+                                <div class="flex items-center gap-3">
+                                    <input type="checkbox" name="dessert_topping" value="icecream" data-price="5000" class="w-4 h-4 accent-brand-500 rounded border-dark-800 bg-dark-900">
+                                    <span class="text-xs sm:text-sm font-bold text-white">Ekstra Es Krim Vanila</span>
+                                </div>
+                                <span class="text-xs font-extrabold text-brand-500">+Rp 5.000</span>
+                            </label>
+                            <label class="flex items-center justify-between p-3 rounded-xl border border-dark-800 bg-dark-950 hover:border-dark-700 transition-colors cursor-pointer select-none">
+                                <div class="flex items-center gap-3">
+                                    <input type="checkbox" name="dessert_topping" value="keju" data-price="4000" class="w-4 h-4 accent-brand-500 rounded border-dark-800 bg-dark-900">
+                                    <span class="text-xs sm:text-sm font-bold text-white">Keju Parut</span>
+                                </div>
+                                <span class="text-xs font-extrabold text-brand-500">+Rp 4.000</span>
+                            </label>
+                        </div>
+                    </div>
+                `;
+            }
+            return html;
+        }
+
+        function setupCustomizationListeners() {
+            const checkboxes = modalCustomizations.querySelectorAll('input[type="checkbox"]');
+            const radios = modalCustomizations.querySelectorAll('input[type="radio"]');
+
+            function calculateTotal() {
+                let extra = 0;
+                checkboxes.forEach(cb => {
+                    if (cb.checked) {
+                        extra += parseInt(cb.dataset.price || 0);
+                    }
+                });
+                radios.forEach(r => {
+                    if (r.checked) {
+                        extra += parseInt(r.dataset.price || 0);
+                    }
+                });
+                totalPrice = basePrice + extra;
+                modalTotalPrice.textContent = `Rp ${formatRupiah(totalPrice)}`;
+            }
+
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', calculateTotal);
+            });
+            radios.forEach(r => {
+                r.addEventListener('change', calculateTotal);
+            });
+        }
+
+        function formatRupiah(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        function openModal(card) {
+            const name = card.dataset.name;
+            const price = parseInt(card.dataset.price);
+            const category = card.dataset.category;
+            const image = card.dataset.image;
+
+            basePrice = price;
+            totalPrice = price;
+
+            modalImage.src = image;
+            modalImage.alt = name;
+            modalCategory.textContent = category;
+            modalName.textContent = name;
+            modalBasePrice.textContent = `Mulai dari Rp ${formatRupiah(price)}`;
+            modalTotalPrice.textContent = `Rp ${formatRupiah(price)}`;
+
+            const details = menuDescriptions[name] || { desc: 'Hidangan lezat racikan khas SajiHUB yang diolah dengan bahan-bahan berkualitas tinggi untuk kepuasan santap Anda.', customType: 'food' };
+            modalDesc.textContent = details.desc;
+            modalCustomizations.innerHTML = generateCustomizations(details.customType);
+
+            setupCustomizationListeners();
+
+            menuModal.classList.remove('opacity-0', 'pointer-events-none');
+            menuModal.classList.add('opacity-100');
+            menuModalBox.classList.remove('scale-95', 'opacity-0');
+            menuModalBox.classList.add('scale-100', 'opacity-100');
+            document.body.classList.add('overflow-hidden');
+        }
+
+        function closeModal() {
+            menuModal.classList.remove('opacity-100');
+            menuModal.classList.add('opacity-0', 'pointer-events-none');
+            menuModalBox.classList.remove('scale-100', 'opacity-100');
+            menuModalBox.classList.add('scale-95', 'opacity-0');
+            document.body.classList.remove('overflow-hidden');
+        }
+
+        // Initialize click handlers on menu cards
+        document.querySelectorAll('.menu-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                openModal(card);
+            });
+        });
+
+        closeModalBtn.addEventListener('click', closeModal);
+        menuModal.addEventListener('click', (e) => {
+            if (e.target === menuModal) {
+                closeModal();
+            }
+        });
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !menuModal.classList.contains('pointer-events-none')) {
+                closeModal();
+            }
+        });
     </script>
 </body>
 </html>

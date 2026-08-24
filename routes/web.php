@@ -28,7 +28,7 @@ Route::post('/register', [AuthController::class, 'register'])->name('register.po
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 // Customer Order Routes
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'branch.status'])->group(function () {
     Route::get('/pesan', [CustomerOrderController::class, 'index'])->name('pesan');
     Route::get('/order', [CustomerOrderController::class, 'index'])->name('order.qr');
     Route::post('/pesan', [CustomerOrderController::class, 'store'])->name('pesan.store');
@@ -37,9 +37,17 @@ Route::middleware(['auth'])->group(function () {
 // Super Admin Routes
 Route::prefix('superadmin')->middleware(['auth', 'role:superadmin'])->name('superadmin.')->group(function () {
     Route::get('/dashboard', [SuperAdminDashboard::class, 'index'])->name('dashboard');
+    Route::patch('/branches/{branch}/toggle-status', [BranchController::class, 'toggleStatus'])->name('branches.toggle-status');
+    Route::patch('/branches/{branch}/status', [BranchController::class, 'updateStatus'])->name('branches.status');
+    Route::post('/branches/{branch}/impersonate', [App\Http\Controllers\SuperAdmin\ImpersonateController::class, 'start'])->name('branches.impersonate');
     Route::resource('branches', BranchController::class);
     Route::resource('users', SuperAdminUserController::class);
 });
+
+// Impersonate Leave Route (needs to be outside superadmin middleware group so impersonated branch admins can access it)
+Route::post('/superadmin/impersonate/leave', [App\Http\Controllers\SuperAdmin\ImpersonateController::class, 'leave'])
+    ->name('superadmin.impersonate.leave')
+    ->middleware('auth');
 
 // Admin Cabang Routes
 Route::prefix('admin')->middleware(['auth', 'role:admin_cabang'])->name('admin.')->group(function () {
@@ -56,8 +64,13 @@ Route::prefix('admin')->middleware(['auth', 'role:admin_cabang'])->name('admin.'
 // Kasir Routes
 Route::prefix('kasir')->middleware(['auth', 'role:kasir'])->name('kasir.')->group(function () {
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
-    Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
-    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+    
+    // Restricted routes when branch is closed/maintenance
+    Route::middleware(['branch.status'])->group(function () {
+        Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
+        Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+    });
+
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::get('/orders/{order}/receipt', [OrderController::class, 'receipt'])->name('orders.receipt');
     Route::patch('/orders/{order}/pay', [OrderController::class, 'pay'])->name('orders.pay');

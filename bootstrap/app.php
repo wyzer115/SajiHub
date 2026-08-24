@@ -12,8 +12,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->web(append: [
+            \App\Http\Middleware\BlockImpersonatorModifications::class,
+        ]);
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
+            'branch.status' => \App\Http\Middleware\CheckBranchStatus::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
