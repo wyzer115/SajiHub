@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -10,7 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['branch_id', 'name', 'email', 'username', 'password', 'role'])]
+#[Fillable(['branch_id', 'name', 'email', 'username', 'phone', 'password', 'role'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -49,13 +48,28 @@ class User extends Authenticatable
         return $this->role === 'admin_cabang';
     }
 
+    public function isOwner(): bool
+    {
+        return $this->role === 'owner';
+    }
+
+    public function isSupervisor(): bool
+    {
+        return $this->role === 'supervisor';
+    }
+
     public function isKasir(): bool
     {
         return $this->role === 'kasir';
     }
 
+    public function isDapur(): bool
+    {
+        return in_array($this->role, ['dapur', 'koki']);
+    }
+
     public function isKoki(): bool
     {
-        return $this->role === 'koki';
+        return $this->isDapur();
     }
 }

@@ -23,14 +23,16 @@ class TableController extends Controller
     {
         $validated = $request->validate([
             'table_number' => 'required|string|max:50',
+            'capacity' => 'nullable|integer|min:1|max:100',
         ]);
 
         $validated['branch_id'] = auth()->user()->branch_id;
+        $validated['capacity'] = $validated['capacity'] ?? 4;
         $validated['qr_code_token'] = Str::random(32);
         
         Table::create($validated);
 
-        return redirect()->back()->with('success', 'Meja berhasil dibuat.');
+        return redirect()->back()->with('success', 'Meja berhasil dibuat dengan kapasitas ' . $validated['capacity'] . ' kursi.');
     }
 
     public function update(Request $request, Table $table)
@@ -41,12 +43,19 @@ class TableController extends Controller
 
         $validated = $request->validate([
             'table_number' => 'sometimes|required|string|max:50',
-            'status' => 'required|in:empty,occupied',
+            'capacity' => 'sometimes|required|integer|min:1|max:100',
+            'status' => 'sometimes|required|in:empty,occupied',
         ]);
 
         $table->update($validated);
 
-        return redirect()->back()->with('success', 'Meja berhasil diperbarui.');
+        if (isset($validated['status']) && $validated['status'] === 'empty') {
+            \App\Models\Order::where('table_id', $table->id)
+                ->whereIn('order_status', ['pending', 'cooking', 'served'])
+                ->update(['order_status' => 'completed']);
+        }
+
+        return redirect()->back()->with('success', 'Data meja ' . $table->table_number . ' berhasil diperbarui.');
     }
 
     public function destroy(Table $table)

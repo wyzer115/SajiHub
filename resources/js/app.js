@@ -56,8 +56,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Delete confirmation
     document.querySelectorAll('[data-confirm-delete]').forEach(function(form) {
         form.addEventListener('submit', function(e) {
-            if (!confirm('Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.')) {
-                e.preventDefault();
+            e.preventDefault();
+            if (window.showConfirm) {
+                window.showConfirm(e, 'Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.', 'Konfirmasi Hapus', 'Ya, Hapus');
+            } else if (confirm('Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.')) {
+                form.submit();
             }
         });
     });

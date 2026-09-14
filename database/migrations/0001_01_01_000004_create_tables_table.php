@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('branch_id')->constrained()->cascadeOnDelete();
             $table->string('table_number');
+            $table->integer('capacity')->default(4);
             $table->string('qr_code_token')->unique()->nullable();
             $table->string('status')->default('empty');
             $table->timestamps();

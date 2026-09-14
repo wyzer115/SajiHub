@@ -6,108 +6,129 @@
 <div class="space-y-6">
     <div class="flex flex-col sm:flex-row justify-between gap-4 items-start sm:items-center animate-fade-in-up">
         <div class="flex space-x-2 w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0">
-            <a href="{{ route('kasir.orders.index') }}" class="px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap {{ !request('status') && !request('payment') ? 'bg-brand-500 text-white' : 'bg-dark-800 text-dark-300 hover:bg-dark-700' }}">Semua</a>
-            <a href="{{ route('kasir.orders.index', ['status' => 'active']) }}" class="px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap {{ request('status') == 'active' ? 'bg-brand-500 text-white' : 'bg-dark-800 text-dark-300 hover:bg-dark-700' }}">Sedang Aktif</a>
-            <a href="{{ route('kasir.orders.index', ['status' => 'pending']) }}" class="px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap {{ request('status') == 'pending' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-dark-800 text-dark-300 hover:bg-dark-700' }}">Menunggu</a>
+            <a href="{{ route('kasir.orders.index') }}" class="px-4 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap {{ !request('status') && !request('payment') ? 'bg-[#BD2000] text-white shadow-sm' : 'bg-white border border-stone-200 text-stone-700 hover:bg-stone-100' }}">Semua</a>
+            <a href="{{ route('kasir.orders.index', ['status' => 'active']) }}" class="px-4 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap {{ request('status') == 'active' ? 'bg-[#BD2000] text-white shadow-sm' : 'bg-white border border-stone-200 text-stone-700 hover:bg-stone-100' }}">Sedang Aktif</a>
+            <a href="{{ route('kasir.orders.index', ['status' => 'pending']) }}" class="px-4 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap {{ request('status') == 'pending' ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-white border border-stone-200 text-stone-700 hover:bg-stone-100' }}">Menunggu</a>
         </div>
-        <a href="{{ route('kasir.orders.create') }}" class="bg-brand-500 hover:bg-brand-600 text-white font-semibold px-6 py-3 rounded-xl transition-all hover:shadow-lg hover:shadow-brand-500/25 flex items-center space-x-2 whitespace-nowrap">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+        <a href="{{ route('kasir.orders.create') }}" class="bg-[#BD2000] hover:bg-[#8C0000] text-white font-extrabold px-6 py-3 rounded-xl transition-all shadow-md flex items-center space-x-2 whitespace-nowrap cursor-pointer">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
             <span>Buat Pesanan Baru</span>
         </a>
     </div>
 
-    <div class="bg-dark-900 border border-dark-700 rounded-2xl overflow-hidden shadow-sm animate-fade-in-up" style="animation-delay: 100ms;">
+    <div class="bg-white border border-stone-200 rounded-3xl overflow-hidden shadow-sm animate-fade-in-up">
         <div class="overflow-x-auto">
             <table class="w-full text-left">
-                <thead class="bg-dark-800 text-dark-400 text-xs uppercase tracking-wider">
+                <thead class="bg-stone-100 text-stone-700 text-xs font-extrabold uppercase tracking-wider border-b border-stone-200">
                     <tr>
-                        <th class="px-6 py-4 font-medium">ID</th>
-                        <th class="px-6 py-4 font-medium">Pelanggan</th>
-                        <th class="px-6 py-4 font-medium">Meja</th>
-                        <th class="px-6 py-4 font-medium">Item</th>
-                        <th class="px-6 py-4 font-medium">Total</th>
-                        <th class="px-6 py-4 font-medium">Metode</th>
-                        <th class="px-6 py-4 font-medium">Status Pesanan</th>
-                        <th class="px-6 py-4 font-medium">Status Bayar</th>
-                        <th class="px-6 py-4 font-medium">Waktu</th>
-                        <th class="px-6 py-4 font-medium text-right">Aksi</th>
+                        <th class="px-6 py-4">No</th>
+                        <th class="px-6 py-4">Pelanggan</th>
+                        <th class="px-6 py-4">Meja</th>
+                        <th class="px-6 py-4">Item</th>
+                        <th class="px-6 py-4">Total</th>
+                        <th class="px-6 py-4">Metode</th>
+                        <th class="px-6 py-4">Status Pesanan</th>
+                        <th class="px-6 py-4">Status Bayar</th>
+                        <th class="px-6 py-4">Waktu</th>
+                        <th class="px-6 py-4 text-right">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-dark-700/50">
+                <tbody class="divide-y divide-stone-200">
                     @forelse($orders ?? [] as $order)
-                    <tr class="hover:bg-dark-800/50 transition-colors">
-                        <td class="px-6 py-4 text-white font-medium">#{{ $order->id }}</td>
-                        <td class="px-6 py-4 text-dark-200 font-medium">{{ $order->customer_name }}</td>
-                        <td class="px-6 py-4 text-dark-300">{{ $order->table->table_number ?? '-' }}</td>
-                        <td class="px-6 py-4 text-dark-300">{{ $order->items_count ?? ($order->items ? $order->items->count() : 0) }} item</td>
-                        <td class="px-6 py-4 text-brand-400 font-bold whitespace-nowrap">Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>
+                    <tr class="hover:bg-stone-50 transition-colors">
+                        <td class="px-6 py-4 text-xs font-bold text-slate-500">{{ $loop->iteration }}</td>
+                        <td class="px-6 py-4 text-[#1C1917] font-extrabold text-sm">{{ $order->customer_name }}</td>
+                        <td class="px-6 py-4 text-slate-700 font-bold">{{ $order->table ? $order->table->table_number : 'Bawa Pulang' }}</td>
+                        <td class="px-6 py-4 text-slate-600 font-semibold">{{ $order->items_count ?? ($order->items ? $order->items->count() : 0) }} item</td>
+                        <td class="px-6 py-4 text-[#BD2000] font-black text-sm whitespace-nowrap">Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             @if(($order->payment_method ?? 'cash') == 'cash')
-                                <span class="text-xs font-semibold text-dark-300">💵 Tunai</span>
+                                <span class="inline-flex items-center gap-1 text-xs font-bold text-stone-700">
+                                    <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                    Tunai
+                                </span>
                             @elseif($order->payment_method == 'qris')
-                                <span class="text-xs font-semibold text-brand-400">📱 QRIS</span>
+                                <span class="inline-flex items-center gap-1 text-xs font-bold text-[#BD2000]">
+                                    <svg class="w-3.5 h-3.5 text-[#BD2000]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                                    QRIS
+                                </span>
                             @else
-                                <span class="text-xs font-semibold text-blue-400">🏦 Transfer</span>
+                                <span class="inline-flex items-center gap-1 text-xs font-bold text-blue-600">
+                                    <svg class="w-3.5 h-3.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                    Transfer
+                                </span>
                             @endif
                         </td>
                         <td class="px-6 py-4">
                             @if($order->order_status == 'pending')
-                                <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-yellow-500/10 text-yellow-400">Menunggu</span>
+                                <span class="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-300">Menunggu</span>
                             @elseif($order->order_status == 'cooking')
-                                <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-orange-500/10 text-orange-400">Dimasak</span>
+                                <span class="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-orange-100 text-orange-800 border border-orange-300">Dimasak</span>
                             @elseif($order->order_status == 'served')
-                                <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-400">Disajikan</span>
+                                <span class="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-blue-100 text-blue-800 border border-blue-300">Disajikan</span>
                             @else
-                                <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-green-500/10 text-green-400">Selesai</span>
+                                <span class="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-300">Selesai</span>
                             @endif
                         </td>
                         <td class="px-6 py-4">
                             @if($order->payment_status == 'paid')
-                                <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-green-500/10 text-green-400">Lunas</span>
+                                <span class="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-300">Lunas</span>
                             @else
-                                <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-red-500/10 text-red-400">Belum Bayar</span>
+                                <span class="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-red-100 text-red-600 border border-red-200">Belum Bayar</span>
                             @endif
                         </td>
-                        <td class="px-6 py-4 text-dark-400 text-xs">{{ $order->created_at->format('H:i') }}<br>{{ $order->created_at->format('d/m/Y') }}</td>
-                        <td class="px-6 py-4 text-right flex justify-end space-x-2">
-                            <a href="{{ route('kasir.orders.show', $order) }}" class="bg-dark-700 hover:bg-dark-600 text-dark-200 px-3 py-1.5 rounded-lg transition-all text-xs font-medium">Detail</a>
-                            
-                            @if($order->payment_status == 'unpaid')
-                            <form action="{{ route('kasir.orders.pay', $order) }}" method="POST" class="inline">
-                                @csrf
-                                @method('PATCH')
-                                <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded-lg transition-all text-xs font-bold" onclick="return confirm('Konfirmasi pembayaran lunas tunai?');">
-                                    Bayar
-                                </button>
-                            </form>
-                            @endif
-                            
-                            @if($order->order_status !== 'completed')
-                            <form action="{{ route('kasir.orders.update-status', $order) }}" method="POST" class="inline">
-                                @csrf
-                                @method('PATCH')
-                                <input type="hidden" name="order_status" value="completed">
-                                <button type="submit" class="bg-brand-500/20 text-brand-400 hover:bg-brand-500/30 px-3 py-1.5 rounded-lg transition-all text-xs font-medium" onclick="return confirm('Selesaikan pesanan ini? Meja akan dikosongkan.');">
-                                    Selesaikan
-                                </button>
-                            </form>
-                            @endif
+                        <td class="px-6 py-4 text-xs text-slate-500 font-semibold whitespace-nowrap">{{ $order->created_at->diffForHumans() }}</td>
+                        <td class="px-6 py-4 text-right whitespace-nowrap">
+                            <div class="flex items-center justify-end gap-2">
+                                @if($order->payment_status == 'unpaid')
+                                    @if(($order->payment_method ?? 'cash') === 'qris')
+                                        <form action="{{ route('kasir.orders.pay', $order) }}" method="POST" class="inline" onsubmit="return showConfirm(event, 'Konfirmasi pembayaran QRIS pesanan #{{ $order->id }} sebagai LUNAS?', 'Konfirmasi QRIS', 'Ya, Tandai Lunas')">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-extrabold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-all shadow-xs cursor-pointer">
+                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                                <span>Tandai Lunas</span>
+                                            </button>
+                                        </form>
+                                    @else
+                                        <button type="button" 
+                                                onclick='openCheckoutModal({!! json_encode([
+                                                    "orderId" => $order->id,
+                                                    "customerName" => $order->customer_name,
+                                                    "tableNumber" => $order->table ? $order->table->table_number : "Takeaway",
+                                                    "totalAmount" => (float)$order->total_price,
+                                                    "paymentMethod" => "cash",
+                                                    "items" => $order->items->map(function($item) {
+                                                        return [
+                                                            "name" => $item->menu->name ?? "Menu",
+                                                            "qty" => (int)$item->quantity,
+                                                            "price" => (float)$item->price,
+                                                        ];
+                                                    })->values()->all()
+                                                ], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!})'
+                                                class="inline-flex items-center gap-1 text-xs font-extrabold text-white bg-[#BD2000] hover:bg-[#8C0000] px-3.5 py-1.5 rounded-xl transition-all shadow-xs cursor-pointer">
+                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                            <span>Bayar</span>
+                                        </button>
+                                    @endif
+                                @endif
+                                <a href="{{ route('kasir.orders.show', $order) }}" class="inline-flex items-center space-x-1 text-xs font-extrabold text-stone-700 bg-stone-100 hover:bg-stone-200 border border-stone-300 px-3 py-1.5 rounded-xl transition-all">
+                                    <span>Detail</span>
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                </a>
+                            </div>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="9" class="px-6 py-12 text-center text-dark-400">Belum ada pesanan ditemukan</td>
+                        <td colspan="10" class="px-6 py-12 text-center text-slate-500 font-medium">
+                            Belum ada data pesanan saat ini.
+                        </td>
                     </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
     </div>
-
-    @if(isset($orders) && $orders->hasPages())
-    <div class="mt-6">
-        {{ $orders->links() }}
-    </div>
-    @endif
 </div>
 @endsection

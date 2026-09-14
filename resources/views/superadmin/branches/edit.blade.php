@@ -3,59 +3,57 @@
 @section('page-title', 'Edit Cabang')
 
 @section('content')
-<div class="mb-6 animate-fade-in-up delay-100">
-    <a href="{{ route('superadmin.branches.index') }}" class="inline-flex items-center gap-2 text-sm text-dark-400 hover:text-white transition-colors">
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-        Kembali ke Daftar Cabang
-    </a>
-</div>
-
-<div class="bg-dark-900 rounded-2xl border border-dark-700 overflow-hidden animate-fade-in-up delay-200 shadow-sm max-w-3xl">
-    <div class="p-6 border-b border-dark-700">
-        <h2 class="text-lg font-semibold text-white">Edit Informasi Cabang</h2>
-        <p class="text-sm text-dark-400 mt-1">Perbarui informasi untuk cabang terpilih di bawah ini.</p>
+<div class="max-w-3xl mx-auto space-y-6 animate-fade-in-up">
+    <div class="flex items-center gap-3">
+        <a href="{{ route('superadmin.branches.index') }}" class="p-2.5 bg-white border border-stone-200 text-stone-700 hover:text-[#BD2000] hover:bg-stone-100 rounded-xl transition-all shadow-sm">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </a>
+        <div>
+            <h2 class="text-xl font-black text-[#8C0000]">Edit Informasi Cabang: {{ $branch->name }}</h2>
+            <p class="text-slate-600 text-xs font-medium">Perbarui informasi untuk cabang terpilih di bawah ini.</p>
+        </div>
     </div>
-    
-    <div class="p-6">
+
+    <div class="bg-white border border-stone-200 rounded-3xl p-8 shadow-sm">
         <form action="{{ route('superadmin.branches.update', $branch->id) }}" method="POST" class="space-y-6">
             @csrf
             @method('PUT')
             
             <div>
-                <label for="name" class="block text-sm font-medium text-dark-300 mb-1.5">Nama Cabang <span class="text-brand-500">*</span></label>
+                <label for="name" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Nama Cabang <span class="text-red-500">*</span></label>
                 <input type="text" id="name" name="name" value="{{ old('name', $branch->name) }}" required
-                    class="block w-full px-4 py-3 bg-dark-800 border border-dark-600 rounded-xl text-white placeholder-dark-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/50 transition-colors shadow-inner" 
-                    placeholder="Contoh: Cabang Jakarta Pusat">
+                    class="w-full bg-stone-50 border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-4 py-3 text-sm focus:border-[#BD2000] focus:outline-none transition-all" 
+                    placeholder="Contoh: SajiHub Cabang Jakarta Pusat">
                 @error('name')
-                    <p class="mt-1.5 text-sm text-red-500">{{ $message }}</p>
+                    <p class="mt-1.5 text-xs font-bold text-red-600">{{ $message }}</p>
                 @enderror
             </div>
 
             <div>
-                <label for="phone" class="block text-sm font-medium text-dark-300 mb-1.5">Nomor Telepon</label>
+                <label for="phone" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Nomor Telepon Operational</label>
                 <input type="text" id="phone" name="phone" value="{{ old('phone', $branch->phone) }}"
-                    class="block w-full px-4 py-3 bg-dark-800 border border-dark-600 rounded-xl text-white placeholder-dark-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/50 transition-colors shadow-inner" 
+                    class="w-full bg-stone-50 border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-4 py-3 text-sm focus:border-[#BD2000] focus:outline-none transition-all" 
                     placeholder="Contoh: 081234567890">
                 @error('phone')
-                    <p class="mt-1.5 text-sm text-red-500">{{ $message }}</p>
+                    <p class="mt-1.5 text-xs font-bold text-red-600">{{ $message }}</p>
                 @enderror
             </div>
 
             <div>
-                <label for="address" class="block text-sm font-medium text-dark-300 mb-1.5">Alamat Lengkap <span class="text-brand-500">*</span></label>
+                <label for="address" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Alamat Lengkap Cabang <span class="text-red-500">*</span></label>
                 <textarea id="address" name="address" rows="4" required
-                    class="block w-full px-4 py-3 bg-dark-800 border border-dark-600 rounded-xl text-white placeholder-dark-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/50 transition-colors shadow-inner resize-none" 
-                    placeholder="Masukkan alamat lengkap cabang...">{{ old('address', $branch->address) }}</textarea>
+                    class="w-full bg-stone-50 border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-4 py-3 text-sm focus:border-[#BD2000] focus:outline-none transition-all resize-none" 
+                    placeholder="Masukkan alamat lengkap lokasi cabang...">{{ old('address', $branch->address) }}</textarea>
                 @error('address')
-                    <p class="mt-1.5 text-sm text-red-500">{{ $message }}</p>
+                    <p class="mt-1.5 text-xs font-bold text-red-600">{{ $message }}</p>
                 @enderror
             </div>
             
-            <div class="pt-4 border-t border-dark-700 flex justify-end gap-3">
-                <a href="{{ route('superadmin.branches.index') }}" class="px-5 py-2.5 rounded-xl text-sm font-medium bg-dark-700 hover:bg-dark-600 text-dark-200 transition-colors">
+            <div class="pt-4 border-t border-stone-200 flex justify-end gap-3">
+                <a href="{{ route('superadmin.branches.index') }}" class="px-5 py-2.5 rounded-xl text-sm font-bold bg-stone-100 hover:bg-stone-200 text-stone-700 border border-stone-300 transition-all">
                     Batal
                 </a>
-                <button type="submit" class="px-5 py-2.5 rounded-xl text-sm font-medium bg-brand-500 hover:bg-brand-600 text-white transition-colors shadow-lg shadow-brand-500/20">
+                <button type="submit" class="px-6 py-2.5 rounded-xl text-sm font-extrabold bg-[#BD2000] hover:bg-[#8C0000] text-white transition-all shadow-md cursor-pointer">
                     Perbarui Cabang
                 </button>
             </div>

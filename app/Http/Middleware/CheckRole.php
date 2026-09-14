@@ -14,7 +14,18 @@ class CheckRole
             return redirect()->route('login');
         }
 
-        if (!in_array(auth()->user()->role, $roles)) {
+        $userRole = auth()->user()->role;
+
+        if ($userRole === 'superadmin') {
+            return $next($request);
+        }
+
+        if (in_array('dapur', $roles) || in_array('koki', $roles)) {
+            $roles[] = 'dapur';
+            $roles[] = 'koki';
+        }
+
+        if (!in_array($userRole, $roles)) {
             abort(403, 'Unauthorized. Anda tidak memiliki akses ke halaman ini.');
         }
 

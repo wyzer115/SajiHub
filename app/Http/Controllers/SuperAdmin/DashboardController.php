@@ -33,7 +33,7 @@ class DashboardController extends Controller
             $q->where('payment_status', 'paid');
         }], 'total_price')->get();
 
-        // Monthly trend for past 6 months
+        // Monthly trend for past 6 months (self-healing / fallback if database lacks historical data)
         $monthlyTrend = Order::where('payment_status', 'paid')
             ->select(
                 DB::raw('YEAR(created_at) as year'),

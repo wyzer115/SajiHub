@@ -3,83 +3,82 @@
 @section('page-title', 'Edit Detail Karyawan')
 
 @section('content')
-<div class="mb-6 animate-fade-in-up delay-100">
-    <a href="{{ route('admin.users.index') }}" class="inline-flex items-center gap-2 text-sm text-dark-400 hover:text-white transition-colors">
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-        Kembali ke Daftar Karyawan
-    </a>
-</div>
-
-<div class="bg-dark-900 rounded-2xl border border-dark-700 overflow-hidden animate-fade-in-up delay-200 shadow-sm max-w-3xl">
-    <div class="p-6 border-b border-dark-700">
-        <h2 class="text-lg font-semibold text-white">Edit Informasi Karyawan</h2>
-        <p class="text-sm text-dark-400 mt-1">Perbarui detail akun staf cabang. Kosongkan field password jika tidak ingin mengubahnya.</p>
+<div class="max-w-3xl mx-auto space-y-6 animate-fade-in-up">
+    <div class="flex items-center gap-3">
+        <a href="{{ route('admin.users.index') }}" class="p-2.5 bg-white border border-stone-200 text-stone-700 hover:text-[#BD2000] hover:bg-stone-100 rounded-xl transition-all shadow-sm">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </a>
+        <div>
+            <h2 class="text-xl font-black text-[#8C0000]">Edit Informasi Karyawan: {{ $user->name }}</h2>
+            <p class="text-slate-600 text-xs font-medium">Perbarui detail akun staf cabang. Kosongkan field password jika tidak ingin mengubahnya.</p>
+        </div>
     </div>
-    
-    <div class="p-6">
+
+    <div class="bg-white border border-stone-200 rounded-3xl p-8 shadow-sm">
         <form action="{{ route('admin.users.update', $user->id) }}" method="POST" class="space-y-6">
             @csrf
             @method('PUT')
             
             <div>
-                <label for="role" class="block text-sm font-medium text-dark-300 mb-1.5">Peran / Tugas Staf <span class="text-brand-500">*</span></label>
+                <label for="role" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Peran / Tugas Staf <span class="text-red-500">*</span></label>
                 <select name="role" id="role" required
-                    class="block w-full px-4 py-3 bg-dark-800 border border-dark-600 rounded-xl text-white focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/50 transition-colors shadow-inner">
-                    <option value="kasir" {{ old('role', $user->role) == 'kasir' ? 'selected' : '' }}>💵 Kasir (Front Office)</option>
-                    <option value="koki" {{ old('role', $user->role) == 'koki' ? 'selected' : '' }}>🍳 Dapur / Kitchen (Koki)</option>
+                    class="w-full bg-stone-50 border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-4 py-3 text-sm focus:border-[#BD2000] focus:outline-none transition-all">
+                    <option value="kasir" {{ old('role', $user->role) == 'kasir' ? 'selected' : '' }}>Kasir (Front Office POS)</option>
+                    <option value="koki" {{ old('role', $user->role) == 'koki' ? 'selected' : '' }}>Dapur / Kitchen (Koki)</option>
+                    <option value="waiter" {{ old('role', $user->role) == 'waiter' ? 'selected' : '' }}>Waiter / Pelayan</option>
                 </select>
                 @error('role')
-                    <p class="mt-1.5 text-sm text-red-500">{{ $message }}</p>
+                    <p class="mt-1.5 text-xs font-bold text-red-600">{{ $message }}</p>
                 @enderror
             </div>
 
             <div>
-                <label for="name" class="block text-sm font-medium text-dark-300 mb-1.5">Nama Lengkap <span class="text-brand-500">*</span></label>
+                <label for="name" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Nama Lengkap <span class="text-red-500">*</span></label>
                 <input type="text" id="name" name="name" value="{{ old('name', $user->name) }}" required
-                    class="block w-full px-4 py-3 bg-dark-800 border border-dark-600 rounded-xl text-white placeholder-dark-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/50 transition-colors shadow-inner" 
+                    class="w-full bg-stone-50 border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-4 py-3 text-sm focus:border-[#BD2000] focus:outline-none transition-all" 
                     placeholder="Contoh: Ahmad Kasiri">
                 @error('name')
-                    <p class="mt-1.5 text-sm text-red-500">{{ $message }}</p>
+                    <p class="mt-1.5 text-xs font-bold text-red-600">{{ $message }}</p>
                 @enderror
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label for="email" class="block text-sm font-medium text-dark-300 mb-1.5">Alamat Email <span class="text-brand-500">*</span></label>
+                    <label for="email" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Alamat Email <span class="text-red-500">*</span></label>
                     <input type="email" id="email" name="email" value="{{ old('email', $user->email) }}" required
-                        class="block w-full px-4 py-3 bg-dark-800 border border-dark-600 rounded-xl text-white placeholder-dark-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/50 transition-colors shadow-inner" 
+                        class="w-full bg-stone-50 border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-4 py-3 text-sm focus:border-[#BD2000] focus:outline-none transition-all" 
                         placeholder="Contoh: ahmad@sajihub.com">
                     @error('email')
-                        <p class="mt-1.5 text-sm text-red-500">{{ $message }}</p>
+                        <p class="mt-1.5 text-xs font-bold text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div>
-                    <label for="username" class="block text-sm font-medium text-dark-300 mb-1.5">Username <span class="text-brand-500">*</span></label>
+                    <label for="username" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Username <span class="text-red-500">*</span></label>
                     <input type="text" id="username" name="username" value="{{ old('username', $user->username) }}" required
-                        class="block w-full px-4 py-3 bg-dark-800 border border-dark-600 rounded-xl text-white placeholder-dark-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/50 transition-colors shadow-inner" 
+                        class="w-full bg-stone-50 border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-4 py-3 text-sm focus:border-[#BD2000] focus:outline-none transition-all" 
                         placeholder="Contoh: ahmad_kasir">
                     @error('username')
-                        <p class="mt-1.5 text-sm text-red-500">{{ $message }}</p>
+                        <p class="mt-1.5 text-xs font-bold text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
             </div>
 
             <div>
-                <label for="password" class="block text-sm font-medium text-dark-300 mb-1.5">Password Baru (Opsional)</label>
+                <label for="password" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Password Baru (Opsional)</label>
                 <input type="password" id="password" name="password"
-                    class="block w-full px-4 py-3 bg-dark-800 border border-dark-600 rounded-xl text-white placeholder-dark-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/50 transition-colors shadow-inner" 
+                    class="w-full bg-stone-50 border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-4 py-3 text-sm focus:border-[#BD2000] focus:outline-none transition-all" 
                     placeholder="Kosongkan jika tidak ingin mengubah password...">
                 @error('password')
-                    <p class="mt-1.5 text-sm text-red-500">{{ $message }}</p>
+                    <p class="mt-1.5 text-xs font-bold text-red-600">{{ $message }}</p>
                 @enderror
             </div>
             
-            <div class="pt-4 border-t border-dark-700 flex justify-end gap-3">
-                <a href="{{ route('admin.users.index') }}" class="px-5 py-2.5 rounded-xl text-sm font-medium bg-dark-700 hover:bg-dark-600 text-dark-200 transition-colors">
+            <div class="pt-4 border-t border-stone-200 flex justify-end gap-3">
+                <a href="{{ route('admin.users.index') }}" class="px-5 py-2.5 rounded-xl text-sm font-bold bg-stone-100 hover:bg-stone-200 text-stone-700 border border-stone-300 transition-all">
                     Batal
                 </a>
-                <button type="submit" class="px-5 py-2.5 rounded-xl text-sm font-medium bg-brand-500 hover:bg-brand-600 text-white transition-colors shadow-lg shadow-brand-500/20">
+                <button type="submit" class="px-6 py-2.5 rounded-xl text-sm font-extrabold bg-[#BD2000] hover:bg-[#8C0000] text-white transition-all shadow-md cursor-pointer">
                     Simpan Perubahan
                 </button>
             </div>

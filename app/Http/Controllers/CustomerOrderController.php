@@ -7,6 +7,7 @@ use App\Models\Menu;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Table;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -14,19 +15,11 @@ class CustomerOrderController extends Controller
 {
     public function index(Request $request)
     {
-<<<<<<< HEAD
         $branches        = Branch::all();
         $selectedBranch  = null;
         $selectedTable   = null;
         $menus           = collect();
         $tables          = collect();
-=======
-        $branches = Branch::all();
-        $selectedBranch = null;
-        $menus = collect();
-        $tables = collect();
-        $selectedTable = null;
->>>>>>> a471717247185442b2b06268d4e157d25322f3c7
 
         // Support Table & Branch detection via URL parameters (e.g. ?branch_id=1&table=01 or ?branch_id=1&table=Table%201 or token)
         if ($request->filled('branch_id')) {
@@ -36,7 +29,6 @@ class CustomerOrderController extends Controller
         if ($request->filled('table')) {
             $tableQuery = Table::query();
             if ($selectedBranch) {
-<<<<<<< HEAD
                 $tableQuery->where('branch_id', $selectedBranch->id);
             }
             
@@ -45,57 +37,30 @@ class CustomerOrderController extends Controller
                 $q->where('qr_code_token', $tableParam)
                   ->orWhere('table_number', $tableParam)
                   ->orWhere('table_number', 'Table ' . $tableParam)
+                  ->orWhere('table_number', 'Meja ' . $tableParam)
                   ->orWhere('table_number', ltrim($tableParam, '0'))
                   ->orWhere('id', $tableParam);
             })->first();
 
             if ($selectedTable && !$selectedBranch) {
                 $selectedBranch = $selectedTable->branch;
-=======
-                $menus = Menu::where('branch_id', $selectedBranch->id)
-                    ->where('status', 'available')
-                    ->with('category')
-                    ->get();
-                $tables = Table::where('branch_id', $selectedBranch->id)->get();
-
-                if ($request->filled('table')) {
-                    $tableNum = $request->table;
-                    $selectedTable = Table::where('branch_id', $selectedBranch->id)
-                        ->where(function($query) use ($tableNum) {
-                            $query->where('table_number', $tableNum)
-                                  ->orWhere('table_number', 'Table ' . $tableNum)
-                                  ->orWhere('table_number', 'Meja ' . $tableNum)
-                                  ->orWhere('table_number', ltrim($tableNum, '0'));
-                        })->first();
-                }
->>>>>>> a471717247185442b2b06268d4e157d25322f3c7
             }
+        }
+
+        if (!$selectedBranch) {
+            $selectedBranch = $branches->first();
         }
 
         if ($selectedBranch) {
             $menus  = Menu::where('branch_id', $selectedBranch->id)
-                ->where('status', 'available')
-                ->with('category')
+                ->with(['category', 'ingredients.inventory'])
                 ->get();
             $tables = Table::where('branch_id', $selectedBranch->id)->get();
         }
 
-<<<<<<< HEAD
-        // Get past orders for this customer (if logged in)
-        $myOrders = collect();
-        if (auth()->check()) {
-            $myOrders = Order::where('user_id', auth()->id())
-                ->with(['branch', 'table', 'items.menu'])
-                ->latest()
-                ->paginate(5);
-        }
-
         return view('customer.order', compact(
-            'branches', 'selectedBranch', 'selectedTable', 'menus', 'tables', 'myOrders'
+            'branches', 'selectedBranch', 'selectedTable', 'menus', 'tables'
         ));
-=======
-        return view('customer.order', compact('branches', 'selectedBranch', 'menus', 'tables', 'myOrders', 'selectedTable'));
->>>>>>> a471717247185442b2b06268d4e157d25322f3c7
     }
 
     public function store(Request $request)
@@ -103,8 +68,9 @@ class CustomerOrderController extends Controller
         $validated = $request->validate([
             'branch_id'      => 'required|exists:branches,id',
             'table_id'       => 'required|exists:tables,id',
-            'customer_name'  => 'nullable|string|max:255',
-            'payment_method' => 'required|in:cash,qris,transfer',
+            'customer_name'  => 'required|string|max:255',
+            'order_notes'    => 'nullable|string|max:500',
+            'payment_method' => 'required|in:cash,qris',
             'items'          => 'required|array|min:1',
             'items.*.menu_id'  => 'required|exists:menus,id',
             'items.*.quantity' => 'required|integer|min:1',
@@ -112,13 +78,13 @@ class CustomerOrderController extends Controller
         ]);
 
         $table = Table::findOrFail($validated['table_id']);
-        $customerName = auth()->check() ? auth()->user()->name : ($validated['customer_name'] ?: 'Pelanggan Meja ' . $table->table_number);
+        $customerName = trim($validated['customer_name']);
         $userId = auth()->check() ? auth()->id() : null;
 
         $order = null;
 
         DB::transaction(function () use ($validated, $table, $customerName, $userId, &$order) {
-            $isInstantPayment = in_array($validated['payment_method'], ['qris', 'transfer']);
+            $isInstantPayment = ($validated['payment_method'] === 'qris');
 
             $order = Order::create([
                 'branch_id'      => $validated['branch_id'],
@@ -132,19 +98,46 @@ class CustomerOrderController extends Controller
             ]);
 
             $totalPrice = 0;
+            $itemIdx = 0;
             foreach ($validated['items'] as $item) {
-                $menu = Menu::find($item['menu_id']);
+                $menu = Menu::with('ingredients.inventory')->find($item['menu_id']);
+                $itemNotes = $item['notes'] ?? null;
+                if ($itemIdx === 0 && !empty($validated['order_notes'])) {
+                    $itemNotes = $itemNotes ? ($itemNotes . ' | Note: ' . $validated['order_notes']) : ('Note: ' . $validated['order_notes']);
+                }
+                
                 OrderItem::create([
                     'order_id' => $order->id,
                     'menu_id'  => $menu->id,
                     'quantity' => $item['quantity'],
                     'price'    => $menu->price,
-                    'notes'    => $item['notes'] ?? null,
+                    'notes'    => $itemNotes,
                 ]);
                 $totalPrice += $menu->price * $item['quantity'];
+                $itemIdx++;
+
+                // Deduct inventory stock based on recipe (BOM)
+                if ($menu && $menu->ingredients) {
+                    foreach ($menu->ingredients as $ingredient) {
+                        if ($ingredient->inventory) {
+                            $usedQty = $ingredient->quantity * $item['quantity'];
+                            $ingredient->inventory->decrement('stock', $usedQty);
+                        }
+                    }
+                }
             }
 
             $order->update(['total_price' => $totalPrice]);
+
+            Transaction::create([
+                'order_id'       => $order->id,
+                'branch_id'      => $validated['branch_id'],
+                'amount'         => $totalPrice,
+                'payment_method' => $validated['payment_method'],
+                'status'         => $isInstantPayment ? 'completed' : 'pending',
+                'merchant_id'    => $isInstantPayment ? 'ID1026528881513' : null,
+                'paid_at'        => $isInstantPayment ? now() : null,
+            ]);
 
             // Update table status to occupied
             $table->update(['status' => 'occupied']);

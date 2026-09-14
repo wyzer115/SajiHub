@@ -18,7 +18,7 @@ class StaffController extends Controller
     public function index()
     {
         $staff = User::where('branch_id', $this->branchId())
-            ->whereIn('role', ['kasir', 'koki'])
+            ->whereIn('role', ['owner', 'supervisor', 'kasir', 'dapur', 'koki'])
             ->latest()
             ->get();
 
@@ -37,7 +37,7 @@ class StaffController extends Controller
             'email'    => 'required|email|unique:users,email',
             'username' => 'required|string|max:255|unique:users,username|alpha_dash',
             'password' => 'required|string|min:6|confirmed',
-            'role'     => 'required|in:kasir,koki',
+            'role'     => 'required|in:owner,supervisor,kasir,dapur,koki',
         ]);
 
         User::create([
@@ -45,7 +45,7 @@ class StaffController extends Controller
             'email'     => $validated['email'],
             'username'  => $validated['username'],
             'password'  => Hash::make($validated['password']),
-            'role'      => $validated['role'],
+            'role'      => $validated['role'] === 'koki' ? 'dapur' : $validated['role'],
             'branch_id' => $this->branchId(),
         ]);
 
@@ -58,9 +58,6 @@ class StaffController extends Controller
         if ($user->branch_id !== $this->branchId()) {
             abort(403, 'Tidak dapat mengedit staff dari cabang lain.');
         }
-        if (!in_array($user->role, ['kasir', 'koki'])) {
-            abort(403, 'Hanya bisa mengedit akun Kasir atau Koki.');
-        }
 
         return view('admin.staff.edit', compact('user'));
     }
@@ -68,10 +65,7 @@ class StaffController extends Controller
     public function update(Request $request, User $user)
     {
         if ($user->branch_id !== $this->branchId()) {
-            abort(403);
-        }
-        if (!in_array($user->role, ['kasir', 'koki'])) {
-            abort(403);
+            abort(403, 'Tidak dapat mengedit staff dari cabang lain.');
         }
 
         $validated = $request->validate([
@@ -79,14 +73,14 @@ class StaffController extends Controller
             'email'    => ['required', 'email', Rule::unique('users')->ignore($user->id)],
             'username' => ['required', 'string', 'max:255', 'alpha_dash', Rule::unique('users')->ignore($user->id)],
             'password' => 'nullable|string|min:6|confirmed',
-            'role'     => 'required|in:kasir,koki',
+            'role'     => 'required|in:owner,supervisor,kasir,dapur,koki',
         ]);
 
         $data = [
             'name'     => $validated['name'],
             'email'    => $validated['email'],
             'username' => $validated['username'],
-            'role'     => $validated['role'],
+            'role'     => $validated['role'] === 'koki' ? 'dapur' : $validated['role'],
         ];
 
         if (!empty($validated['password'])) {
@@ -96,16 +90,13 @@ class StaffController extends Controller
         $user->update($data);
 
         return redirect()->route('admin.staff.index')
-            ->with('success', 'Data staff "' . $user->name . '" berhasil diperbarui.');
+            ->with('success', 'Akun staff "' . $user->name . '" berhasil diperbarui.');
     }
 
     public function destroy(User $user)
     {
         if ($user->branch_id !== $this->branchId()) {
-            abort(403);
-        }
-        if (!in_array($user->role, ['kasir', 'koki'])) {
-            abort(403);
+            abort(403, 'Tidak dapat menghapus staff dari cabang lain.');
         }
 
         $name = $user->name;

@@ -104,7 +104,7 @@
                 <td class="font-bold text-right">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</td>
                 <td>Tunai (Cash)</td>
                 <td class="text-right">Rp {{ number_format($paymentMethods->get('cash')['total'] ?? 0, 0, ',', '.') }} ({{ $paymentMethods->get('cash')['count'] ?? 0 }} pesanan)</td>
-                <td colspan="4" rowspan="3" style="vertical-align: middle; text-align: center; font-size: 14pt; background-color: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0;" class="font-bold">
+                <td colspan="4" rowspan="2" style="vertical-align: middle; text-align: center; font-size: 14pt; background-color: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0;" class="font-bold">
                     Omset Terkumpul:<br>
                     Rp {{ number_format($totalRevenue, 0, ',', '.') }}
                 </td>
@@ -114,12 +114,6 @@
                 <td class="text-right">{{ $totalOrders }} transaksi</td>
                 <td>QRIS</td>
                 <td class="text-right">Rp {{ number_format($paymentMethods->get('qris')['total'] ?? 0, 0, ',', '.') }} ({{ $paymentMethods->get('qris')['count'] ?? 0 }} pesanan)</td>
-            </tr>
-            <tr>
-                <td>Rata-Rata Transaksi</td>
-                <td class="text-right">Rp {{ number_format($averageOrderValue, 0, ',', '.') }}</td>
-                <td>Transfer Bank</td>
-                <td class="text-right">Rp {{ number_format($paymentMethods->get('transfer')['total'] ?? 0, 0, ',', '.') }} ({{ $paymentMethods->get('transfer')['count'] ?? 0 }} pesanan)</td>
             </tr>
         </tbody>
     </table>
@@ -148,7 +142,7 @@
                 <td class="text-center font-bold">#{{ $order->id }}</td>
                 <td>{{ $order->created_at->format('d M Y, H:i') }} WIB</td>
                 <td>{{ $order->customer_name }}</td>
-                <td class="text-center">Meja {{ $order->table->table_number ?? '-' }}</td>
+                <td class="text-center">{{ $order->table ? 'Meja ' . $order->table->table_number : 'Takeaway' }}</td>
                 <td>
                     @if($order->payment_method == 'cash')
                         Tunai

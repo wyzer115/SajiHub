@@ -15,6 +15,15 @@ class Menu extends Model
         ];
     }
 
+    public function getImageUrlAttribute(): ?string
+    {
+        if (!$this->image) return null;
+        if (str_starts_with($this->image, 'http://') || str_starts_with($this->image, 'https://')) {
+            return $this->image;
+        }
+        return asset('storage/' . $this->image);
+    }
+
     public function branch()
     {
         return $this->belongsTo(Branch::class);
@@ -28,5 +37,10 @@ class Menu extends Model
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function ingredients()
+    {
+        return $this->hasMany(MenuIngredient::class);
     }
 }

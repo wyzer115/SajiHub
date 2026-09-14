@@ -3,15 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SajiHUB — Portal Restoran Multi-Branch</title>
-    <meta name="description" content="SajiHUB — Tempat makan favorit keluarga dengan berbagai pilihan menu lezat khas Nusantara. Tersedia di berbagai cabang terdekat.">
+    <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
+    <title>SajiHUB — Restoran & Kuliner Otentik Nusantara</title>
+    <meta name="description" content="SajiHUB — Nikmati sajian kuliner khas Nusantara dengan bumbu meresap, bahan segar, dan pelayanan cepat di berbagai cabang restoran kami.">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         body {
             font-family: 'Outfit', sans-serif;
-            background-color: #020617;
-            color: #cbd5e1;
+            background-color: #FAF8F5;
+            color: #1C1917;
         }
         .scrollbar-none::-webkit-scrollbar {
             display: none;
@@ -22,307 +25,658 @@
         }
     </style>
 </head>
-<body class="antialiased overflow-x-hidden bg-dark-950 text-dark-300">
+<body class="antialiased overflow-x-hidden bg-[#FAF8F5] text-[#1C1917]">
 
+    {{-- 1. NAVIGASI ATAS (HEADER) --}}
+    <nav class="w-full bg-white border-b border-stone-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            
+            {{-- Logo Merk --}}
+            <a href="#beranda" class="flex items-center group">
+                <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-10 sm:h-11 w-auto object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-300">
+            </a>
 
-    {{-- 2. CENTERED NAVBAR --}}
-    <nav class="bg-dark-950/90 backdrop-blur-md border-b border-dark-800 sticky top-0 z-40 shadow-lg">
-        <div class="max-w-7xl mx-auto px-6 lg:px-8">
-            <div class="flex items-center justify-between h-24">
-                {{-- Left Logo --}}
-                <a href="#" class="flex items-center gap-3 group">
-                    <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-16 w-auto group-hover:scale-105 transition-transform duration-300">
-                </a>
-
-                {{-- Center links --}}
-                <div class="hidden lg:flex items-center gap-10 text-[13.5px] sm:text-[14.5px] font-black uppercase tracking-widest text-dark-300">
-                    <a href="#beranda" class="nav-link text-brand-500 border-brand-500 py-1.5 border-b-2 hover:text-brand-500 transition-all">Beranda</a>
-                    <a href="#menu-favorit" class="nav-link border-transparent py-1.5 border-b-2 hover:text-brand-500 transition-all">Menu Favorit</a>
-                    <a href="#testimoni" class="nav-link border-transparent py-1.5 border-b-2 hover:text-brand-500 transition-all">Testimoni</a>
-                </div>
-
-                {{-- Right Actions --}}
-                <div class="flex items-center gap-4">
-                    @auth
-                        <div class="flex items-center gap-4">
-                            <span class="text-sm font-extrabold text-dark-300 hidden sm:inline">Halo, <span class="text-brand-500 font-black">{{ auth()->user()->name }}</span></span>
-                            <form action="{{ route('logout') }}" method="POST" class="inline">
-                                @csrf
-                                <button type="submit" class="px-6 py-3 text-xs sm:text-[13.5px] font-black uppercase tracking-wider text-white bg-brand-500 hover:bg-brand-600 rounded-xl transition-colors cursor-pointer">
-                                    Logout
-                                </button>
-                            </form>
-                        </div>
-                    @else
-                        <a href="{{ route('login') }}" class="px-6 py-3 rounded-xl text-xs sm:text-[13.5px] font-black text-white bg-brand-500 hover:bg-brand-600 transition-all shadow-md hover:shadow-brand-500/20 hover:scale-105 transform">
-                            MASUK PORTAL
-                        </a>
-                    @endauth
-                </div>
+            {{-- Menu Navigasi Tengah --}}
+            <div class="hidden lg:flex items-center gap-8 text-sm font-bold tracking-wide">
+                <a href="#beranda" class="nav-link text-[#BD2000] border-[#BD2000] py-1 border-b-2 transition-all">Beranda</a>
+                <a href="#menu-terlaris" class="nav-link text-stone-600 border-transparent py-1 border-b-2 hover:text-[#BD2000] transition-all">Menu Terlaris</a>
+                <a href="#testimoni" class="nav-link text-stone-600 border-transparent py-1 border-b-2 hover:text-[#BD2000] transition-all">Testimoni</a>
+                <a href="{{ route('menu.catalog') }}" class="nav-link text-stone-600 border-transparent py-1 border-b-2 hover:text-[#BD2000] transition-all">Lihat Menu</a>
             </div>
+
+            {{-- Tombol Aksi Kanan --}}
+            <div class="flex items-center gap-3">
+                <button type="button" onclick="openQrScannerModal()" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-[#BD2000] bg-white border border-[#BD2000] hover:bg-[#BD2000]/10 transition-all shadow-sm flex items-center gap-2 cursor-pointer">
+                    <svg class="w-4 h-4 text-[#BD2000]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 116 0z"/>
+                    </svg>
+                    Pindai QR Meja
+                </button>
+
+                @auth
+                    <div class="flex items-center gap-3 border-l border-stone-200 pl-4">
+                        <span class="text-sm font-bold text-stone-700 hidden sm:inline">Halo, <span class="text-[#BD2000] font-black">{{ auth()->user()->name }}</span></span>
+                        <form action="{{ route('logout') }}" method="POST" class="inline">
+                            @csrf
+                            <button type="submit" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-stone-700 bg-stone-100 hover:bg-stone-200 transition-colors cursor-pointer">
+                                Keluar
+                            </button>
+                        </form>
+                    </div>
+                @else
+                    <a href="{{ route('login') }}" class="bg-[#BD2000] text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-[#8C0000] transition shadow-md inline-block">
+                        Masuk Akun
+                    </a>
+                @endauth
+            </div>
+
         </div>
     </nav>
 
-    {{-- 3. HERO SLIDER BANNER (SajiHUB Dark Branding with Gradient Overlay) --}}
-    <section id="beranda" class="relative bg-dark-950 overflow-hidden aspect-[21/9] min-h-[400px] flex items-end border-b border-dark-900">
-        {{-- Hero Background Image (Dimly lit cozy warm restaurant) --}}
-        <div id="hero-bg" class="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-500 ease-in-out" style="background-image: url('https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=1920&q=80');"></div>
-        {{-- Smooth diagonal dark gradient overlay for organic text blending and color preservation on the right --}}
-        <div class="absolute inset-0 bg-gradient-to-tr from-black/95 via-black/45 to-transparent z-10"></div>
+    {{-- 2. BAGIAN UTAMA (HERO SECTION - 2 KOLOM SEIMBANG) --}}
+    <section id="beranda" class="w-full bg-[#FAF8F5] border-b border-stone-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center py-16 w-full">
+                
+                {{-- Sisi Kiri (Teks) --}}
+                <div class="w-full text-left">
+                    <div class="inline-flex items-center gap-2 bg-[#BD2000]/10 border border-[#BD2000]/20 text-[#BD2000] px-3.5 py-1.5 rounded-full text-xs font-bold mb-4">
+                        <svg class="w-4 h-4 text-[#BD2000]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        <span>Restoran Kuliner Otentik & Pelayanan Cepat</span>
+                    </div>
 
-        {{-- Left & Right Arrow Navigation (Orange branding color and z-30 clickable index) --}}
-        <button id="hero-btn-prev" class="absolute left-6 top-1/2 -translate-y-1/2 z-30 text-brand-500 hover:scale-110 transition-transform bg-black/40 p-2.5 rounded-full border border-dark-800 cursor-pointer">
-            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg>
-        </button>
-        <button id="hero-btn-next" class="absolute right-6 top-1/2 -translate-y-1/2 z-30 text-brand-500 hover:scale-110 transition-transform bg-black/40 p-2.5 rounded-full border border-dark-800 cursor-pointer">
-            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
-        </button>
+                    <h1 class="text-4xl lg:text-5xl font-extrabold text-[#8C0000] leading-tight">
+                        Nikmati Kelezatan Kuliner Otentik SajiHUB
+                    </h1>
 
-        {{-- Hero Content: Positioned at the very bottom-left (aligned directly to the viewport edge for maximum left alignment) --}}
-        <div class="w-full px-4 sm:px-8 lg:px-12 pb-8 pt-20 relative z-20">
-            <div class="w-full max-w-none drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)]">
-                <h1 class="font-black text-white tracking-tight uppercase mb-4" style="line-height: 0.85;">
-                    <span id="hero-heading-1" class="block whitespace-nowrap animate-fade-in-up transition-all duration-300" style="font-size: clamp(2.5rem, 6vw, 5.5rem);">LOKASI</span>
-                    <span id="hero-heading-2" class="block whitespace-nowrap animate-fade-in-up delay-100 transition-all duration-300" style="font-size: clamp(3.2rem, 8vw, 7.2rem);">SAJIHUB RESTO</span>
-                </h1>
-                <!-- Two-line description matching reference photo, enlarged and bolded -->
-                <div class="text-white text-sm sm:text-base lg:text-lg leading-relaxed drop-shadow-md font-bold">
-                    <div id="hero-sub" class="font-black text-brand-400 uppercase tracking-widest mb-1 transition-all duration-300">Cabang Resmi Pilihan Keluarga!</div>
-                    <div id="hero-desc" class="text-gray-255 max-w-5xl text-gray-200 transition-all duration-300">Nikmati menu terpopuler khas Nusantara, harga ramah kantong, dengan suasana makan nyaman dan pelayanan cepat!</div>
+                    <p class="text-slate-600 text-lg leading-relaxed mt-4 font-medium">
+                        Sajikan kehangatan cita rasa bumbu rempah pilihan khas Nusantara di meja makan Anda. Dibuat dari bahan baku segar berkualitas, dimasak higienis, dan disajikan dengan pelayanan prima super cepat.
+                    </p>
+
+                    <div class="flex flex-wrap gap-4 mt-8">
+                        <button type="button" onclick="openOrderTypeModal()" class="px-7 py-3.5 rounded-xl bg-[#BD2000] hover:bg-[#8C0000] text-white font-extrabold text-base transition-all shadow-lg hover:shadow-xl hover:scale-105 transform inline-flex items-center gap-2 cursor-pointer">
+                            Pesan Sekarang
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </button>
+
+                        <button type="button" onclick="openQrScannerModal()" class="px-6 py-3.5 rounded-xl bg-white border-2 border-stone-300 hover:border-[#BD2000] text-[#1C1917] hover:text-[#BD2000] font-bold text-base transition-all shadow-sm inline-flex items-center gap-2 cursor-pointer">
+                            <svg class="w-5 h-5 text-[#BD2000]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 116 0z"/>
+                            </svg>
+                            Pindai QR Meja
+                        </button>
+                    </div>
+
+                    {{-- Ringkasan Statistik --}}
+                    <div class="grid grid-cols-3 gap-4 pt-8 mt-8 border-t border-stone-200/80 w-full">
+                        <div>
+                            <div class="text-2xl lg:text-3xl font-black text-[#8C0000] flex items-center gap-1.5">
+                                <svg class="w-6 h-6 text-[#FFBE0F] fill-current" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                                <span>4.9/5</span>
+                            </div>
+                            <div class="text-xs sm:text-sm text-slate-600 font-bold mt-0.5">Rating Pelanggan</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl lg:text-3xl font-black text-[#8C0000]">100%</div>
+                            <div class="text-xs sm:text-sm text-slate-600 font-bold mt-0.5">Bahan Rempah Segar</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl lg:text-3xl font-black text-[#8C0000]">Cepat</div>
+                            <div class="text-xs sm:text-sm text-slate-600 font-bold mt-0.5">Sajikan Meja</div>
+                        </div>
+                    </div>
                 </div>
+
+                {{-- Sisi Kanan (Carousel 3 Menu Terlaris Interaktif) --}}
+                @php
+                    $heroTopMenus = \App\Models\Menu::with('category')
+                        ->withSum('orderItems as count', 'quantity')
+                        ->orderByDesc('count')
+                        ->take(3)
+                        ->get();
+
+                    if ($heroTopMenus->isEmpty()) {
+                        $heroTopMenus = \App\Models\Menu::with('category')->take(3)->get();
+                    }
+
+                    $fallbackImages = [
+                        'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1000&q=80',
+                        'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=1000&q=80',
+                        'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=1000&q=80'
+                    ];
+
+                    $slidesData = $heroTopMenus->map(function($menu, $idx) use ($fallbackImages) {
+                        $img = $menu->image ? asset('storage/' . $menu->image) : ($menu->image_url ?? $fallbackImages[$idx % 3]);
+                        return [
+                            'name' => $menu->name,
+                            'category' => $menu->category->name ?? 'Kuliner Otentik',
+                            'price' => 'Rp ' . number_format($menu->price, 0, ',', '.'),
+                            'image' => $img,
+                        ];
+                    })->values()->all();
+
+                    if (empty($slidesData)) {
+                        $slidesData = [
+                            ['name' => 'Ayam Bakar Madu', 'category' => 'Spesial Ayam', 'price' => 'Rp 42.000', 'image' => $fallbackImages[0]],
+                            ['name' => 'Nasi Goreng Rempah', 'category' => 'Olahan Nasi', 'price' => 'Rp 35.000', 'image' => $fallbackImages[1]],
+                            ['name' => 'Es Teh Manis Jumbo', 'category' => 'Minuman', 'price' => 'Rp 8.000', 'image' => $fallbackImages[2]],
+                        ];
+                    }
+                @endphp
+
+                <div class="w-full">
+                    <div id="hero-carousel-container" class="w-full rounded-3xl overflow-hidden shadow-2xl border border-stone-200 relative bg-stone-900 group" style="height: 450px; min-height: 420px;">
+                        
+                        {{-- Render Slides directly in HTML for Instant Server-side Load --}}
+                        @foreach($slidesData as $index => $slide)
+                        <div class="hero-slide absolute inset-0 w-full h-full transition-all duration-700 ease-in-out" 
+                             style="{{ $index === 0 ? 'opacity: 1; pointer-events: auto; transform: scale(1); z-index: 10;' : 'opacity: 0; pointer-events: none; transform: scale(0.95); z-index: 0;' }}" 
+                             data-slide-index="{{ $index }}">
+                            <img src="{{ $slide['image'] }}" alt="{{ $slide['name'] }}" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent"></div>
+
+                            <div class="absolute bottom-6 left-6 right-6 bg-white/95 backdrop-blur-md p-4 rounded-2xl border border-stone-200 shadow-xl flex items-center justify-between z-10">
+                                <div class="flex items-center gap-3 pr-2 min-w-0">
+                                    <div class="w-10 h-10 rounded-2xl bg-[#BD2000] text-white flex items-center justify-center font-black text-sm shrink-0 shadow-md">
+                                        #{{ $index + 1 }}
+                                    </div>
+                                    <div class="truncate">
+                                        <div class="text-[10px] font-extrabold text-[#BD2000] uppercase tracking-wider flex items-center gap-1">
+                                            <svg class="w-3.5 h-3.5 text-[#BD2000]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/></svg>
+                                            <span>Menu Terlaris</span>
+                                            <span>•</span>
+                                            <span>{{ $slide['category'] }}</span>
+                                        </div>
+                                        <div class="text-base font-black text-[#1C1917] truncate">{{ $slide['name'] }}</div>
+                                    </div>
+                                </div>
+                                <div class="text-right shrink-0">
+                                    <span class="text-xs font-bold text-slate-400 block uppercase text-[9px]">Harga</span>
+                                    <span class="text-base font-black text-[#BD2000]">{{ $slide['price'] }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+
+                        {{-- Tombol Navigasi Kiri & Kanan (< >) --}}
+                        <button type="button" onclick="prevHeroSlide()" title="Menu Sebelumya"
+                                style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); z-index: 30;"
+                                class="w-11 h-11 rounded-full bg-black/60 hover:bg-[#BD2000] text-white backdrop-blur-md border border-white/30 flex items-center justify-center transition-all shadow-lg cursor-pointer">
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                        </button>
+
+                        <button type="button" onclick="nextHeroSlide()" title="Menu Selanjutnya"
+                                style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); z-index: 30;"
+                                class="w-11 h-11 rounded-full bg-black/60 hover:bg-[#BD2000] text-white backdrop-blur-md border border-white/30 flex items-center justify-center transition-all shadow-lg cursor-pointer">
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                        </button>
+
+                        {{-- Slide Indicator Dots --}}
+                        <div style="position: absolute; top: 20px; right: 20px; z-index: 30;" class="flex items-center gap-2 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/30">
+                            @foreach($slidesData as $index => $slide)
+                            <button type="button" onclick="goToHeroSlide({{ $index }})" 
+                                    class="hero-dot h-2.5 rounded-full transition-all cursor-pointer" 
+                                    style="{{ $index === 0 ? 'width: 24px; background-color: #BD2000;' : 'width: 10px; background-color: rgba(255, 255, 255, 0.6);' }}" 
+                                    data-dot-index="{{ $index }}"></button>
+                            @endforeach
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
         </div>
     </section>
 
-    {{-- 4. FAVORITE MENUS SECTION (SajiHUB Dark Theme) --}}
-    <section id="menu-favorit" class="py-20 bg-dark-950">
-        <div class="max-w-7xl mx-auto px-6 lg:px-8">
-            <div class="flex justify-between items-center mb-12">
-                <h2 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight">
-                    Menu Favorit SajiHUB
-                </h2>
-                <div class="flex items-center gap-2 relative z-20">
-                    <button id="favorit-btn-prev" class="w-8 h-8 rounded-full border border-dark-800 text-brand-500 hover:bg-dark-900 flex items-center justify-center font-bold cursor-pointer transition-colors">&lt;</button>
-                    <button id="favorit-btn-next" class="w-8 h-8 rounded-full border border-dark-800 text-brand-500 hover:bg-dark-900 flex items-center justify-center font-bold cursor-pointer transition-colors">&gt;</button>
+    {{-- 3. BAGIAN MENU TERLARIS (DYNAMIC TOP 3 MENU) --}}
+    <section id="menu-terlaris" class="w-full py-16 sm:py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+            
+            {{-- Header Judul Bagian --}}
+            <div class="text-center max-w-3xl mx-auto mb-16 space-y-3">
+                <div class="inline-flex items-center gap-1.5 text-xs font-bold text-[#BD2000] uppercase tracking-wider bg-[#BD2000]/10 px-3.5 py-1.5 rounded-full border border-[#BD2000]/20">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/></svg>
+                    Rekomendasi Utama
                 </div>
+                <h2 class="text-3xl sm:text-4xl font-black text-[#8C0000] tracking-tight">
+                    Menu Terlaris SajiHUB
+                </h2>
+                <p class="text-slate-600 text-base font-medium">
+                    Pilihan paling favorit dan paling banyak dipesan oleh pelanggan setia kami setiap harinya.
+                </p>
             </div>
 
-            <!-- Slider Menu Container -->
-            <div id="favorit-scroll-container" class="flex gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory scrollbar-none pb-4">
-                @php
-                    $menuFavorites = [
-                        ['name' => 'NASI GORENG SPESIAL', 'price' => 35000, 'category' => 'Makanan Utama', 'image' => 'nasi-goreng.jpg'],
-                        ['name' => 'MIE GORENG SEAFOOD', 'price' => 38000, 'category' => 'Makanan Utama', 'image' => 'seafood.jpg'],
-                        ['name' => 'AYAM BAKAR MADU', 'price' => 42000, 'category' => 'Makanan Utama', 'image' => 'ayam-bakar.jpg'],
-                        ['name' => 'ES TEH MANIS', 'price' => 8000, 'category' => 'Minuman', 'image' => 'es-teh.jpg'],
-                        ['name' => 'JUS ALPUKAT', 'price' => 18000, 'category' => 'Minuman', 'image' => 'jus-alpukat.jpg'],
-                        ['name' => 'ES CAMPUR', 'price' => 20000, 'category' => 'Dessert', 'image' => 'es-campur.jpg'],
-                    ];
-                @endphp
+            {{-- Ambil Top Menu Dinamis (3 Menu Terlaris) --}}
+            @php
+                $topMenus = \App\Models\Menu::with('category')
+                    ->withSum('orderItems as count', 'quantity')
+                    ->orderByDesc('count')
+                    ->take(3)
+                    ->get();
 
-                @foreach($menuFavorites as $menu)
-                    <div class="w-[85%] sm:w-[45%] md:w-[30%] lg:w-[23.5%] flex-shrink-0 bg-dark-900 border border-dark-800 rounded-2xl p-4 hover:border-brand-500/20 hover:scale-[1.02] transition-all flex flex-col justify-between group snap-start">
-                        <!-- Image Container -->
-                        <div class="aspect-square rounded-xl border border-dark-800 bg-dark-950 flex items-center justify-center relative overflow-hidden group-hover:border-brand-500 transition-colors mb-4">
-                            <img src="{{ asset('images/landing/' . $menu['image']) }}" alt="{{ $menu['name'] }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                            
-                            <!-- Category Badge -->
-                            <div class="absolute top-2 left-2 z-10">
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[8px] font-extrabold uppercase tracking-wider bg-dark-950/80 text-dark-400 border border-dark-800/80 backdrop-blur-sm">
-                                    {{ $menu['category'] }}
-                                </span>
-                            </div>
+                if ($topMenus->isEmpty()) {
+                    $topMenus = \App\Models\Menu::with('category')->take(3)->get();
+                }
+            @endphp
 
-                            <!-- "LIHAT MENU" Button Overlay -->
-                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10">
-                                <a href="#simulator" class="px-4 py-2 bg-brand-500 text-white text-[10px] font-bold uppercase rounded-lg shadow-md hover:scale-105 transform transition-transform">
-                                    LIHAT MENU
-                                </a>
-                            </div>
-                        </div>
-
-                        <!-- Menu details -->
+            {{-- Grid 3 Kolom Lapang (6 Menu Card) --}}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
+                @foreach($topMenus as $menu)
+                    <div class="bg-white border border-stone-200 rounded-2xl p-5 shadow-sm hover:shadow-xl hover:border-[#BD2000]/40 transition-all duration-300 flex flex-col justify-between group w-full">
+                        
                         <div>
-                            <h3 class="font-extrabold text-sm text-brand-500 leading-tight truncate uppercase mb-1">{{ $menu['name'] }}</h3>
-                            <p class="text-xs text-white font-bold">MULAI DARI RP {{ number_format($menu['price'], 0, ',', '.') }}</p>
+                            {{-- Container Foto Makanan (Rasio 4:3) --}}
+                            <div class="aspect-[4/3] rounded-xl overflow-hidden relative mb-4 bg-stone-100 border border-stone-200 w-full">
+                                @if($menu->image_url || $menu->image)
+                                    <img src="{{ $menu->image_url ?? asset('storage/' . $menu->image) }}" 
+                                         alt="{{ $menu->name }}" 
+                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                @else
+                                    <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80" 
+                                         alt="{{ $menu->name }}" 
+                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                @endif
+
+                                {{-- Lencana Terlaris --}}
+                                <div class="absolute top-3 left-3 z-10">
+                                    <span class="bg-[#FA1E0E] text-white px-3 py-1 text-xs font-extrabold rounded-full shadow-md flex items-center gap-1">
+                                        <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/></svg>
+                                        <span>Terlaris</span>
+                                    </span>
+                                </div>
+                            </div>
+
+                            {{-- Informasi Menu --}}
+                            <div class="space-y-2">
+                                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                    {{ $menu->category->name ?? 'Kuliner Nusantara' }}
+                                </span>
+                                <h3 class="font-extrabold text-xl text-[#1C1917] group-hover:text-[#BD2000] transition-colors leading-snug">
+                                    {{ $menu->name }}
+                                </h3>
+                                <p class="text-xs text-slate-600 line-clamp-2 leading-relaxed font-medium">
+                                    {{ $menu->description ?? 'Olahan masakan segar pilihan khas SajiHUB dengan rasa bumbu rempah otentik meresap sempurna.' }}
+                                </p>
+                            </div>
                         </div>
+
+                        {{-- Harga & Tombol Pesan --}}
+                        <div class="pt-5 mt-4 border-t border-stone-100 flex items-center justify-between gap-4 w-full">
+                            <div>
+                                <span class="text-[11px] font-bold text-slate-400 uppercase block">Harga Porsi</span>
+                                <span class="font-black text-2xl text-[#BD2000]">Rp {{ number_format($menu->price, 0, ',', '.') }}</span>
+                            </div>
+
+                            <button type="button" onclick="openOrderTypeModal()" class="px-5 py-2.5 rounded-xl bg-[#BD2000] hover:bg-[#8C0000] text-white font-extrabold text-xs sm:text-sm transition-all shadow-md hover:shadow-lg flex items-center gap-1.5 cursor-pointer">
+                                Pesan
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                            </button>
+                        </div>
+
                     </div>
                 @endforeach
             </div>
+
+            {{-- Tombol Lihat Seluruh Menu (Redirect to /menu Catalog) --}}
+            <div class="mt-12 text-center">
+                <a href="{{ route('menu.catalog') }}" class="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-stone-100 hover:bg-[#BD2000] text-[#1C1917] hover:text-white font-extrabold text-sm transition-all border border-stone-300 hover:border-[#BD2000] shadow-sm cursor-pointer">
+                    Lihat Seluruh Daftar Menu SajiHUB
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </a>
+            </div>
+
         </div>
     </section>
 
-    {{-- 5. TESTIMONIAL BANNER (SajiHUB Dark Branding with Gradient Overlay) --}}
-    <section id="testimoni" class="relative bg-dark-950 overflow-hidden aspect-[21/9] min-h-[300px] flex items-end border-t border-b border-dark-800">
-        {{-- Background Image --}}
-        <div class="absolute inset-0 bg-cover bg-center bg-no-repeat" style="background-image: url('https://images.unsplash.com/photo-1543007630-9710e4a00a20?auto=format&fit=crop&w=1920&q=80');"></div>
-        {{-- Smooth diagonal dark gradient overlay for organic text blending and color preservation on the right --}}
-        <div class="absolute inset-0 bg-gradient-to-tr from-black/95 via-black/45 to-transparent z-10"></div>
-
-        <div class="w-full px-4 sm:px-8 lg:px-12 pb-8 pt-20 relative z-20">
-            <div class="w-full max-w-none drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)]">
-                <!-- Top: Rating block matching Photo 1 -->
-                <div class="text-white text-sm sm:text-base lg:text-[17px] font-bold tracking-wide mb-4 drop-shadow-sm">
-                    <div class="font-extrabold text-white">★★★★★ Rating Kepuasan Pelanggan 4.9</div>
-                    <div class="text-gray-300 font-medium">Ribuan Pelanggan Setia</div>
+    {{-- 4. BAGIAN TESTIMONI / ULASAN PELANGGAN --}}
+    <section id="testimoni" class="w-full py-16 sm:py-24 bg-[#FAF8F5] border-t border-stone-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+            
+            {{-- Header Judul --}}
+            <div class="text-center max-w-3xl mx-auto mb-16 space-y-3">
+                <div class="inline-flex items-center gap-1.5 text-xs font-bold text-[#BD2000] uppercase tracking-wider bg-[#BD2000]/10 px-3.5 py-1.5 rounded-full border border-[#BD2000]/20">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                    Ulasan Jujur Pelanggan
                 </div>
-
-                <!-- Middle: Heading matching Photo 1 -->
-                <h2 class="font-black text-white uppercase tracking-tight mb-5 whitespace-nowrap" style="font-size: clamp(2.8rem, 6.5vw, 5.8rem); line-height: 0.95;">
-                    ULASAN PELANGGAN
+                <h2 class="text-3xl sm:text-4xl font-black text-[#8C0000] tracking-tight">
+                    Apa Kata Pelanggan Setia Kami?
                 </h2>
-
-                <!-- Bottom: Two-line details matching Photo 1 -->
-                <div class="text-white text-sm sm:text-base lg:text-lg leading-relaxed drop-shadow-md font-bold max-w-5xl">
-                    <div class="font-black text-brand-400 uppercase tracking-widest mb-1.5">Ribuan testimoni positif dari pecinta kuliner SajiHUB setiap harinya.</div>
-                    <div class="text-gray-150 text-gray-100">"Cita rasa bumbunya meresap sempurna, sajian menu bervariasi, porsi mengenyangkan, dengan harga bersahabat dan tempat makan yang bersih dan nyaman."</div>
-                </div>
+                <p class="text-slate-600 text-base font-medium">
+                    Ribuan pengalaman santap puas dari pecinta kuliner yang telah membuktikan cita rasa otentik SajiHUB.
+                </p>
             </div>
+
+            {{-- Grid Kartu Ulasan --}}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
+                
+                {{-- Kartu Ulasan 1 --}}
+                <div class="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between w-full">
+                    <div>
+                        <div class="text-[#FFBE0F] text-lg font-bold flex gap-1 mb-3">
+                            ★★★★★
+                        </div>
+                        <p class="text-[#1C1917] text-sm leading-relaxed font-medium italic mb-6">
+                            "Rasa bumbu rasanya pas banget di lidah, ayam bakarnya empuk dan bumbunya meresap sampai ke tulang. Pelayanannya cepat dan tempatnya sangat bersih!"
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-3 pt-4 border-t border-stone-100">
+                        <div class="w-11 h-11 rounded-full bg-[#BD2000]/10 border border-[#BD2000]/20 flex items-center justify-center font-black text-[#BD2000] text-sm">
+                            B
+                        </div>
+                        <div>
+                            <div class="font-bold text-[#1C1917] text-sm">Bambang S.</div>
+                            <div class="text-xs text-slate-500 font-semibold">Pelanggan Setia — Cabang Pusat</div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Kartu Ulasan 2 --}}
+                <div class="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between w-full">
+                    <div>
+                        <div class="text-[#FFBE0F] text-lg font-bold flex gap-1 mb-3">
+                            ★★★★★
+                        </div>
+                        <p class="text-[#1C1917] text-sm leading-relaxed font-medium italic mb-6">
+                            "Sistem scan QR meja nya praktis banget! Nggak perlu antre lama di kasir, tinggal pesan dari meja langsung diantar panas-panas. Sangat direkomendasikan."
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-3 pt-4 border-t border-stone-100">
+                        <div class="w-11 h-11 rounded-full bg-[#BD2000]/10 border border-[#BD2000]/20 flex items-center justify-center font-black text-[#BD2000] text-sm">
+                            R
+                        </div>
+                        <div>
+                            <div class="font-bold text-[#1C1917] text-sm">Rina Rahmawati</div>
+                            <div class="text-xs text-slate-500 font-semibold">Pengunjung Keluarga</div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Kartu Ulasan 3 --}}
+                <div class="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between w-full">
+                    <div>
+                        <div class="text-[#FFBE0F] text-lg font-bold flex gap-1 mb-3">
+                            ★★★★★
+                        </div>
+                        <p class="text-[#1C1917] text-sm leading-relaxed font-medium italic mb-6">
+                            "Harga porsinya sangat bersahabat dibanding kualitas rasanya yang bintang lima. Nasi goreng rempahnya bikin nagih!"
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-3 pt-4 border-t border-stone-100">
+                        <div class="w-11 h-11 rounded-full bg-[#BD2000]/10 border border-[#BD2000]/20 flex items-center justify-center font-black text-[#BD2000] text-sm">
+                            A
+                        </div>
+                        <div>
+                            <div class="font-bold text-[#1C1917] text-sm">Agung Pratama</div>
+                            <div class="text-xs text-slate-500 font-semibold">Pecinta Kuliner Nusantara</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
         </div>
     </section>
 
-    {{-- 6. PREMIUM FOUR-COLUMN FOOTER (SajiHUB Dark Branding - Gacoan Structured) --}}
-    <footer class="bg-dark-950 text-dark-300 text-lg py-20 border-t border-dark-900">
-        <div class="max-w-7xl mx-auto px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-24 pb-12 border-b border-dark-900">
+    {{-- 5. FOOTER (KAKI HALAMAN - WADAH MARUN GELAP #8C0000) --}}
+    <footer class="w-full bg-[#8C0000] text-stone-100 pt-16 pb-12 border-t border-stone-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-12 pb-12 border-b border-white/10 w-full">
                 
-                {{-- Column 1: Newsletter signup (4 cols) --}}
-                <div class="lg:col-span-4 space-y-6">
-                    <h3 class="font-black text-white text-lg sm:text-[21px] uppercase tracking-wider mb-2">BERGABUNG BERSAMA SAJIHUB</h3>
-                    <p class="text-gray-300 leading-relaxed text-[15px] sm:text-[16px]">Masukkan email Anda untuk berlangganan info promo terbaru dan penawaran khusus dari SajiHUB Resto.</p>
-                    <div class="relative w-full max-w-[300px]">
-                        <input type="email" placeholder="Enter Email Address" class="w-full bg-dark-900 border border-dark-800 text-white rounded-none px-4 py-4 text-base focus:outline-none focus:border-brand-500 transition-colors">
-                        <button class="absolute right-0 top-0 bottom-0 px-5 bg-brand-500 hover:bg-brand-600 text-white flex items-center justify-center transition-colors">
-                            &rarr;
-                        </button>
+                {{-- Kolom 1: Tentang SajiHUB & Langganan Promo --}}
+                <div class="lg:col-span-4 space-y-4">
+                    <div class="flex items-center gap-3">
+                        <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-10 w-10 object-contain">
+                        <span class="font-black text-2xl tracking-tight text-white">Saji<span class="text-[#FFBE0F]">HUB</span></span>
                     </div>
-                </div>
-
-                {{-- Column 2: Navigation Links (2 cols) --}}
-                <div class="lg:col-span-2 space-y-6">
-                    <h3 class="font-black text-white text-lg sm:text-[21px] uppercase tracking-wider mb-2">Navigasi SajiHUB</h3>
-                    <ul class="space-y-4 text-[15px] sm:text-[16px] font-bold">
-                        <li><a href="#beranda" class="hover:text-brand-500 transition-colors">Beranda</a></li>
-                        <li><a href="#menu-favorit" class="hover:text-brand-500 transition-colors">Menu Favorit</a></li>
-                        <li><a href="#testimoni" class="hover:text-brand-500 transition-colors">Testimoni</a></li>
-                        <li><a href="#" class="hover:text-brand-500 transition-colors">Karir</a></li>
-                        <li><a href="#" class="hover:text-brand-500 transition-colors">About Us</a></li>
-                    </ul>
-                </div>
-
-                {{-- Column 3: Partner Links (2 cols) --}}
-                <div class="lg:col-span-2 space-y-6">
-                    <h3 class="font-black text-white text-lg sm:text-[21px] uppercase tracking-wider mb-2">Kemitraan</h3>
-                    <ul class="space-y-4 text-[15px] sm:text-[16px] font-bold">
-                        <li><a href="#" class="hover:text-brand-500 transition-colors">Informasi Kemitraan</a></li>
-                        <li><a href="#" class="hover:text-brand-500 transition-colors">Hubungi Kemitraan</a></li>
-                        <li><a href="#" class="hover:text-brand-500 transition-colors">Kontak Kami</a></li>
-                        <li><a href="#" class="hover:text-brand-500 transition-colors">Terms of Service</a></li>
-                        <li><a href="#" class="hover:text-brand-500 transition-colors">Privacy Policy</a></li>
-                    </ul>
-                </div>
-
-                {{-- Column 4: Description, CS and Office (4 cols) --}}
-                <div class="lg:col-span-4 space-y-6">
-                    <p class="leading-relaxed text-[15px] sm:text-[16px] text-gray-300">
-                        SajiHUB berkomitmen menghadirkan pengalaman kuliner Nusantara terbaik dengan cita rasa otentik bumbu meresap, harga ramah di kantong, serta mengutamakan kebersihan dan pelayanan prima di setiap cabang kami.
+                    
+                    <p class="text-stone-200 text-sm leading-relaxed font-medium">
+                        SajiHUB berkomitmen menghadirkan pengalaman kuliner khas Nusantara terbaik dengan bumbu rempah otentik meresap, bahan segar, serta pelayanan prima di setiap restoran kami.
                     </p>
-                    <div class="space-y-1 text-[15px] sm:text-[16px]">
-                        <h4 class="font-black text-white uppercase tracking-wider">CUSTOMER SUPPORT:</h4>
-                        <p class="text-brand-400 font-extrabold hover:underline cursor-pointer">@sajihub.resto</p>
-                        <p class="text-gray-300 font-semibold">0813-9889-7488 (WhatsApp)</p>
+
+                    {{-- Form Langganan Email --}}
+                    <div class="pt-2 space-y-2">
+                        <label for="newsletter-email" class="block text-xs font-bold uppercase tracking-wider text-stone-200">
+                            Langganan Promo Terbaru
+                        </label>
+                        <form onsubmit="event.preventDefault(); alert('Terima kasih telah berlangganan promo SajiHUB!');" class="flex gap-2">
+                            <input type="email" id="newsletter-email" placeholder="Masukkan alamat email Anda" required
+                                   class="w-full bg-white/10 border border-white/20 text-white placeholder-stone-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#FFBE0F]">
+                            <button type="submit" class="bg-[#FFBE0F] hover:bg-[#e5ab0e] text-[#1C1917] font-black px-4 py-2.5 rounded-xl transition-all shadow-md text-sm cursor-pointer whitespace-nowrap">
+                                Kirim
+                            </button>
+                        </form>
                     </div>
-                    <div class="space-y-1 text-[15px] sm:text-[16px]">
-                        <h4 class="font-black text-white uppercase tracking-wider">ALAMAT KANTOR PUSAT:</h4>
-                        <p class="text-gray-300 font-semibold">Jakarta, Indonesia</p>
-                    </div>
+                </div>
+
+                {{-- Kolom 2: Navigasi Cepat --}}
+                <div class="lg:col-span-2 space-y-4">
+                    <h4 class="font-extrabold text-white text-base uppercase tracking-wider">Navigasi Cepat</h4>
+                    <ul class="space-y-2.5 text-sm font-medium text-stone-200">
+                        <li><a href="#beranda" class="hover:text-[#FFBE0F] transition-colors">Beranda</a></li>
+                        <li><a href="#menu-terlaris" class="hover:text-[#FFBE0F] transition-colors">Menu Terlaris</a></li>
+                        <li><a href="#testimoni" class="hover:text-[#FFBE0F] transition-colors">Testimoni</a></li>
+                        <li><a href="{{ route('pesan') }}" class="hover:text-[#FFBE0F] transition-colors">Pesan Online</a></li>
+                    </ul>
+                </div>
+
+                {{-- Kolom 3: Layanan Kontak --}}
+                <div class="lg:col-span-3 space-y-4">
+                    <h4 class="font-extrabold text-white text-base uppercase tracking-wider">Layanan Pelanggan</h4>
+                    <ul class="space-y-2.5 text-sm font-medium text-stone-200">
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-[#FFBE0F]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                            <span>0813-9889-7488 (WhatsApp)</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-[#FFBE0F]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            <span>@sajihub.resto (Instagram)</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-[#FFBE0F]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span>Setiap Hari (09.00 - 22.00 WIB)</span>
+                        </li>
+                    </ul>
+                </div>
+
+                {{-- Kolom 4: Alamat Resto --}}
+                <div class="lg:col-span-3 space-y-4">
+                    <h4 class="font-extrabold text-white text-base uppercase tracking-wider">Alamat Restoran</h4>
+                    <p class="text-sm text-stone-200 leading-relaxed font-medium">
+                        Jl. Raya Kuliner Nusantara No. 88, Jakarta Selatan, Indonesia.
+                    </p>
                 </div>
 
             </div>
 
-            {{-- Bottom info: copyright (PT. DAVIN GALUH PARTNER) --}}
-            <div class="pt-8 text-center space-y-3">
-                <div class="font-bold text-base sm:text-lg text-white tracking-widest uppercase">PT. DAVIN GALUH PARTNER</div>
-                <p class="text-xs sm:text-sm text-dark-500 font-medium">Privacy Policy &copy; {{ date('Y') }} SajiHUB Restaurant Systems. Seluruh Hak Cipta Dilindungi.</p>
+            {{-- Copyright Text --}}
+            <div class="pt-8 text-center text-xs text-stone-300 font-medium">
+                © 2026 SajiHUB Resto. Seluruh Hak Cipta Dilindungi.
             </div>
         </div>
     </footer>
 
+    {{-- MODAL PILIH LAYANAN PEMESANAN --}}
+    <div id="order-type-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300">
+        <div class="bg-white border border-stone-200 w-full max-w-3xl rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 relative text-left">
+            <div class="flex justify-between items-start border-b border-stone-200 pb-4">
+                <div>
+                    <h3 class="font-black text-xl text-[#8C0000]">Pilih Metode Pemesanan</h3>
+                    <p class="text-xs sm:text-sm text-slate-600 font-medium mt-0.5">Silakan pilih opsi layanan pemesanan sesuai keinginan Anda.</p>
+                </div>
+                <button type="button" onclick="closeOrderTypeModal()" class="text-stone-400 hover:text-stone-700 bg-stone-100 p-2 rounded-full border border-stone-200 transition-colors cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {{-- Opsi 1: Makan di Tempat (Dine-In) --}}
+                <div class="bg-stone-50 border border-stone-200 rounded-3xl p-6 flex flex-col justify-between space-y-4 hover:border-[#BD2000] hover:shadow-md transition-all group">
+                    <div class="space-y-3">
+                        <div class="p-3.5 bg-[#BD2000]/10 text-[#BD2000] rounded-2xl border border-[#BD2000]/20 w-max">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                            </svg>
+                        </div>
+                        <span class="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider text-[#BD2000] bg-[#BD2000]/10 px-3 py-1 rounded-full border border-[#BD2000]/20">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            Makan di Tempat (Dine-In)
+                        </span>
+                        <h4 class="text-lg font-black text-[#1C1917]">Pesan dari Meja Makan</h4>
+                        <p class="text-xs text-slate-600 font-medium leading-relaxed">
+                            Silakan <strong>tempati meja kosong</strong> di restoran, kemudian <strong>pindai (scan) Kode QR</strong> yang tertera di meja Anda untuk langsung memilih menu & memesan dari smartphone.
+                        </p>
+                    </div>
+
+                    <div class="pt-2">
+                        <button type="button" onclick="openQrFromOrderType()" class="w-full bg-[#BD2000] hover:bg-[#8C0000] text-white font-extrabold py-3 px-4 rounded-xl text-xs uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 116 0z"/>
+                            </svg>
+                            <span>Pindai QR Code Meja</span>
+                        </button>
+                    </div>
+                </div>
+
+                {{-- Opsi 2: Bawa Pulang (Takeaway) --}}
+                <div class="bg-stone-50 border border-stone-200 rounded-3xl p-6 flex flex-col justify-between space-y-4 hover:border-amber-500 hover:shadow-md transition-all group">
+                    <div class="space-y-3">
+                        <div class="p-3.5 bg-amber-100 text-amber-700 rounded-2xl border border-amber-300 w-max">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                            </svg>
+                        </div>
+                        <span class="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider text-amber-800 bg-amber-100 px-3 py-1 rounded-full border border-amber-300">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                            Bawa Pulang (Takeaway)
+                        </span>
+                        <h4 class="text-lg font-black text-[#1C1917]">Pesan Langsung di Kasir</h4>
+                        <p class="text-xs text-slate-600 font-medium leading-relaxed">
+                            Untuk pesanan bawa pulang / dibungkus, silakan <strong>langsung menuju ke area Kasir</strong> restoran kami. Petugas kasir kami siap mencatat & melayani pesanan Anda secara cepat.
+                        </p>
+                    </div>
+
+                    <div class="pt-2 space-y-2">
+                        <div class="w-full bg-amber-500 text-white font-extrabold py-3 px-4 rounded-xl text-xs uppercase tracking-wider text-center flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            <span>Silakan Pesan di Kasir</span>
+                        </div>
+                        <a href="{{ route('menu.catalog') }}" class="block text-center text-[11px] text-[#BD2000] hover:underline font-extrabold">
+                            Lihat Menu & Harga →
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- MODAL KAMERA SCANNER QR MEJA --}}
+    <div id="qr-scanner-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300">
+        <div class="bg-white border border-stone-200 w-full max-w-md rounded-3xl p-6 shadow-2xl space-y-4 text-center">
+            <div class="flex justify-between items-center border-b border-stone-200 pb-3">
+                <h3 class="font-black text-lg text-[#8C0000]">Pindai Kode QR Meja</h3>
+                <button type="button" onclick="closeQrScannerModal()" class="text-stone-400 hover:text-stone-700 p-1 rounded-lg">
+                    ✕
+                </button>
+            </div>
+            
+            <p class="text-xs text-slate-600 font-medium">Arahkan kamera ponsel Anda ke stiker kode QR yang menempel di meja makan.</p>
+
+            <div id="qr-reader-container" class="w-full bg-stone-900 rounded-2xl p-2 border border-stone-300 min-h-[250px] flex flex-col items-center justify-center relative overflow-hidden">
+                <div id="qr-reader" class="w-full"></div>
+            </div>
+
+            <div class="pt-2">
+                <button type="button" onclick="closeQrScannerModal()" class="w-full py-3 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs uppercase rounded-xl border border-stone-300 transition-all cursor-pointer">
+                    Tutup Kamera
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Interactive Hero Banner Slider
-        const heroSlides = [
-            {
-                image: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=1920&q=80",
-                heading1: "LOKASI",
-                heading2: "SAJIHUB RESTO",
-                sub: "Cabang Resmi Pilihan Keluarga!",
-                desc: "Nikmati menu terpopuler khas Nusantara, harga ramah kantong, dengan suasana makan nyaman dan pelayanan cepat!"
-            },
-            {
-                image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1920&q=80",
-                heading1: "CITA RASA",
-                heading2: "MENU ANDALAN",
-                sub: "Kuliner Lezat & Higienis!",
-                desc: "Pilihan bahan segar berkualitas premium yang dimasak secara higienis oleh chef andalan kami khusus untuk Anda."
-            },
-            {
-                image: "https://images.unsplash.com/photo-1543007630-9710e4a00a20?auto=format&fit=crop&w=1920&q=80",
-                heading1: "ULASAN",
-                heading2: "PELANGGAN SETIA",
-                sub: "Rating Kepuasan Bintang 5!",
-                desc: "Ribuan testimoni puas dari pecinta kuliner yang menyukai rasa bumbu otentik meresap dan harga ramah dompet."
+        let html5QrCodeScannerInstance = null;
+
+        function openOrderTypeModal() {
+            const modal = document.getElementById('order-type-modal');
+            if (modal) {
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                modal.classList.add('opacity-100');
             }
-        ];
-
-        let currentHeroSlide = 0;
-        const heroBg = document.getElementById('hero-bg');
-        const heroH1 = document.getElementById('hero-heading-1');
-        const heroH2 = document.getElementById('hero-heading-2');
-        const heroSub = document.getElementById('hero-sub');
-        const heroDesc = document.getElementById('hero-desc');
-
-        function updateHeroSlide(index) {
-            // Apply fade-out effect
-            heroBg.style.opacity = '0.5';
-            heroH1.style.opacity = '0';
-            heroH2.style.opacity = '0';
-            heroSub.style.opacity = '0';
-            heroDesc.style.opacity = '0';
-
-            setTimeout(() => {
-                const slide = heroSlides[index];
-                heroBg.style.backgroundImage = `url('${slide.image}')`;
-                heroH1.textContent = slide.heading1;
-                heroH2.textContent = slide.heading2;
-                heroSub.textContent = slide.sub;
-                heroDesc.textContent = slide.desc;
-
-                // Fade back in
-                heroBg.style.opacity = '1';
-                heroH1.style.opacity = '1';
-                heroH2.style.opacity = '1';
-                heroSub.style.opacity = '1';
-                heroDesc.style.opacity = '1';
-            }, 300);
         }
 
-        document.getElementById('hero-btn-prev').addEventListener('click', () => {
-            currentHeroSlide = (currentHeroSlide - 1 + heroSlides.length) % heroSlides.length;
-            updateHeroSlide(currentHeroSlide);
-        });
+        function closeOrderTypeModal() {
+            const modal = document.getElementById('order-type-modal');
+            if (modal) {
+                modal.classList.remove('opacity-100');
+                modal.classList.add('opacity-0', 'pointer-events-none');
+            }
+        }
 
-        document.getElementById('hero-btn-next').addEventListener('click', () => {
-            currentHeroSlide = (currentHeroSlide + 1) % heroSlides.length;
-            updateHeroSlide(currentHeroSlide);
-        });
+        function openQrFromOrderType() {
+            closeOrderTypeModal();
+            setTimeout(() => {
+                openQrScannerModal();
+            }, 200);
+        }
 
-        // Dynamic ScrollSpy for Navbar Tautan Aktif
+        function openQrScannerModal() {
+            const modal = document.getElementById('qr-scanner-modal');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.classList.add('opacity-100');
+
+            if (!html5QrCodeScannerInstance) {
+                html5QrCodeScannerInstance = new Html5QrcodeScanner("qr-reader", { 
+                    fps: 10, 
+                    qrbox: { width: 220, height: 220 },
+                    rememberLastUsedCamera: true
+                });
+                
+                html5QrCodeScannerInstance.render(onScanSuccess, onScanError);
+            }
+        }
+
+        function onScanSuccess(decodedText, decodedResult) {
+            console.log("QR Code Scanned:", decodedText);
+            if (decodedText) {
+                if (html5QrCodeScannerInstance) {
+                    html5QrCodeScannerInstance.clear();
+                    html5QrCodeScannerInstance = null;
+                }
+                window.location.href = decodedText;
+            }
+        }
+
+        function onScanError(errorMessage) {
+            // silent scan failure
+        }
+
+        function closeQrScannerModal() {
+            const modal = document.getElementById('qr-scanner-modal');
+            modal.classList.remove('opacity-100');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+
+            if (html5QrCodeScannerInstance) {
+                html5QrCodeScannerInstance.clear().then(() => {
+                    html5QrCodeScannerInstance = null;
+                }).catch(err => {
+                    html5QrCodeScannerInstance = null;
+                });
+            }
+        }
+
+        // ScrollSpy Navbar Link Highlighter
         const sections = document.querySelectorAll('section');
         const navLinks = document.querySelectorAll('.nav-link');
 
         function activateScrollSpy() {
             let current = 'beranda';
-            const scrollPosition = window.scrollY + 120; // 120px offset for navbar height and margins
+            const scrollPosition = window.scrollY + 100;
 
             sections.forEach(section => {
                 const sectionTop = section.offsetTop;
@@ -335,44 +689,85 @@
                 }
             });
 
-            // If we are at the top of the page, default to beranda
             if (window.scrollY < 50) {
                 current = 'beranda';
             }
 
             navLinks.forEach(link => {
-                link.classList.remove('text-brand-500', 'border-brand-500');
-                link.classList.add('border-transparent');
+                link.classList.remove('text-[#BD2000]', 'border-[#BD2000]');
+                link.classList.add('text-stone-600', 'border-transparent');
                 
                 const href = link.getAttribute('href');
                 if (href === `#${current}`) {
-                    link.classList.remove('border-transparent');
-                    link.classList.add('text-brand-500', 'border-brand-500');
+                    link.classList.remove('text-stone-600', 'border-transparent');
+                    link.classList.add('text-[#BD2000]', 'border-[#BD2000]');
                 }
             });
         }
 
-        // Favorite Menu Slider Navigation (Scroll behavior)
-        const favoritContainer = document.getElementById('favorit-scroll-container');
-        const favoritBtnPrev = document.getElementById('favorit-btn-prev');
-        const favoritBtnNext = document.getElementById('favorit-btn-next');
+        let currentHeroIndex = 0;
+        let heroSlideTimer = null;
 
-        if (favoritContainer && favoritBtnPrev && favoritBtnNext) {
-            favoritBtnPrev.addEventListener('click', () => {
-                const card = favoritContainer.querySelector('.snap-start');
-                const scrollAmount = card ? card.offsetWidth + 24 : 320; // card width + flex gap
-                favoritContainer.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+        function showHeroSlide(index) {
+            const slides = document.querySelectorAll('.hero-slide');
+            const dots = document.querySelectorAll('.hero-dot');
+            if (!slides.length) return;
+
+            currentHeroIndex = (index + slides.length) % slides.length;
+
+            slides.forEach((slide, idx) => {
+                if (idx === currentHeroIndex) {
+                    slide.style.opacity = '1';
+                    slide.style.pointerEvents = 'auto';
+                    slide.style.transform = 'scale(1)';
+                    slide.style.zIndex = '10';
+                } else {
+                    slide.style.opacity = '0';
+                    slide.style.pointerEvents = 'none';
+                    slide.style.transform = 'scale(0.95)';
+                    slide.style.zIndex = '0';
+                }
             });
 
-            favoritBtnNext.addEventListener('click', () => {
-                const card = favoritContainer.querySelector('.snap-start');
-                const scrollAmount = card ? card.offsetWidth + 24 : 320; // card width + flex gap
-                favoritContainer.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            dots.forEach((dot, idx) => {
+                if (idx === currentHeroIndex) {
+                    dot.style.width = '24px';
+                    dot.style.backgroundColor = '#BD2000';
+                } else {
+                    dot.style.width = '10px';
+                    dot.style.backgroundColor = 'rgba(255, 255, 255, 0.6)';
+                }
             });
         }
 
+        function nextHeroSlide() {
+            showHeroSlide(currentHeroIndex + 1);
+            resetHeroTimer();
+        }
+
+        function prevHeroSlide() {
+            showHeroSlide(currentHeroIndex - 1);
+            resetHeroTimer();
+        }
+
+        function goToHeroSlide(index) {
+            showHeroSlide(index);
+            resetHeroTimer();
+        }
+
+        function resetHeroTimer() {
+            if (heroSlideTimer) clearInterval(heroSlideTimer);
+            heroSlideTimer = setInterval(() => {
+                showHeroSlide(currentHeroIndex + 1);
+            }, 4000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            showHeroSlide(0);
+            resetHeroTimer();
+        });
+
         window.addEventListener('scroll', activateScrollSpy);
-        // Run immediately on page load
         activateScrollSpy();
     </script>
 </body>

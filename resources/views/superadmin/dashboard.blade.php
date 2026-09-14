@@ -7,79 +7,68 @@
 <!-- Stat Cards -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
     <!-- Card 1 -->
-    <div class="bg-dark-800 border border-dark-700 rounded-2xl p-6 hover:bg-dark-800/80 hover:border-dark-600 transition-all duration-300 animate-fade-in-up delay-100 shadow-sm">
-        <div class="flex items-start justify-between">
-            <div>
-                <p class="text-sm font-medium text-dark-400 mb-1">Total Cabang Aktif</p>
-                <h3 class="text-3xl font-bold text-white">{{ $totalBranches ?? 0 }} <span class="text-base font-normal text-dark-500">cabang</span></h3>
-            </div>
-            <div class="p-3 bg-blue-500/10 text-blue-500 rounded-xl">
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-            </div>
+    <div class="bg-white border border-stone-200 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all flex items-center justify-between">
+        <div>
+            <p class="text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Total Cabang Aktif</p>
+            <h3 class="text-3xl font-black text-blue-600">{{ $totalBranches ?? 0 }} <span class="text-sm font-bold text-slate-500">cabang</span></h3>
+        </div>
+        <div class="p-3.5 bg-blue-50 text-blue-600 rounded-2xl border border-blue-200 shrink-0">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
         </div>
     </div>
 
     <!-- Card 2 -->
-    <div class="bg-dark-800 border border-dark-700 rounded-2xl p-6 hover:bg-dark-800/80 hover:border-dark-600 transition-all duration-300 animate-fade-in-up delay-200 shadow-sm">
-        <div class="flex items-start justify-between">
-            <div>
-                <p class="text-sm font-medium text-dark-400 mb-1">Total Pendapatan</p>
-                <h3 class="text-3xl font-bold text-white">Rp {{ number_format($totalRevenue ?? 0, 0, ',', '.') }}</h3>
-                @if(isset($revenueGrowth))
-                <div class="mt-2 flex items-center text-sm {{ $revenueGrowth >= 0 ? 'text-emerald-500' : 'text-red-500' }}">
-                    <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $revenueGrowth >= 0 ? 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' : 'M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6' }}"></path>
-                    </svg>
-                    <span>{{ abs($revenueGrowth) }}% dari bulan lalu</span>
-                </div>
-                @endif
+    <div class="bg-white border border-stone-200 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all flex items-center justify-between">
+        <div>
+            <p class="text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Total Pendapatan</p>
+            <h3 class="text-3xl font-black text-emerald-600">Rp {{ number_format($totalRevenue ?? 0, 0, ',', '.') }}</h3>
+            @if(isset($revenueGrowth))
+            <div class="mt-2 flex items-center text-xs font-extrabold {{ $revenueGrowth >= 0 ? 'text-emerald-700' : 'text-red-600' }}">
+                <span>{{ $revenueGrowth >= 0 ? '▲ +' : '▼ -' }}{{ abs($revenueGrowth) }}% dari bulan lalu</span>
             </div>
-            <div class="p-3 bg-emerald-500/10 text-emerald-500 rounded-xl">
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            </div>
+            @endif
+        </div>
+        <div class="p-3.5 bg-emerald-50 text-emerald-600 rounded-2xl border border-emerald-200 shrink-0">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
         </div>
     </div>
 
     <!-- Card 3 -->
-    <div class="bg-dark-800 border border-dark-700 rounded-2xl p-6 hover:bg-dark-800/80 hover:border-dark-600 transition-all duration-300 animate-fade-in-up delay-300 shadow-sm">
-        <div class="flex items-start justify-between">
-            <div>
-                <p class="text-sm font-medium text-dark-400 mb-1">Total Karyawan</p>
-                <h3 class="text-3xl font-bold text-white">{{ $totalEmployees ?? 0 }} <span class="text-base font-normal text-dark-500">orang</span></h3>
-            </div>
-            <div class="p-3 bg-purple-500/10 text-purple-500 rounded-xl">
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-            </div>
+    <div class="bg-white border border-stone-200 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all flex items-center justify-between">
+        <div>
+            <p class="text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Total Karyawan</p>
+            <h3 class="text-3xl font-black text-purple-600">{{ $totalEmployees ?? 0 }} <span class="text-sm font-bold text-slate-500">orang</span></h3>
+        </div>
+        <div class="p-3.5 bg-purple-50 text-purple-600 rounded-2xl border border-purple-200 shrink-0">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
         </div>
     </div>
 
     <!-- Card 4 -->
-    <div class="bg-dark-800 border border-dark-700 rounded-2xl p-6 hover:bg-dark-800/80 hover:border-dark-600 transition-all duration-300 animate-fade-in-up delay-400 shadow-sm">
-        <div class="flex items-start justify-between">
-            <div>
-                <p class="text-sm font-medium text-dark-400 mb-1">Total Pesanan</p>
-                <h3 class="text-3xl font-bold text-white">{{ $totalOrders ?? 0 }} <span class="text-base font-normal text-dark-500">pesanan</span></h3>
-            </div>
-            <div class="p-3 bg-amber-500/10 text-amber-500 rounded-xl">
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-            </div>
+    <div class="bg-white border border-stone-200 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all flex items-center justify-between">
+        <div>
+            <p class="text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Total Pesanan</p>
+            <h3 class="text-3xl font-black text-[#BD2000]">{{ $totalOrders ?? 0 }} <span class="text-sm font-bold text-slate-500">Pesanan</span></h3>
+        </div>
+        <div class="p-3.5 bg-[#BD2000]/10 text-[#BD2000] rounded-2xl border border-[#BD2000]/20 shrink-0">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
         </div>
     </div>
 </div>
 
 <!-- Charts Section -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in-up delay-300">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in-up">
     <!-- Monthly Global Revenue Trend -->
-    <div class="bg-dark-800 border border-dark-700 rounded-2xl p-6 shadow-sm flex flex-col">
-        <h3 class="text-base font-bold text-white mb-4">Tren Pendapatan Bulanan Global</h3>
+    <div class="bg-white border border-stone-200 rounded-3xl p-6 shadow-sm flex flex-col">
+        <h3 class="text-base font-black text-[#8C0000] mb-4">Tren Pendapatan Bulanan Global</h3>
         <div class="relative w-full h-[260px]">
             <canvas id="globalRevenueChart"></canvas>
         </div>
     </div>
 
     <!-- Revenue Comparison per Branch -->
-    <div class="bg-dark-800 border border-dark-700 rounded-2xl p-6 shadow-sm flex flex-col">
-        <h3 class="text-base font-bold text-white mb-4">Perbandingan Pendapatan Antar Cabang</h3>
+    <div class="bg-white border border-stone-200 rounded-3xl p-6 shadow-sm flex flex-col">
+        <h3 class="text-base font-black text-[#8C0000] mb-4">Perbandingan Pendapatan Antar Cabang</h3>
         <div class="relative w-full h-[260px]">
             <canvas id="branchRevenueChart"></canvas>
         </div>
@@ -87,55 +76,60 @@
 </div>
 
 <!-- Header Action -->
-<div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 animate-fade-in-up delay-400">
-    <h2 class="text-lg font-semibold text-white">Daftar Cabang Aktif</h2>
-    <a href="{{ route('superadmin.branches.create') }}" class="inline-flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-xl font-medium transition-colors shadow-lg shadow-brand-500/20">
-        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+<div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 animate-fade-in-up">
+    <h2 class="text-lg font-black text-[#8C0000]">Daftar Cabang Aktif</h2>
+    <a href="{{ route('superadmin.branches.create') }}" class="inline-flex items-center gap-2 bg-[#BD2000] hover:bg-[#8C0000] text-white px-5 py-2.5 rounded-xl font-extrabold text-sm transition-all shadow-md cursor-pointer">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
         Tambah Cabang Baru
     </a>
 </div>
 
 <!-- Branches Table -->
-<div class="bg-dark-900 rounded-2xl border border-dark-700 overflow-hidden mb-8 animate-fade-in-up delay-400 shadow-sm">
+<div class="bg-white border border-stone-200 rounded-3xl overflow-hidden mb-8 shadow-sm animate-fade-in-up">
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
             <thead>
-                <tr class="bg-dark-800 border-b border-dark-700">
-                    <th class="px-6 py-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">ID Cabang</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">Nama Cabang</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">Lokasi</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">Status</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">Admin PJ</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">Pesanan</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">Aksi</th>
+                <tr class="bg-stone-100 border-b border-stone-200 text-stone-700 text-xs font-extrabold uppercase tracking-wider">
+                    <th class="px-6 py-4">Nama Cabang</th>
+                    <th class="px-6 py-4">Lokasi</th>
+                    <th class="px-6 py-4">Status</th>
+                    <th class="px-6 py-4">Admin PJ</th>
+                    <th class="px-6 py-4">Pesanan</th>
+                    <th class="px-6 py-4 text-right">Aksi</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-dark-700/50">
+            <tbody class="divide-y divide-stone-200">
                 @forelse($branches ?? [] as $branch)
-                <tr class="hover:bg-dark-800/50 transition-colors">
-                    <td class="px-6 py-4 text-sm font-medium text-dark-300">BR-{{ str_pad($branch->id, 3, '0', STR_PAD_LEFT) }}</td>
+                <tr class="hover:bg-stone-50 transition-colors">
                     <td class="px-6 py-4">
-                        <div class="text-sm font-bold text-white">{{ $branch->name }}</div>
+                        <div class="text-sm font-extrabold text-[#1C1917]">{{ $branch->name }}</div>
                     </td>
-                    <td class="px-6 py-4 text-sm text-dark-300 truncate max-w-[200px]">{{ $branch->address }}</td>
+                    <td class="px-6 py-4 text-sm text-slate-600 font-semibold truncate max-w-[200px]">{{ $branch->address }}</td>
                     <td class="px-6 py-4">
-                        @if($branch->status == 'Buka' || true)
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                        @if($branch->status == 'buka')
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
                                 Buka
                             </span>
+                        @elseif($branch->status == 'tutup')
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-red-50 text-red-700 border border-red-200">
+                                <span class="w-2 h-2 rounded-full bg-red-500 shrink-0"></span>
+                                Tutup
+                            </span>
                         @else
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-500/10 text-blue-500 border border-blue-500/20">
-                                Stabil
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                                <span class="w-2 h-2 rounded-full bg-amber-500 shrink-0"></span>
+                                Maintenance
                             </span>
                         @endif
                     </td>
-                    <td class="px-6 py-4 text-sm text-dark-300">
+                    <td class="px-6 py-4 text-sm text-slate-700 font-bold">
                         {{ $branch->admin->name ?? '-' }}
                     </td>
-                    <td class="px-6 py-4 text-sm text-dark-300">{{ $branch->orders_count ?? 0 }}</td>
-                    <td class="px-6 py-4">
-                        <div class="flex items-center gap-2">
-                            <button class="show-branch-btn p-1.5 bg-dark-700 hover:bg-dark-600 text-dark-200 hover:text-white rounded-lg transition-colors cursor-pointer" 
+                    <td class="px-6 py-4 text-sm text-slate-700 font-bold">{{ $branch->orders_count ?? 0 }}</td>
+                    <td class="px-6 py-4 text-right">
+                        <div class="flex items-center justify-end gap-2">
+                            <button class="show-branch-btn p-2 bg-stone-100 hover:bg-stone-200 text-stone-700 border border-stone-300 rounded-xl transition-colors cursor-pointer" 
                                     title="Lihat Detail"
                                     data-id="BR-{{ str_pad($branch->id, 3, '0', STR_PAD_LEFT) }}"
                                     data-name="{{ $branch->name }}"
@@ -149,7 +143,7 @@
                                     data-revenue="Rp {{ number_format($branchRevenues->firstWhere('id', $branch->id)->orders_sum_total_price ?? 0, 0, ',', '.') }}">
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                             </button>
-                            <a href="{{ route('superadmin.branches.edit', $branch->id) }}" class="p-1.5 bg-dark-700 hover:bg-brand-500 text-dark-200 hover:text-white rounded-lg transition-colors" title="Edit">
+                            <a href="{{ route('superadmin.branches.edit', $branch->id) }}" class="p-2 bg-stone-100 hover:bg-[#BD2000] text-stone-700 hover:text-white rounded-xl transition-colors border border-stone-300" title="Edit">
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                             </a>
                         </div>
@@ -157,7 +151,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" class="px-6 py-8 text-center text-dark-400">Belum ada data cabang.</td>
+                    <td colspan="6" class="px-6 py-8 text-center text-slate-500 font-medium">Belum ada data cabang.</td>
                 </tr>
                 @endforelse
             </tbody>
@@ -166,51 +160,49 @@
 </div>
 
 <!-- Recent Orders -->
-<h2 class="text-lg font-semibold text-white mb-4 animate-fade-in-up delay-400">Pesanan Terakhir</h2>
-<div class="bg-dark-900 rounded-2xl border border-dark-700 overflow-hidden animate-fade-in-up delay-400 shadow-sm">
+<h2 class="text-lg font-black text-[#8C0000] mb-4 animate-fade-in-up">Pesanan Terakhir</h2>
+<div class="bg-white border border-stone-200 rounded-3xl overflow-hidden mb-8 shadow-sm animate-fade-in-up">
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
             <thead>
-                <tr class="bg-dark-800 border-b border-dark-700">
-                    <th class="px-6 py-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">ID Pesanan</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">Cabang</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">Pelanggan</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">Total</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">Status Dapur</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">Pembayaran</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-dark-400 uppercase tracking-wider">Waktu</th>
+                <tr class="bg-stone-100 border-b border-stone-200 text-stone-700 text-xs font-extrabold uppercase tracking-wider">
+                    <th class="px-6 py-4">Cabang</th>
+                    <th class="px-6 py-4">Pelanggan</th>
+                    <th class="px-6 py-4">Total</th>
+                    <th class="px-6 py-4">Status Dapur</th>
+                    <th class="px-6 py-4">Pembayaran</th>
+                    <th class="px-6 py-4 text-right">Waktu</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-dark-700/50">
+            <tbody class="divide-y divide-stone-200">
                 @forelse($recentOrders ?? [] as $order)
-                <tr class="hover:bg-dark-800/50 transition-colors">
-                    <td class="px-6 py-4 text-sm font-medium text-white">#{{ $order->id }}</td>
-                    <td class="px-6 py-4 text-sm text-dark-300">{{ $order->branch->name ?? '-' }}</td>
-                    <td class="px-6 py-4 text-sm text-dark-300">{{ $order->customer_name }}</td>
-                    <td class="px-6 py-4 text-sm font-medium text-white">Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>
+                <tr class="hover:bg-stone-50 transition-colors">
+                    <td class="px-6 py-4 text-sm font-extrabold text-[#1C1917]">{{ $order->branch->name ?? '-' }}</td>
+                    <td class="px-6 py-4 text-sm text-slate-700 font-semibold">{{ $order->customer_name }}</td>
+                    <td class="px-6 py-4 text-sm font-black text-[#BD2000]">Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>
                     <td class="px-6 py-4">
                         @if($order->order_status == 'pending')
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">Menunggu</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-100 text-amber-800 border border-amber-300">Menunggu</span>
                         @elseif($order->order_status == 'cooking')
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-orange-500/10 text-orange-500 border border-orange-500/20">Dimasak</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-orange-100 text-orange-800 border border-orange-300">Dimasak</span>
                         @elseif($order->order_status == 'served')
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-blue-500/10 text-blue-500 border border-blue-500/20">Disajikan</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-blue-100 text-blue-800 border border-blue-300">Disajikan</span>
                         @else
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">Selesai</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-emerald-100 text-emerald-800 border border-emerald-300">Selesai</span>
                         @endif
                     </td>
                     <td class="px-6 py-4">
                         @if($order->payment_status == 'paid')
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">Lunas</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-emerald-100 text-emerald-800 border border-emerald-300">Lunas</span>
                         @else
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-red-500/10 text-red-500 border border-red-500/20">Belum Bayar</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-red-100 text-red-600 border border-red-200">Belum Bayar</span>
                         @endif
                     </td>
-                    <td class="px-6 py-4 text-xs text-dark-400">{{ $order->created_at->diffForHumans() }}</td>
+                    <td class="px-6 py-4 text-xs text-slate-500 font-semibold text-right">{{ $order->created_at->diffForHumans() }}</td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" class="px-6 py-8 text-center text-dark-400">Belum ada pesanan terbaru.</td>
+                    <td colspan="6" class="px-6 py-8 text-center text-slate-500 font-medium">Belum ada pesanan terbaru.</td>
                 </tr>
                 @endforelse
             </tbody>
@@ -220,13 +212,14 @@
 
 <!-- Modal Detail Cabang -->
 <div id="branch-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden animate-fade-in">
-    <div class="bg-dark-900 border border-dark-700 rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl relative animate-scale-up">
+    <div class="bg-white border border-stone-200 rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl relative">
         <!-- Header -->
-        <div class="px-6 py-5 border-b border-dark-800 flex justify-between items-center bg-dark-950/50">
-            <h3 class="text-xl font-bold text-white uppercase tracking-tight flex items-center gap-2">
-                🏢 Detail Cabang
+        <div class="px-6 py-5 border-b border-stone-200 flex justify-between items-center bg-stone-50">
+            <h3 class="text-xl font-black text-[#8C0000] uppercase tracking-tight flex items-center gap-2">
+                <svg class="w-6 h-6 text-[#8C0000]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h5m-5 0V11m0 0h5M12 11H7m5 0v5m0 0h5m-5 0H7"/></svg>
+                <span>Detail Cabang</span>
             </h3>
-            <button id="close-modal-btn" class="text-dark-400 hover:text-white hover:bg-dark-800 p-1.5 rounded-lg transition-colors cursor-pointer">
+            <button id="close-modal-btn" class="text-stone-400 hover:text-stone-700 hover:bg-stone-100 p-1.5 rounded-xl transition-colors cursor-pointer">
                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
         </div>
@@ -234,58 +227,58 @@
         <!-- Content -->
         <div class="p-6 space-y-6">
             <div>
-                <div class="text-[10px] uppercase font-bold tracking-widest text-brand-500 mb-1">Nama Cabang</div>
-                <h4 id="modal-branch-name" class="text-2xl font-black text-white">Nama Cabang</h4>
+                <div class="text-[10px] uppercase font-bold tracking-widest text-[#BD2000] mb-1">Nama Cabang</div>
+                <h4 id="modal-branch-name" class="text-2xl font-black text-[#1C1917]">Nama Cabang</h4>
             </div>
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <div class="text-[10px] uppercase font-bold tracking-widest text-dark-500 mb-1">ID Cabang</div>
-                    <div id="modal-branch-id" class="text-sm font-semibold text-white">BR-001</div>
+                    <div class="text-[10px] uppercase font-bold tracking-widest text-stone-500 mb-1">ID Cabang</div>
+                    <div id="modal-branch-id" class="text-sm font-black text-[#1C1917]">BR-001</div>
                 </div>
                 <div>
-                    <div class="text-[10px] uppercase font-bold tracking-widest text-dark-500 mb-1">Telepon</div>
-                    <div id="modal-branch-phone" class="text-sm font-semibold text-white">-</div>
+                    <div class="text-[10px] uppercase font-bold tracking-widest text-stone-500 mb-1">Telepon</div>
+                    <div id="modal-branch-phone" class="text-sm font-black text-[#1C1917]">-</div>
                 </div>
             </div>
 
             <div>
-                <div class="text-[10px] uppercase font-bold tracking-widest text-dark-500 mb-1">Alamat Lengkap</div>
-                <p id="modal-branch-address" class="text-sm text-dark-300 leading-relaxed font-medium">Alamat</p>
+                <div class="text-[10px] uppercase font-bold tracking-widest text-stone-500 mb-1">Alamat Lengkap</div>
+                <p id="modal-branch-address" class="text-sm text-slate-700 leading-relaxed font-semibold">Alamat</p>
             </div>
 
             <!-- PJ Admin Info -->
-            <div class="bg-dark-950/40 border border-dark-800 rounded-2xl p-4">
-                <div class="text-[10px] uppercase font-bold tracking-widest text-brand-500 mb-2">Penanggung Jawab (PJ)</div>
+            <div class="bg-stone-50 border border-stone-200 rounded-2xl p-4">
+                <div class="text-[10px] uppercase font-bold tracking-widest text-[#BD2000] mb-2">Penanggung Jawab (PJ)</div>
                 <div class="space-y-2">
                     <div class="flex justify-between text-sm">
-                        <span class="text-dark-400">Nama Admin:</span>
-                        <span id="modal-branch-admin-name" class="text-white font-bold">-</span>
+                        <span class="text-slate-600 font-medium">Nama Admin:</span>
+                        <span id="modal-branch-admin-name" class="text-[#1C1917] font-black">-</span>
                     </div>
                     <div class="flex justify-between text-sm">
-                        <span class="text-dark-400">Username:</span>
-                        <span id="modal-branch-admin-username" class="text-dark-300 font-mono">-</span>
+                        <span class="text-slate-600 font-medium">Username:</span>
+                        <span id="modal-branch-admin-username" class="text-slate-700 font-mono font-bold">-</span>
                     </div>
                     <div class="flex justify-between text-sm">
-                        <span class="text-dark-400">Email:</span>
-                        <span id="modal-branch-admin-email" class="text-dark-300 font-mono">-</span>
+                        <span class="text-slate-600 font-medium">Email:</span>
+                        <span id="modal-branch-admin-email" class="text-slate-700 font-mono font-bold">-</span>
                     </div>
                 </div>
             </div>
 
             <!-- Stats -->
             <div class="grid grid-cols-3 gap-3">
-                <div class="bg-dark-950/40 border border-dark-800 rounded-xl p-3 text-center">
-                    <div class="text-xs text-dark-500 font-semibold mb-1">Karyawan</div>
-                    <div id="modal-branch-users-count" class="text-lg font-black text-white">0</div>
+                <div class="bg-stone-50 border border-stone-200 rounded-2xl p-3 text-center">
+                    <div class="text-xs text-stone-500 font-bold mb-1">Karyawan</div>
+                    <div id="modal-branch-users-count" class="text-lg font-black text-[#1C1917]">0</div>
                 </div>
-                <div class="bg-dark-950/40 border border-dark-800 rounded-xl p-3 text-center">
-                    <div class="text-xs text-dark-500 font-semibold mb-1">Pesanan</div>
-                    <div id="modal-branch-orders-count" class="text-lg font-black text-white">0</div>
+                <div class="bg-stone-50 border border-stone-200 rounded-2xl p-3 text-center">
+                    <div class="text-xs text-stone-500 font-bold mb-1">Pesanan</div>
+                    <div id="modal-branch-orders-count" class="text-lg font-black text-[#1C1917]">0</div>
                 </div>
-                <div class="bg-dark-950/40 border border-dark-800 rounded-xl p-3 text-center">
-                    <div class="text-xs text-dark-500 font-semibold mb-1">Total Omset</div>
-                    <div id="modal-branch-revenue" class="text-lg font-black text-brand-400">Rp 0</div>
+                <div class="bg-stone-50 border border-stone-200 rounded-2xl p-3 text-center">
+                    <div class="text-xs text-stone-500 font-bold mb-1">Total Omset</div>
+                    <div id="modal-branch-revenue" class="text-lg font-black text-[#BD2000]">Rp 0</div>
                 </div>
             </div>
         </div>
@@ -306,11 +299,16 @@
             datasets: [{
                 label: 'Omzet Bulanan (Rp)',
                 data: {!! json_encode($monthlyValues ?? []) !!},
-                borderColor: '#e85824',
-                backgroundColor: 'rgba(232, 88, 36, 0.1)',
+                borderColor: '#059669',
+                backgroundColor: 'rgba(5, 150, 105, 0.1)',
                 borderWidth: 3,
                 fill: true,
-                tension: 0.3
+                tension: 0.4,
+                pointBackgroundColor: '#059669',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 5,
+                pointHoverRadius: 7
             }]
         },
         options: {
@@ -324,10 +322,11 @@
             scales: {
                 y: {
                     grid: {
-                        color: '#282b30'
+                        color: 'rgba(0,0,0,0.05)'
                     },
                     ticks: {
-                        color: '#72767d',
+                        color: '#475569',
+                        font: { weight: 'bold' },
                         callback: function(value) {
                             return 'Rp ' + value.toLocaleString('id-ID');
                         }
@@ -338,7 +337,8 @@
                         display: false
                     },
                     ticks: {
-                        color: '#72767d'
+                        color: '#475569',
+                        font: { weight: 'bold' }
                     }
                 }
             }
@@ -357,9 +357,10 @@
             datasets: [{
                 label: 'Total Pendapatan (Rp)',
                 data: branchTotals,
-                backgroundColor: '#3b82f6',
-                borderRadius: 8,
-                maxBarThickness: 40
+                backgroundColor: '#bd2000',
+                borderRadius: 12,
+                borderSkipped: false,
+                maxBarThickness: 32
             }]
         },
         options: {
@@ -373,10 +374,11 @@
             scales: {
                 y: {
                     grid: {
-                        color: '#282b30'
+                        color: 'rgba(0,0,0,0.05)'
                     },
                     ticks: {
-                        color: '#72767d',
+                        color: '#475569',
+                        font: { weight: 'bold' },
                         callback: function(value) {
                             return 'Rp ' + value.toLocaleString('id-ID');
                         }
@@ -387,7 +389,8 @@
                         display: false
                     },
                     ticks: {
-                        color: '#72767d'
+                        color: '#475569',
+                        font: { weight: 'bold' }
                     }
                 }
             }

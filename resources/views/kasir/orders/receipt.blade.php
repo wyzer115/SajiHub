@@ -108,6 +108,7 @@
     </div>
 
     <div class="header">
+        <img src="{{ asset('images/logo.png') }}" alt="SajiHUB" style="height: 36px; width: 36px; object-fit: contain; margin: 0 auto 6px auto; display: block;">
         <h2>SajiHUB</h2>
         <h3>{{ $order->branch->name ?? 'Cabang Restoran' }}</h3>
         <p>{{ $order->branch->address ?? '' }}</p>
@@ -121,7 +122,7 @@
     <table class="info-table">
         <tr>
             <td>No. Pesanan: #{{ $order->id }}</td>
-            <td>Meja: {{ $order->table->table_number ?? '-' }}</td>
+            <td>Meja: {{ $order->table ? $order->table->table_number : 'Takeaway (Bungkus)' }}</td>
         </tr>
         <tr>
             <td>Tanggal: {{ $order->created_at->format('d/m/Y H:i') }}</td>

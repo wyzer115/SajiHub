@@ -23,10 +23,35 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        $loginType = filter_var($request->input('login'), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        $loginInput = trim($request->input('login'));
+        $loginType = filter_var($loginInput, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
+        if ($loginType === 'username') {
+            $aliases = [
+                'admin_jkt'      => 'admin_jakarta',
+                'admin_bdg'      => 'admin_bandung',
+                'admin_sby'      => 'admin_surabaya',
+                'owner_jakarta'  => 'owner_jkt',
+                'owner_bandung'  => 'owner_bdg',
+                'owner_surabaya' => 'owner_sby',
+                'spv_jakarta'    => 'spv_jkt',
+                'spv_bandung'    => 'spv_bdg',
+                'spv_surabaya'   => 'spv_sby',
+                'kasir_jakarta'  => 'kasir_jkt',
+                'kasir_bandung'  => 'kasir_bdg',
+                'kasir_surabaya' => 'kasir_sby',
+                'koki_jakarta'   => 'koki_jkt',
+                'koki_bandung'   => 'koki_bdg',
+                'koki_surabaya'  => 'koki_sby',
+                'dapur_jkt'      => 'koki_jkt',
+                'dapur_bdg'      => 'koki_bdg',
+                'dapur_sby'      => 'koki_sby',
+            ];
+            $loginInput = $aliases[$loginInput] ?? $loginInput;
+        }
 
         $credentials = [
-            $loginType => $request->input('login'),
+            $loginType => $loginInput,
             'password' => $request->input('password'),
         ];
 
@@ -50,20 +75,37 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
+        $loginInput = $request->input('username_or_email');
+        $isEmail = filter_var($loginInput, FILTER_VALIDATE_EMAIL);
+
+        if ($isEmail) {
+            $request->merge([
+                'email' => $loginInput,
+                'username' => explode('@', $loginInput)[0],
+            ]);
+        } else {
+            $request->merge([
+                'username' => $loginInput,
+                'email' => $loginInput . '@sajihub.com',
+            ]);
+        }
+
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'username' => 'required|string|max:255|unique:users|alpha_dash',
+            'username' => 'required|string|max:255|unique:users,username',
+            'email' => 'required|string|email|max:255|unique:users,email',
+            'phone' => 'nullable|string|max:20',
             'password' => 'required|string|min:6|confirmed',
-            'role' => 'required|string|in:member,pelanggan',
+            'role' => 'required|in:customer,kasir,dapur,koki',
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'username' => $request->username,
+            'phone' => $request->phone,
             'password' => bcrypt($request->password),
-            'role' => $request->role,
+            'role' => $request->role === 'koki' ? 'dapur' : $request->role,
         ]);
 
         Auth::login($user);
@@ -82,11 +124,13 @@ class AuthController extends Controller
     private function redirectBasedOnRole(User $user): string
     {
         return match ($user->role) {
-            'superadmin' => route('superadmin.dashboard'),
+            'superadmin'   => route('superadmin.dashboard'),
             'admin_cabang' => route('admin.dashboard'),
-            'kasir' => route('kasir.orders.index'),
-            'koki' => route('koki.kitchen'),
-            default => route('pesan'),
+            'owner'        => route('owner.dashboard'),
+            'supervisor'   => route('supervisor.inventory.index'),
+            'kasir'        => route('kasir.orders.index'),
+            'dapur', 'koki'=> route('koki.kitchen'),
+            default        => route('pesan'),
         };
     }
 }

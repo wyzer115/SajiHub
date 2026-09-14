@@ -23,11 +23,33 @@ class DashboardController extends Controller
             ->with('category')
             ->withSum('orderItems as count', 'quantity')
             ->orderByDesc('count')
-            ->limit(5)
+            ->limit(3)
             ->get();
 
+        // 7 Days Trend
+        $chartDates = [];
+        $chartRevenues = [];
+        $chartOrders = [];
+
+        for ($i = 6; $i >= 0; $i--) {
+            $date = now()->subDays($i);
+            $chartDates[] = $date->format('d/m');
+
+            $dayRev = $branch->orders()
+                ->where('payment_status', 'paid')
+                ->whereDate('created_at', $date->toDateString())
+                ->sum('total_price');
+            $chartRevenues[] = (float) $dayRev;
+
+            $dayOrd = $branch->orders()
+                ->whereDate('created_at', $date->toDateString())
+                ->count();
+            $chartOrders[] = $dayOrd;
+        }
+
         return view('admin.dashboard', compact(
-            'branch', 'todayRevenue', 'todayOrders', 'activeOrders', 'totalMenus', 'recentOrders', 'popularMenus'
+            'branch', 'todayRevenue', 'todayOrders', 'activeOrders', 'totalMenus', 'recentOrders', 'popularMenus',
+            'chartDates', 'chartRevenues', 'chartOrders'
         ));
     }
 }
