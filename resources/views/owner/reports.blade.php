@@ -8,10 +8,16 @@
     <!-- Header & Date Filter -->
     <div class="bg-white border border-stone-200 rounded-3xl p-6 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-            <h2 class="text-xl font-black text-[#8C0000]">Laporan Keuangan Cabang {{ $branch->name }}</h2>
+            <h2 class="text-xl font-black text-[#8C0000]">Laporan Keuangan: {{ $selectedBranch ? $selectedBranch->name : 'Semua Cabang (Gabungan)' }}</h2>
             <p class="text-slate-600 text-xs mt-0.5 font-medium">Periode: <span class="text-[#BD2000] font-extrabold">{{ \Carbon\Carbon::parse($startDate)->format('d M Y') }} - {{ \Carbon\Carbon::parse($endDate)->format('d M Y') }}</span></p>
         </div>
         <form method="GET" action="{{ route('owner.reports') }}" class="flex items-center gap-3 flex-wrap">
+            <select name="branch_id" onchange="this.form.submit()" class="bg-stone-50 border border-stone-300 text-stone-800 text-xs font-bold rounded-xl px-3 py-2 focus:border-[#BD2000] focus:outline-none shadow-sm cursor-pointer">
+                <option value="all" {{ ($selectedBranchId == 'all' || !$selectedBranchId) ? 'selected' : '' }}>🌐 Semua Cabang</option>
+                @foreach($branches as $b)
+                    <option value="{{ $b->id }}" {{ $selectedBranchId == $b->id ? 'selected' : '' }}>🏢 {{ $b->name }}</option>
+                @endforeach
+            </select>
             <input type="date" name="start_date" value="{{ $startDate }}" class="bg-stone-50 border border-stone-300 text-[#1C1917] font-bold rounded-xl px-3 py-2 text-xs focus:border-[#BD2000] focus:outline-none">
             <span class="text-slate-500 text-xs font-bold">s/d</span>
             <input type="date" name="end_date" value="{{ $endDate }}" class="bg-stone-50 border border-stone-300 text-[#1C1917] font-bold rounded-xl px-3 py-2 text-xs focus:border-[#BD2000] focus:outline-none">

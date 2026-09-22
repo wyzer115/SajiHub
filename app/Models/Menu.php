@@ -43,4 +43,9 @@ class Menu extends Model
     {
         return $this->hasMany(MenuIngredient::class);
     }
+
+    public function menuIngredients()
+    {
+        return $this->hasMany(MenuIngredient::class);
+    }
 }

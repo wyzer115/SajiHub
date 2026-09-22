@@ -403,4 +403,105 @@ class OrderController extends Controller
 
         return view('kasir.transactions', compact('orders', 'totalPaidRevenue', 'preset', 'startDate', 'endDate'));
     }
+
+    public function financialReport(Request $request)
+    {
+        $branchId = auth()->user()->branch_id;
+        $branch = auth()->user()->branch;
+
+        $preset = $request->get('preset', 'today');
+        $startDate = $request->get('start_date');
+        $endDate = $request->get('end_date');
+
+        if (!$startDate && !$endDate) {
+            switch ($preset) {
+                case 'today':
+                    $startDate = now()->toDateString();
+                    $endDate = now()->toDateString();
+                    break;
+                case 'weekly':
+                    $startDate = now()->startOfWeek()->toDateString();
+                    $endDate = now()->toDateString();
+                    break;
+                case 'monthly':
+                    $startDate = now()->startOfMonth()->toDateString();
+                    $endDate = now()->toDateString();
+                    break;
+            }
+        }
+
+        $baseQuery = Order::where('branch_id', $branchId)
+            ->where('payment_status', 'paid');
+
+        if ($startDate && $endDate) {
+            $baseQuery->whereBetween('created_at', [
+                \Carbon\Carbon::parse($startDate)->startOfDay(),
+                \Carbon\Carbon::parse($endDate)->endOfDay()
+            ]);
+        }
+
+        // Financial KPIs
+        $paidOrders = (clone $baseQuery)->with(['table', 'user', 'items.menu.category', 'transaction'])->latest()->get();
+        $totalPaidRevenue = (float) $paidOrders->sum('total_price');
+        $totalPaidOrdersCount = $paidOrders->count();
+
+        $cashRevenue = (float) $paidOrders->where('payment_method', 'cash')->sum('total_price');
+        $qrisRevenue = (float) $paidOrders->where('payment_method', 'qris')->sum('total_price');
+        $avgTransactionValue = $totalPaidOrdersCount > 0 ? ($totalPaidRevenue / $totalPaidOrdersCount) : 0;
+
+        // Sales Breakdown by Menu Category & Top Items
+        $menuSales = [];
+        $categorySales = [];
+
+        foreach ($paidOrders as $order) {
+            foreach ($order->items as $item) {
+                $itemTotal = (float) ($item->price * $item->quantity);
+                $menuName = $item->menu ? $item->menu->name : 'Unknown';
+                $categoryName = ($item->menu && $item->menu->category) ? $item->menu->category->name : 'Lainnya';
+
+                if (!isset($menuSales[$menuName])) {
+                    $menuSales[$menuName] = [
+                        'name' => $menuName,
+                        'qty' => 0,
+                        'total' => 0,
+                    ];
+                }
+                $menuSales[$menuName]['qty'] += $item->quantity;
+                $menuSales[$menuName]['total'] += $itemTotal;
+
+                if (!isset($categorySales[$categoryName])) {
+                    $categorySales[$categoryName] = [
+                        'name' => $categoryName,
+                        'qty' => 0,
+                        'total' => 0,
+                    ];
+                }
+                $categorySales[$categoryName]['qty'] += $item->quantity;
+                $categorySales[$categoryName]['total'] += $itemTotal;
+            }
+        }
+
+        usort($menuSales, fn($a, $b) => $b['total'] <=> $a['total']);
+        $topMenus = array_slice($menuSales, 0, 5);
+
+        $paginatedOrders = (clone $baseQuery)->with(['table', 'user', 'items.menu', 'transaction'])
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('kasir.reports', compact(
+            'branch',
+            'preset',
+            'startDate',
+            'endDate',
+            'totalPaidRevenue',
+            'totalPaidOrdersCount',
+            'cashRevenue',
+            'qrisRevenue',
+            'avgTransactionValue',
+            'categorySales',
+            'topMenus',
+            'paginatedOrders'
+        ));
+    }
 }

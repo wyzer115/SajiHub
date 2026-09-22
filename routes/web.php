@@ -53,6 +53,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 Route::get('/order', [CustomerOrderController::class, 'index'])->name('order.qr');
 Route::get('/pesan', [CustomerOrderController::class, 'index'])->name('pesan');
 Route::post('/pesan', [CustomerOrderController::class, 'store'])->name('pesan.store');
+Route::get('/pesan/{order}/receipt', [CustomerOrderController::class, 'showReceipt'])->name('pesan.receipt');
 
 
 // Super Admin Routes
@@ -111,6 +112,7 @@ Route::prefix('supervisor')->middleware(['auth', 'role:supervisor'])->name('supe
 Route::prefix('kasir')->middleware(['auth', 'role:kasir'])->name('kasir.')->group(function () {
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/transactions', [OrderController::class, 'transactions'])->name('transactions');
+    Route::get('/reports', [OrderController::class, 'financialReport'])->name('reports');
     Route::get('/tables', [\App\Http\Controllers\AdminCabang\TableController::class, 'index'])->name('tables.index');
     Route::post('/tables', [\App\Http\Controllers\AdminCabang\TableController::class, 'store'])->name('tables.store');
     Route::put('/tables/{table}', [\App\Http\Controllers\AdminCabang\TableController::class, 'update'])->name('tables.update');

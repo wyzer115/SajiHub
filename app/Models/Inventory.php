@@ -34,4 +34,9 @@ class Inventory extends Model
     {
         return $this->hasMany(MenuIngredient::class);
     }
+
+    public function reconciliations()
+    {
+        return $this->hasMany(StockReconciliation::class);
+    }
 }

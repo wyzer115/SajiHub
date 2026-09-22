@@ -9,7 +9,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @endif
     <style>
         body {
             font-family: 'Outfit', sans-serif;
@@ -22,6 +24,76 @@
         .scrollbar-none {
             -ms-overflow-style: none;
             scrollbar-width: none;
+        }
+
+        /* Scroll Reveal Animations */
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(35px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+        .reveal-left {
+            transform: translateX(-40px);
+        }
+        .reveal-right {
+            transform: translateX(40px);
+        }
+        .reveal-scale {
+            transform: scale(0.93);
+        }
+        .reveal-on-scroll.is-visible {
+            opacity: 1;
+            transform: translate(0) scale(1);
+        }
+        .delay-100 { transition-delay: 0.1s; }
+        .delay-200 { transition-delay: 0.2s; }
+        .delay-300 { transition-delay: 0.3s; }
+
+        /* QR Code Scanner Custom Styles */
+        #qr-reader {
+            border: none !important;
+            background: transparent !important;
+        }
+        #qr-reader img[alt="Info icon"],
+        #qr-reader__header_message,
+        #qr-reader__dashboard_section_csr,
+        #qr-reader__dashboard_section_swaplink,
+        #qr-reader__status_span,
+        #qr-reader canvas {
+            display: none !important;
+        }
+        #qr-reader__scan_region {
+            border: none !important;
+            background: transparent !important;
+        }
+        #qr-reader__scan_region video {
+            border-radius: 1rem !important;
+            object-fit: cover !important;
+            width: 100% !important;
+            max-height: 320px !important;
+        }
+        #qr-reader button {
+            background-color: #BD2000 !important;
+            color: white !important;
+            border-radius: 0.75rem !important;
+            padding: 0.6rem 1.2rem !important;
+            font-weight: 800 !important;
+            font-size: 0.8rem !important;
+            border: none !important;
+            cursor: pointer !important;
+            box-shadow: 0 4px 6px -1px rgba(189, 32, 0, 0.2) !important;
+            margin-top: 0.5rem !important;
+        }
+        #qr-reader select {
+            background-color: #FAF8F5 !important;
+            border: 1px solid #E7E5E4 !important;
+            border-radius: 0.75rem !important;
+            padding: 0.5rem 1rem !important;
+            font-size: 0.8rem !important;
+            font-weight: 700 !important;
+            color: #1C1917 !important;
+            margin-bottom: 0.5rem !important;
         }
     </style>
 </head>
@@ -66,7 +138,7 @@
                     </div>
                 @else
                     <a href="{{ route('login') }}" class="bg-[#BD2000] text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-[#8C0000] transition shadow-md inline-block">
-                        Masuk Akun
+                        Masuk
                     </a>
                 @endauth
             </div>
@@ -75,12 +147,12 @@
     </nav>
 
     {{-- 2. BAGIAN UTAMA (HERO SECTION - 2 KOLOM SEIMBANG) --}}
-    <section id="beranda" class="w-full bg-[#FAF8F5] border-b border-stone-200">
+    <section id="beranda" class="w-full bg-[#FAF8F5]">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center py-16 w-full">
                 
                 {{-- Sisi Kiri (Teks) --}}
-                <div class="w-full text-left">
+                <div class="w-full text-left reveal-on-scroll reveal-left">
                     <div class="inline-flex items-center gap-2 bg-[#BD2000]/10 border border-[#BD2000]/20 text-[#BD2000] px-3.5 py-1.5 rounded-full text-xs font-bold mb-4">
                         <svg class="w-4 h-4 text-[#BD2000]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
@@ -112,8 +184,11 @@
                         </button>
                     </div>
 
+                    {{-- Pembatas Garis Gradasi Statistik --}}
+                    <div class="w-full h-[1.5px] bg-gradient-to-r from-transparent via-[#BD2000]/30 to-transparent mt-8 mb-6 reveal-on-scroll reveal-scale delay-150"></div>
+
                     {{-- Ringkasan Statistik --}}
-                    <div class="grid grid-cols-3 gap-4 pt-8 mt-8 border-t border-stone-200/80 w-full">
+                    <div class="grid grid-cols-3 gap-4 w-full reveal-on-scroll reveal-scale delay-200">
                         <div>
                             <div class="text-2xl lg:text-3xl font-black text-[#8C0000] flex items-center gap-1.5">
                                 <svg class="w-6 h-6 text-[#FFBE0F] fill-current" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
@@ -169,7 +244,7 @@
                     }
                 @endphp
 
-                <div class="w-full">
+                <div class="w-full reveal-on-scroll reveal-right">
                     <div id="hero-carousel-container" class="w-full rounded-3xl overflow-hidden shadow-2xl border border-stone-200 relative bg-stone-900 group" style="height: 450px; min-height: 420px;">
                         
                         {{-- Render Slides directly in HTML for Instant Server-side Load --}}
@@ -233,12 +308,20 @@
         </div>
     </section>
 
+    {{-- Pembatas Garis Gradasi Beranimasi --}}
+    <div class="w-full bg-[#FAF8F5] py-2 flex items-center justify-center overflow-hidden reveal-on-scroll">
+        <div class="w-3/4 max-w-4xl h-[1.5px] bg-gradient-to-r from-transparent via-[#BD2000]/35 to-transparent relative flex items-center justify-center">
+            <div class="w-2.5 h-2.5 rounded-full bg-[#BD2000]/40 animate-ping absolute"></div>
+            <div class="w-2 h-2 rounded-full bg-[#BD2000] relative"></div>
+        </div>
+    </div>
+
     {{-- 3. BAGIAN MENU TERLARIS (DYNAMIC TOP 3 MENU) --}}
     <section id="menu-terlaris" class="w-full py-16 sm:py-24 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
             
             {{-- Header Judul Bagian --}}
-            <div class="text-center max-w-3xl mx-auto mb-16 space-y-3">
+            <div class="text-center max-w-3xl mx-auto mb-16 space-y-3 reveal-on-scroll">
                 <div class="inline-flex items-center gap-1.5 text-xs font-bold text-[#BD2000] uppercase tracking-wider bg-[#BD2000]/10 px-3.5 py-1.5 rounded-full border border-[#BD2000]/20">
                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/></svg>
                     Rekomendasi Utama
@@ -266,8 +349,8 @@
 
             {{-- Grid 3 Kolom Lapang (6 Menu Card) --}}
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
-                @foreach($topMenus as $menu)
-                    <div class="bg-white border border-stone-200 rounded-2xl p-5 shadow-sm hover:shadow-xl hover:border-[#BD2000]/40 transition-all duration-300 flex flex-col justify-between group w-full">
+                @foreach($topMenus as $index => $menu)
+                    <div class="bg-white border border-stone-200 rounded-2xl p-5 shadow-sm hover:shadow-xl hover:border-[#BD2000]/40 transition-all duration-300 flex flex-col justify-between group w-full reveal-on-scroll reveal-scale delay-{{ ($index + 1) * 100 }}">
                         
                         <div>
                             {{-- Container Foto Makanan (Rasio 4:3) --}}
@@ -323,7 +406,7 @@
             </div>
 
             {{-- Tombol Lihat Seluruh Menu (Redirect to /menu Catalog) --}}
-            <div class="mt-12 text-center">
+            <div class="mt-12 text-center reveal-on-scroll reveal-scale">
                 <a href="{{ route('menu.catalog') }}" class="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-stone-100 hover:bg-[#BD2000] text-[#1C1917] hover:text-white font-extrabold text-sm transition-all border border-stone-300 hover:border-[#BD2000] shadow-sm cursor-pointer">
                     Lihat Seluruh Daftar Menu SajiHUB
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
@@ -333,12 +416,20 @@
         </div>
     </section>
 
+    {{-- Pembatas Garis Gradasi Beranimasi --}}
+    <div class="w-full bg-white py-2 flex items-center justify-center overflow-hidden reveal-on-scroll">
+        <div class="w-3/4 max-w-4xl h-[1.5px] bg-gradient-to-r from-transparent via-[#BD2000]/35 to-transparent relative flex items-center justify-center">
+            <div class="w-2.5 h-2.5 rounded-full bg-[#BD2000]/40 animate-ping absolute"></div>
+            <div class="w-2 h-2 rounded-full bg-[#BD2000] relative"></div>
+        </div>
+    </div>
+
     {{-- 4. BAGIAN TESTIMONI / ULASAN PELANGGAN --}}
-    <section id="testimoni" class="w-full py-16 sm:py-24 bg-[#FAF8F5] border-t border-stone-200">
+    <section id="testimoni" class="w-full py-16 sm:py-24 bg-[#FAF8F5]">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
             
             {{-- Header Judul --}}
-            <div class="text-center max-w-3xl mx-auto mb-16 space-y-3">
+            <div class="text-center max-w-3xl mx-auto mb-16 space-y-3 reveal-on-scroll">
                 <div class="inline-flex items-center gap-1.5 text-xs font-bold text-[#BD2000] uppercase tracking-wider bg-[#BD2000]/10 px-3.5 py-1.5 rounded-full border border-[#BD2000]/20">
                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
                     Ulasan Jujur Pelanggan
@@ -355,7 +446,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
                 
                 {{-- Kartu Ulasan 1 --}}
-                <div class="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between w-full">
+                <div class="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between w-full reveal-on-scroll reveal-left delay-100">
                     <div>
                         <div class="text-[#FFBE0F] text-lg font-bold flex gap-1 mb-3">
                             ★★★★★
@@ -376,7 +467,7 @@
                 </div>
 
                 {{-- Kartu Ulasan 2 --}}
-                <div class="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between w-full">
+                <div class="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between w-full reveal-on-scroll reveal-scale delay-200">
                     <div>
                         <div class="text-[#FFBE0F] text-lg font-bold flex gap-1 mb-3">
                             ★★★★★
@@ -397,7 +488,7 @@
                 </div>
 
                 {{-- Kartu Ulasan 3 --}}
-                <div class="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between w-full">
+                <div class="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between w-full reveal-on-scroll reveal-right delay-300">
                     <div>
                         <div class="text-[#FFBE0F] text-lg font-bold flex gap-1 mb-3">
                             ★★★★★
@@ -422,10 +513,18 @@
         </div>
     </section>
 
+    {{-- Pembatas Garis Gradasi Emas-Marun --}}
+    <div class="w-full bg-[#FAF8F5] py-2 flex items-center justify-center overflow-hidden reveal-on-scroll">
+        <div class="w-3/4 max-w-4xl h-[1.5px] bg-gradient-to-r from-transparent via-[#FFBE0F]/50 to-transparent relative flex items-center justify-center">
+            <div class="w-2.5 h-2.5 rounded-full bg-[#FFBE0F]/40 animate-ping absolute"></div>
+            <div class="w-2 h-2 rounded-full bg-[#FFBE0F] relative"></div>
+        </div>
+    </div>
+
     {{-- 5. FOOTER (KAKI HALAMAN - WADAH MARUN GELAP #8C0000) --}}
-    <footer class="w-full bg-[#8C0000] text-stone-100 pt-16 pb-12 border-t border-stone-800">
+    <footer class="w-full bg-[#8C0000] text-stone-100 pt-16 pb-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-12 pb-12 border-b border-white/10 w-full">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-12 pb-12 border-b border-white/10 w-full reveal-on-scroll">
                 
                 {{-- Kolom 1: Tentang SajiHUB & Langganan Promo --}}
                 <div class="lg:col-span-4 space-y-4">
@@ -576,31 +675,55 @@
     </div>
 
     {{-- MODAL KAMERA SCANNER QR MEJA --}}
-    <div id="qr-scanner-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300">
-        <div class="bg-white border border-stone-200 w-full max-w-md rounded-3xl p-6 shadow-2xl space-y-4 text-center">
-            <div class="flex justify-between items-center border-b border-stone-200 pb-3">
-                <h3 class="font-black text-lg text-[#8C0000]">Pindai Kode QR Meja</h3>
-                <button type="button" onclick="closeQrScannerModal()" class="text-stone-400 hover:text-stone-700 p-1 rounded-lg">
+    <div id="qr-scanner-modal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300">
+        <div class="bg-white border border-stone-200/80 w-full max-w-md rounded-3xl p-6 shadow-2xl space-y-4 text-center relative overflow-hidden">
+            {{-- Header --}}
+            <div class="flex justify-between items-center border-b border-stone-100 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-[#BD2000]/10 border border-[#BD2000]/20 flex items-center justify-center text-[#BD2000]">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 116 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-black text-base text-[#8C0000]">Pindai Kode QR Meja</h3>
+                </div>
+                <button type="button" onclick="closeQrScannerModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-500 hover:text-stone-800 hover:bg-stone-200 flex items-center justify-center transition-colors cursor-pointer">
                     ✕
                 </button>
             </div>
             
-            <p class="text-xs text-slate-600 font-medium">Arahkan kamera ponsel Anda ke stiker kode QR yang menempel di meja makan.</p>
+            <p class="text-xs text-slate-600 font-medium leading-relaxed">
+                Arahkan kamera ponsel Anda ke stiker kode QR yang menempel di meja makan.
+            </p>
 
-            <div id="qr-reader-container" class="w-full bg-stone-900 rounded-2xl p-2 border border-stone-300 min-h-[250px] flex flex-col items-center justify-center relative overflow-hidden">
-                <div id="qr-reader" class="w-full"></div>
+            {{-- Camera Container with Viewfinder --}}
+            <div id="qr-reader-container" class="w-full bg-stone-950 rounded-2xl p-2 border border-stone-300/80 min-h-[260px] flex flex-col items-center justify-center relative overflow-hidden shadow-inner">
+                <div id="qr-reader" class="w-full rounded-xl overflow-hidden"></div>
+                
+                {{-- Glowing Viewfinder Target Box Overlay --}}
+                <div class="absolute inset-0 pointer-events-none flex items-center justify-center">
+                    <div class="w-48 h-48 border-2 border-[#BD2000]/80 rounded-2xl relative shadow-[0_0_25px_rgba(189,32,0,0.4)]">
+                        <div class="absolute -top-1 -left-1 w-5 h-5 border-t-4 border-l-4 border-[#FFBE0F] rounded-tl-lg"></div>
+                        <div class="absolute -top-1 -right-1 w-5 h-5 border-t-4 border-r-4 border-[#FFBE0F] rounded-tr-lg"></div>
+                        <div class="absolute -bottom-1 -left-1 w-5 h-5 border-b-4 border-l-4 border-[#FFBE0F] rounded-bl-lg"></div>
+                        <div class="absolute -bottom-1 -right-1 w-5 h-5 border-b-4 border-r-4 border-[#FFBE0F] rounded-br-lg"></div>
+                    </div>
+                </div>
             </div>
 
-            <div class="pt-2">
-                <button type="button" onclick="closeQrScannerModal()" class="w-full py-3 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs uppercase rounded-xl border border-stone-300 transition-all cursor-pointer">
-                    Tutup Kamera
+            {{-- Close Button --}}
+            <div class="pt-1">
+                <button type="button" onclick="closeQrScannerModal()" class="w-full py-3.5 bg-[#BD2000] hover:bg-[#8C0000] text-white font-extrabold text-xs uppercase tracking-wider rounded-2xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                    <span>Tutup Kamera</span>
                 </button>
             </div>
         </div>
     </div>
 
     <script>
-        let html5QrCodeScannerInstance = null;
+        let html5QrCodeInstance = null;
 
         function openOrderTypeModal() {
             const modal = document.getElementById('order-type-modal');
@@ -630,30 +753,32 @@
             modal.classList.remove('opacity-0', 'pointer-events-none');
             modal.classList.add('opacity-100');
 
-            if (!html5QrCodeScannerInstance) {
-                html5QrCodeScannerInstance = new Html5QrcodeScanner("qr-reader", { 
-                    fps: 10, 
-                    qrbox: { width: 220, height: 220 },
-                    rememberLastUsedCamera: true
-                });
-                
-                html5QrCodeScannerInstance.render(onScanSuccess, onScanError);
+            if (!html5QrCodeInstance) {
+                html5QrCodeInstance = new Html5Qrcode("qr-reader");
             }
+
+            const config = { fps: 15 };
+
+            html5QrCodeInstance.start(
+                { facingMode: "environment" },
+                config,
+                onScanSuccess,
+                onScanError
+            ).catch(err => {
+                html5QrCodeInstance.start({ facingMode: "user" }, config, onScanSuccess, onScanError).catch(e => console.log(e));
+            });
         }
 
         function onScanSuccess(decodedText, decodedResult) {
             console.log("QR Code Scanned:", decodedText);
             if (decodedText) {
-                if (html5QrCodeScannerInstance) {
-                    html5QrCodeScannerInstance.clear();
-                    html5QrCodeScannerInstance = null;
-                }
+                closeQrScannerModal();
                 window.location.href = decodedText;
             }
         }
 
         function onScanError(errorMessage) {
-            // silent scan failure
+            // silent continuous scan error
         }
 
         function closeQrScannerModal() {
@@ -661,11 +786,12 @@
             modal.classList.remove('opacity-100');
             modal.classList.add('opacity-0', 'pointer-events-none');
 
-            if (html5QrCodeScannerInstance) {
-                html5QrCodeScannerInstance.clear().then(() => {
-                    html5QrCodeScannerInstance = null;
+            if (html5QrCodeInstance && html5QrCodeInstance.isScanning) {
+                html5QrCodeInstance.stop().then(() => {
+                    html5QrCodeInstance.clear();
+                    html5QrCodeInstance = null;
                 }).catch(err => {
-                    html5QrCodeScannerInstance = null;
+                    html5QrCodeInstance = null;
                 });
             }
         }
@@ -765,6 +891,25 @@
         document.addEventListener('DOMContentLoaded', () => {
             showHeroSlide(0);
             resetHeroTimer();
+
+            // Scroll Reveal Observer
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px 0px -50px 0px',
+                threshold: 0.1
+            };
+
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    } else {
+                        entry.target.classList.remove('is-visible');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.reveal-on-scroll').forEach(el => revealObserver.observe(el));
         });
 
         window.addEventListener('scroll', activateScrollSpy);

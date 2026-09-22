@@ -6,7 +6,9 @@
     <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
     <title>Daftar Akun - SajiHUB Enterprise</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @endif
 </head>
 <body class="bg-[#FAF8F5] text-[#1C1917] font-sans antialiased min-h-screen flex items-center justify-center relative overflow-y-auto py-12">
     
@@ -34,12 +36,17 @@
         </a>
 
         <!-- Register Card -->
-        <div class="bg-white border border-stone-200 rounded-3xl p-8 shadow-xl relative">
+        <div class="bg-white/95 backdrop-blur-md border border-stone-200/80 rounded-3xl p-8 shadow-2xl relative">
+            <div class="w-12 h-12 rounded-2xl bg-[#BD2000]/10 border border-[#BD2000]/20 flex items-center justify-center text-[#BD2000] mx-auto mb-4">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+            </div>
+
             <h2 class="text-xl font-black text-[#8C0000] mb-6 text-center">Daftar Akun Baru</h2>
             
             @if($errors->any())
-                <div class="mb-6 bg-red-500/10 border border-red-500/20 text-red-600 px-4 py-3 rounded-xl text-xs font-bold">
-                    {{ $errors->first() }}
+                <div class="mb-6 bg-red-500/10 border border-red-500/20 text-red-600 px-4 py-3 rounded-2xl text-xs font-bold flex items-center gap-2">
+                    <svg class="w-4 h-4 text-red-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span>{{ $errors->first() }}</span>
                 </div>
             @endif
 
@@ -48,14 +55,14 @@
 
                 {{-- Role Selection Tab --}}
                 <div>
-                    <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Pilih Tipe Akun</label>
-                    <div class="grid grid-cols-2 gap-2 bg-stone-100 p-1.5 rounded-xl border border-stone-200">
+                    <label class="block text-xs font-extrabold text-stone-700 uppercase tracking-wider mb-2">Pilih Tipe Akun</label>
+                    <div class="grid grid-cols-2 gap-2 bg-stone-100 p-1.5 rounded-2xl border border-stone-200">
                         <button type="button" id="tab-pelanggan" onclick="setRole('pelanggan')"
-                            class="py-2.5 px-4 rounded-lg text-xs font-extrabold text-center transition-all duration-300 bg-[#BD2000] text-white shadow-md cursor-pointer">
+                            class="py-2.5 px-4 rounded-xl text-xs font-extrabold text-center transition-all duration-300 bg-[#BD2000] text-white shadow-md cursor-pointer">
                             Akun Biasa
                         </button>
                         <button type="button" id="tab-member" onclick="setRole('member')"
-                            class="py-2.5 px-4 rounded-lg text-xs font-bold text-center transition-all duration-300 text-stone-600 hover:text-[#BD2000] cursor-pointer">
+                            class="py-2.5 px-4 rounded-xl text-xs font-bold text-center transition-all duration-300 text-stone-600 hover:text-[#BD2000] cursor-pointer">
                             Akun Member
                         </button>
                     </div>
@@ -63,14 +70,14 @@
                 </div>
 
                 {{-- Role Description Box --}}
-                <div id="role-desc" class="p-4 rounded-xl bg-[#BD2000]/5 border border-[#BD2000]/20 text-xs text-stone-600 leading-relaxed font-medium transition-all duration-300">
+                <div id="role-desc" class="p-4 rounded-2xl bg-[#BD2000]/5 border border-[#BD2000]/20 text-xs text-stone-600 leading-relaxed font-medium transition-all duration-300">
                     <span class="text-[#BD2000] font-extrabold block mb-1">Benefit Akun Biasa:</span>
                     Akses pemesanan menu online standar, simpan riwayat transaksi kuliner, dan lacak status pesanan langsung dari meja Anda.
                 </div>
 
                 {{-- Name --}}
                 <div>
-                    <label for="name" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">Nama Lengkap</label>
+                    <label for="name" class="block text-xs font-extrabold text-stone-700 uppercase tracking-wider mb-1.5">Nama Lengkap</label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -78,13 +85,13 @@
                             </svg>
                         </div>
                         <input type="text" id="name" name="name" value="{{ old('name') }}" required placeholder="Masukkan Nama Lengkap"
-                            class="block w-full pl-11 pr-4 py-3 bg-stone-50 border border-stone-300 rounded-xl text-[#1C1917] placeholder-stone-400 focus:outline-none focus:border-[#BD2000] focus:ring-1 focus:ring-[#BD2000] transition-colors font-medium">
+                            class="block w-full pl-11 pr-4 py-3 bg-stone-50/80 border border-stone-300 rounded-2xl text-[#1C1917] placeholder-stone-400 focus:outline-none focus:border-[#BD2000] focus:ring-2 focus:ring-[#BD2000]/20 transition-all font-medium text-sm">
                     </div>
                 </div>
 
                 {{-- Email / Username --}}
                 <div>
-                    <label for="username_or_email" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">Email / Username</label>
+                    <label for="username_or_email" class="block text-xs font-extrabold text-stone-700 uppercase tracking-wider mb-1.5">Email / Username</label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -92,13 +99,13 @@
                             </svg>
                         </div>
                         <input type="text" id="username_or_email" name="username_or_email" value="{{ old('username_or_email') }}" required placeholder="Masukkan Email atau Username" autocomplete="off"
-                            class="block w-full pl-11 pr-4 py-3 bg-stone-50 border border-stone-300 rounded-xl text-[#1C1917] placeholder-stone-400 focus:outline-none focus:border-[#BD2000] focus:ring-1 focus:ring-[#BD2000] transition-colors font-medium">
+                            class="block w-full pl-11 pr-4 py-3 bg-stone-50/80 border border-stone-300 rounded-2xl text-[#1C1917] placeholder-stone-400 focus:outline-none focus:border-[#BD2000] focus:ring-2 focus:ring-[#BD2000]/20 transition-all font-medium text-sm">
                     </div>
                 </div>
 
                 {{-- WhatsApp / Phone --}}
                 <div>
-                    <label for="phone" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">Nomor WhatsApp / Telepon</label>
+                    <label for="phone" class="block text-xs font-extrabold text-stone-700 uppercase tracking-wider mb-1.5">Nomor WhatsApp / Telepon</label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -106,7 +113,7 @@
                             </svg>
                         </div>
                         <input type="tel" id="phone" name="phone" value="{{ old('phone') }}" required placeholder="08xxxxxxxxxx"
-                            class="block w-full pl-11 pr-4 py-3 bg-stone-50 border border-stone-300 rounded-xl text-[#1C1917] placeholder-stone-400 focus:outline-none focus:border-[#BD2000] focus:ring-1 focus:ring-[#BD2000] transition-colors font-medium">
+                            class="block w-full pl-11 pr-4 py-3 bg-stone-50/80 border border-stone-300 rounded-2xl text-[#1C1917] placeholder-stone-400 focus:outline-none focus:border-[#BD2000] focus:ring-2 focus:ring-[#BD2000]/20 transition-all font-medium text-sm">
                     </div>
                 </div>
 

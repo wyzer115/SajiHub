@@ -21,7 +21,56 @@
             });
         };
     </script>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @endif
+    <style>
+        /* QR Code Scanner Custom Styles */
+        #qr-reader {
+            border: none !important;
+            background: transparent !important;
+        }
+        #qr-reader img[alt="Info icon"],
+        #qr-reader__header_message,
+        #qr-reader__dashboard_section_csr,
+        #qr-reader__dashboard_section_swaplink,
+        #qr-reader__status_span,
+        #qr-reader canvas {
+            display: none !important;
+        }
+        #qr-reader__scan_region {
+            border: none !important;
+            background: transparent !important;
+        }
+        #qr-reader__scan_region video {
+            border-radius: 1rem !important;
+            object-fit: cover !important;
+            width: 100% !important;
+            max-height: 320px !important;
+        }
+        #qr-reader button {
+            background-color: #BD2000 !important;
+            color: white !important;
+            border-radius: 0.75rem !important;
+            padding: 0.6rem 1.2rem !important;
+            font-weight: 800 !important;
+            font-size: 0.8rem !important;
+            border: none !important;
+            cursor: pointer !important;
+            box-shadow: 0 4px 6px -1px rgba(189, 32, 0, 0.2) !important;
+            margin-top: 0.5rem !important;
+        }
+        #qr-reader select {
+            background-color: #FAF8F5 !important;
+            border: 1px solid #E7E5E4 !important;
+            border-radius: 0.75rem !important;
+            padding: 0.5rem 1rem !important;
+            font-size: 0.8rem !important;
+            font-weight: 700 !important;
+            color: #1C1917 !important;
+            margin-bottom: 0.5rem !important;
+        }
+    </style>
 </head>
 <body class="bg-[#FAF8F5] text-[#1C1917] font-sans antialiased overflow-y-auto pb-24">
 
@@ -47,7 +96,7 @@
                     </form>
                 @else
                     <a href="{{ route('login') }}" class="px-4 py-2 text-xs font-bold text-white bg-[#BD2000] hover:bg-[#8C0000] rounded-xl transition-all shadow-md">
-                        Masuk Akun
+                        Masuk
                     </a>
                 @endauth
             </div>
@@ -464,60 +513,75 @@
     </script>
 
     <!-- Camera QR Scanner Modal -->
-    <div id="qr-scanner-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300">
-        <div class="w-full max-w-md bg-white border border-stone-200 rounded-3xl p-6 shadow-2xl space-y-5 text-center relative">
-            <div class="flex justify-between items-center border-b border-stone-200 pb-3">
+    <div id="qr-scanner-modal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-stone-900/80 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300">
+        <div class="w-full max-w-md bg-white border border-stone-200 rounded-3xl p-6 shadow-2xl space-y-4 text-center relative">
+            <div class="flex justify-between items-center border-b border-stone-100 pb-3">
                 <h3 class="text-base font-black text-[#8C0000] uppercase tracking-wider flex items-center gap-2">
                     <svg class="w-5 h-5 text-[#BD2000]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                     <span>Pindai Kode QR Meja</span>
                 </h3>
-                <button type="button" onclick="closeQrScannerModal()" class="text-stone-400 hover:text-stone-700 bg-stone-100 p-1.5 rounded-full border border-stone-200 transition-colors cursor-pointer">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                <button type="button" onclick="closeQrScannerModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-500 hover:text-stone-800 hover:bg-stone-200 flex items-center justify-center transition-colors cursor-pointer">
+                    ✕
                 </button>
             </div>
-
+            
             <p class="text-xs text-slate-600 font-medium leading-relaxed">
-                Arahkan kamera HP Anda ke stiker QR Code yang tertera di meja restoran untuk langsung mengunci meja & memilih menu.
+                Arahkan kamera ponsel Anda ke stiker kode QR yang menempel di meja makan.
             </p>
 
-            <div id="qr-reader-container" class="w-full bg-stone-50 rounded-2xl p-2 border border-stone-200 min-h-[250px] flex flex-col items-center justify-center relative overflow-hidden">
-                <div id="qr-reader" class="w-full"></div>
+            {{-- Camera Container with Viewfinder --}}
+            <div id="qr-reader-container" class="w-full bg-stone-950 rounded-2xl p-2 border border-stone-300/80 min-h-[260px] flex flex-col items-center justify-center relative overflow-hidden shadow-inner">
+                <div id="qr-reader" class="w-full rounded-xl overflow-hidden"></div>
+                
+                {{-- Glowing Viewfinder Target Box Overlay --}}
+                <div class="absolute inset-0 pointer-events-none flex items-center justify-center">
+                    <div class="w-48 h-48 border-2 border-[#BD2000]/80 rounded-2xl relative shadow-[0_0_25px_rgba(189,32,0,0.4)]">
+                        <div class="absolute -top-1 -left-1 w-5 h-5 border-t-4 border-l-4 border-[#FFBE0F] rounded-tl-lg"></div>
+                        <div class="absolute -top-1 -right-1 w-5 h-5 border-t-4 border-r-4 border-[#FFBE0F] rounded-tr-lg"></div>
+                        <div class="absolute -bottom-1 -left-1 w-5 h-5 border-b-4 border-l-4 border-[#FFBE0F] rounded-bl-lg"></div>
+                        <div class="absolute -bottom-1 -right-1 w-5 h-5 border-b-4 border-r-4 border-[#FFBE0F] rounded-br-lg"></div>
+                    </div>
+                </div>
             </div>
 
-            <div class="pt-2 flex flex-col gap-2">
-                <button type="button" onclick="closeQrScannerModal()" class="w-full py-3 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs uppercase rounded-xl border border-stone-300 transition-all cursor-pointer">
-                    Tutup Kamera
+            {{-- Close Button --}}
+            <div class="pt-1">
+                <button type="button" onclick="closeQrScannerModal()" class="w-full py-3.5 bg-[#BD2000] hover:bg-[#8C0000] text-white font-extrabold text-xs uppercase tracking-wider rounded-2xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                    <span>Tutup Kamera</span>
                 </button>
             </div>
         </div>
     </div>
 
     <script>
-        let html5QrCodeScannerInstance = null;
+        let html5QrCodeInstance = null;
 
         function openQrScannerModal() {
             const modal = document.getElementById('qr-scanner-modal');
             modal.classList.remove('opacity-0', 'pointer-events-none');
             modal.classList.add('opacity-100');
 
-            if (!html5QrCodeScannerInstance) {
-                html5QrCodeScannerInstance = new Html5QrcodeScanner("qr-reader", { 
-                    fps: 10, 
-                    qrbox: { width: 220, height: 220 },
-                    rememberLastUsedCamera: true
-                });
-                
-                html5QrCodeScannerInstance.render(onScanSuccess, onScanError);
+            if (!html5QrCodeInstance) {
+                html5QrCodeInstance = new Html5Qrcode("qr-reader");
             }
+
+            const config = { fps: 15 };
+
+            html5QrCodeInstance.start(
+                { facingMode: "environment" },
+                config,
+                onScanSuccess,
+                onScanError
+            ).catch(err => {
+                html5QrCodeInstance.start({ facingMode: "user" }, config, onScanSuccess, onScanError).catch(e => console.log(e));
+            });
         }
 
         function onScanSuccess(decodedText, decodedResult) {
             console.log("QR Code Scanned:", decodedText);
             if (decodedText) {
-                if (html5QrCodeScannerInstance) {
-                    html5QrCodeScannerInstance.clear();
-                    html5QrCodeScannerInstance = null;
-                }
+                closeQrScannerModal();
                 window.location.href = decodedText;
             }
         }
@@ -528,17 +592,156 @@
 
         function closeQrScannerModal() {
             const modal = document.getElementById('qr-scanner-modal');
-            modal.classList.remove('opacity-100');
-            modal.classList.add('opacity-0', 'pointer-events-none');
+            if (modal) {
+                modal.classList.remove('opacity-100');
+                modal.classList.add('opacity-0', 'pointer-events-none');
+            }
 
-            if (html5QrCodeScannerInstance) {
-                html5QrCodeScannerInstance.clear().then(() => {
-                    html5QrCodeScannerInstance = null;
+            if (html5QrCodeInstance) {
+                html5QrCodeInstance.stop().then(() => {
+                    console.log("Camera stopped.");
                 }).catch(err => {
-                    html5QrCodeScannerInstance = null;
+                    console.log("Stop error:", err);
                 });
             }
         }
+
+        function closeReceiptModal() {
+            const modal = document.getElementById('digital-receipt-modal');
+            if (modal) {
+                modal.classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+            }
+        }
+
+        function openReceiptModal() {
+            const modal = document.getElementById('digital-receipt-modal');
+            if (modal) {
+                modal.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+                modal.classList.add('opacity-100');
+            }
+        }
     </script>
+
+    {{-- MODAL STRUK DIGITAL --}}
+    @if (!empty($receiptOrder))
+        <div id="digital-receipt-modal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-stone-900/80 backdrop-blur-sm transition-all duration-300">
+            <div class="w-full max-w-md bg-white border border-stone-200 rounded-3xl p-6 sm:p-7 shadow-2xl space-y-5 relative max-h-[90vh] overflow-y-auto">
+                
+                {{-- Header Modal --}}
+                <div class="flex justify-between items-start border-b border-stone-100 pb-3">
+                    <div class="flex items-center gap-2">
+                        <div class="w-9 h-9 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-lg shadow-sm">
+                            🧾
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-black text-[#8C0000] uppercase tracking-wider">Struk Digital Pesanan</h3>
+                            <p class="text-[11px] text-stone-500 font-medium">Nota Pemesanan #ORD-{{ $receiptOrder->id }}</p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="closeReceiptModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-500 hover:text-stone-800 hover:bg-stone-200 flex items-center justify-center transition-colors cursor-pointer">
+                        ✕
+                    </button>
+                </div>
+
+                {{-- Status Badge --}}
+                <div class="bg-stone-50 rounded-2xl p-3.5 border border-stone-200/80 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-stone-500 font-bold uppercase tracking-wider">Status Pembayaran</span>
+                        @if ($receiptOrder->payment_status === 'paid' || $receiptOrder->payment_method === 'qris')
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-[11px] font-black uppercase tracking-wider">
+                                <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                <span>LUNAS (QRIS)</span>
+                            </span>
+                        @else
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-[11px] font-black uppercase tracking-wider">
+                                <svg class="w-3.5 h-3.5 text-amber-600 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <span>BELUM DIBAYAR (TUNAI)</span>
+                            </span>
+                        @endif
+                    </div>
+
+                    @if ($receiptOrder->payment_method === 'cash' && $receiptOrder->payment_status !== 'paid')
+                        <p class="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-2.5 font-medium leading-relaxed">
+                            💡 Silakan tunjukkan nama <strong>{{ $receiptOrder->customer_name }}</strong> atau nota <strong>#ORD-{{ $receiptOrder->id }}</strong> ke Kasir untuk melunasi pembayaran pesanan Anda.
+                        </p>
+                    @else
+                        <p class="text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl p-2.5 font-medium leading-relaxed">
+                            ✨ Pembayaran QRIS berhasil dikonfirmasi! Pesanan Anda telah terkirim otomatis dan sedang disiapkan di Dapur.
+                        </p>
+                    @endif
+                </div>
+
+                {{-- Detail Meta --}}
+                <div class="text-xs space-y-1.5 border-b border-stone-200 pb-3 font-medium">
+                    <div class="flex justify-between text-stone-600">
+                        <span>Nama Pemesan:</span>
+                        <span class="font-bold text-stone-900">{{ $receiptOrder->customer_name }}</span>
+                    </div>
+                    <div class="flex justify-between text-stone-600">
+                        <span>Nomor Meja:</span>
+                        <span class="font-bold text-[#BD2000]">{{ $receiptOrder->table ? $receiptOrder->table->table_number : 'Takeaway / Bebas' }}</span>
+                    </div>
+                    <div class="flex justify-between text-stone-600">
+                        <span>Waktu Pesan:</span>
+                        <span class="font-bold text-stone-900">{{ $receiptOrder->created_at->format('d M Y, H:i') }} WIB</span>
+                    </div>
+                    <div class="flex justify-between text-stone-600">
+                        <span>Metode Bayar:</span>
+                        <span class="font-bold uppercase text-stone-900">{{ strtoupper($receiptOrder->payment_method) }}</span>
+                    </div>
+                </div>
+
+                {{-- Items Table --}}
+                <div class="space-y-2">
+                    <h4 class="text-[11px] font-black text-stone-400 uppercase tracking-wider">Item Pesanan</h4>
+                    <div class="divide-y divide-stone-100 max-h-48 overflow-y-auto pr-1">
+                        @foreach ($receiptOrder->items as $item)
+                            <div class="py-2 flex items-start justify-between gap-2 text-xs">
+                                <div>
+                                    <span class="font-bold text-stone-800">{{ $item->menu->name ?? 'Menu' }}</span>
+                                    <div class="text-[11px] text-stone-500 font-mono">
+                                        {{ $item->quantity }} x Rp {{ number_format($item->price, 0, ',', '.') }}
+                                    </div>
+                                    @if (!empty($item->notes))
+                                        <div class="text-[10px] text-amber-700 italic bg-amber-50 px-1 py-0.5 rounded border border-amber-200 inline-block mt-0.5">
+                                            Catatan: {{ $item->notes }}
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="font-bold text-stone-900 font-mono text-right shrink-0">
+                                    Rp {{ number_format($item->price * $item->quantity, 0, ',', '.') }}
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                {{-- Total --}}
+                <div class="border-t-2 border-dashed border-stone-300 pt-3 flex justify-between items-center text-sm font-black">
+                    <span class="text-stone-700 uppercase tracking-wider">TOTAL TAGIHAN</span>
+                    <span class="text-base text-[#BD2000] font-mono">Rp {{ number_format($receiptOrder->total_price, 0, ',', '.') }}</span>
+                </div>
+
+                {{-- Buttons --}}
+                <div class="pt-2 flex flex-col sm:flex-row gap-2">
+                    <a href="{{ route('pesan.receipt', $receiptOrder->id) }}" target="_blank" class="flex-1 py-3 bg-stone-900 hover:bg-black text-white font-extrabold text-xs uppercase tracking-wider rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                        <span>Cetak Struk Full</span>
+                    </a>
+                    <button type="button" onclick="closeReceiptModal()" class="py-3 px-5 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs uppercase rounded-2xl border border-stone-200 transition-all cursor-pointer">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        {{-- Floating Action Button to Re-Open Receipt --}}
+        <div class="fixed bottom-6 right-6 z-40">
+            <button type="button" onclick="openReceiptModal()" class="px-4 py-3 bg-[#BD2000] hover:bg-[#8C0000] text-white font-extrabold text-xs rounded-2xl shadow-xl hover:shadow-2xl transition-all flex items-center gap-2 cursor-pointer border-2 border-white animate-bounce">
+                <span>🧾 Lihat Struk Digital (#ORD-{{ $receiptOrder->id }})</span>
+            </button>
+        </div>
+    @endif
 </body>
 </html>

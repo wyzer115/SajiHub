@@ -21,7 +21,7 @@ class CustomerOrderController extends Controller
         $menus           = collect();
         $tables          = collect();
 
-        // Support Table & Branch detection via URL parameters (e.g. ?branch_id=1&table=01 or ?branch_id=1&table=Table%201 or token)
+        // Support Table & Branch detection via URL parameters
         if ($request->filled('branch_id')) {
             $selectedBranch = Branch::find($request->branch_id);
         }
@@ -58,8 +58,14 @@ class CustomerOrderController extends Controller
             $tables = Table::where('branch_id', $selectedBranch->id)->get();
         }
 
+        $receiptOrder = null;
+        $receiptOrderId = session('receipt_order_id') ?? $request->get('receipt_id');
+        if ($receiptOrderId) {
+            $receiptOrder = Order::with(['items.menu', 'branch', 'table', 'transaction'])->find($receiptOrderId);
+        }
+
         return view('customer.order', compact(
-            'branches', 'selectedBranch', 'selectedTable', 'menus', 'tables'
+            'branches', 'selectedBranch', 'selectedTable', 'menus', 'tables', 'receiptOrder'
         ));
     }
 
@@ -143,7 +149,18 @@ class CustomerOrderController extends Controller
             $table->update(['status' => 'occupied']);
         });
 
-        return redirect()->route('pesan', ['branch_id' => $validated['branch_id'], 'table_id' => $validated['table_id']])
-            ->with('success', 'Pesanan Anda #' . $order->id . ' berhasil dikirim ke Kasir & Dapur! Silakan tunggu pesanan disajikan.');
+        return redirect()->route('pesan', [
+            'branch_id' => $validated['branch_id'], 
+            'table_id'  => $validated['table_id'],
+            'receipt_id' => $order->id
+        ])
+            ->with('success', 'Pesanan Anda #' . $order->id . ' berhasil dikirim ke Kasir & Dapur!')
+            ->with('receipt_order_id', $order->id);
+    }
+
+    public function showReceipt(Order $order)
+    {
+        $order->load(['items.menu', 'branch', 'table', 'transaction']);
+        return view('customer.receipt', compact('order'));
     }
 }

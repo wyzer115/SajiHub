@@ -71,13 +71,13 @@
                                 <div class="text-xs text-slate-500 font-medium mt-0.5">{{ $item->notes }}</div>
                             @endif
                         </td>
-                        <td class="px-6 py-4">
+                        <td class="px-6 py-4 text-xs uppercase font-extrabold text-[#1C1917]">
                             @if($item->category === 'bahan_makanan')
-                                <span class="inline-flex items-center px-3 py-1 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">Bahan Makanan</span>
+                                Bahan Makanan
                             @elseif($item->category === 'bahan_minuman')
-                                <span class="inline-flex items-center px-3 py-1 rounded-xl text-xs font-bold bg-blue-50 text-blue-800 border border-blue-200">Bahan Minuman</span>
+                                Bahan Minuman
                             @else
-                                <span class="inline-flex items-center px-3 py-1 rounded-xl text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">Peralatan</span>
+                                Peralatan
                             @endif
                         </td>
                         <td class="px-6 py-4">

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Owner;
 
 use App\Http\Controllers\Controller;
+use App\Models\Branch;
 use App\Models\Expense;
 use App\Models\Inventory;
 use App\Models\Order;
@@ -11,25 +12,55 @@ use Illuminate\Support\Facades\DB;
 
 class OwnerController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $branch = auth()->user()->branch;
-        $branchId = $branch->id;
+        $branches = Branch::all();
+        $selectedBranchId = $request->get('branch_id');
+        
+        $selectedBranch = null;
+        if ($selectedBranchId && $selectedBranchId !== 'all') {
+            $selectedBranch = Branch::find($selectedBranchId);
+        }
+
+        // Branch filter helper query closures
+        $orderQuery = function() use ($selectedBranchId) {
+            $q = Order::query();
+            if ($selectedBranchId && $selectedBranchId !== 'all') {
+                $q->where('branch_id', $selectedBranchId);
+            }
+            return $q;
+        };
+
+        $expenseQuery = function() use ($selectedBranchId) {
+            $q = Expense::query();
+            if ($selectedBranchId && $selectedBranchId !== 'all') {
+                $q->where('branch_id', $selectedBranchId);
+            }
+            return $q;
+        };
+
+        $inventoryQuery = function() use ($selectedBranchId) {
+            $q = Inventory::query();
+            if ($selectedBranchId && $selectedBranchId !== 'all') {
+                $q->where('branch_id', $selectedBranchId);
+            }
+            return $q;
+        };
 
         // Pemasukan (Total Revenue)
-        $totalRevenue = Order::where('branch_id', $branchId)
+        $totalRevenue = $orderQuery()
             ->where('payment_status', 'paid')
             ->sum('total_price');
 
-        $monthRevenue = Order::where('branch_id', $branchId)
+        $monthRevenue = $orderQuery()
             ->where('payment_status', 'paid')
             ->whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
             ->sum('total_price');
 
         // Pengeluaran (Total Expenses)
-        $totalExpenses = Expense::where('branch_id', $branchId)->sum('amount');
-        $monthExpenses = Expense::where('branch_id', $branchId)
+        $totalExpenses = $expenseQuery()->sum('amount');
+        $monthExpenses = $expenseQuery()
             ->whereMonth('date', now()->month)
             ->whereYear('date', now()->year)
             ->sum('amount');
@@ -39,20 +70,22 @@ class OwnerController extends Controller
         $monthNetProfit = $monthRevenue - $monthExpenses;
 
         // Inventoris Stok Summary
-        $inventories = Inventory::where('branch_id', $branchId)->get();
+        $inventories = $inventoryQuery()->get();
         $lowStockCount = $inventories->filter(fn($i) => $i->isLowStock())->count();
         $bahanMakananCount = $inventories->where('category', 'bahan_makanan')->count();
         $bahanMinumanCount = $inventories->where('category', 'bahan_minuman')->count();
         $peralatanCount = $inventories->where('category', 'peralatan')->count();
 
         // Recent Expenses
-        $recentExpenses = Expense::where('branch_id', $branchId)
+        $recentExpenses = $expenseQuery()
+            ->with('branch')
             ->latest('date')
             ->take(5)
             ->get();
 
         // Recent Orders
-        $recentOrders = Order::where('branch_id', $branchId)
+        $recentOrders = $orderQuery()
+            ->with('branch')
             ->where('payment_status', 'paid')
             ->latest()
             ->take(5)
@@ -67,20 +100,22 @@ class OwnerController extends Controller
             $date = now()->subDays($i);
             $chartDates[] = $date->format('d/m');
 
-            $dayRev = Order::where('branch_id', $branchId)
+            $dayRev = $orderQuery()
                 ->where('payment_status', 'paid')
                 ->whereDate('created_at', $date->toDateString())
                 ->sum('total_price');
             $chartRevenues[] = (float) $dayRev;
 
-            $dayExp = Expense::where('branch_id', $branchId)
+            $dayExp = $expenseQuery()
                 ->whereDate('date', $date->toDateString())
                 ->sum('amount');
             $chartExpenses[] = (float) $dayExp;
         }
 
         return view('owner.dashboard', compact(
-            'branch',
+            'branches',
+            'selectedBranchId',
+            'selectedBranch',
             'totalRevenue',
             'monthRevenue',
             'totalExpenses',
@@ -102,46 +137,60 @@ class OwnerController extends Controller
 
     public function reports(Request $request)
     {
-        $branchId = auth()->user()->branch_id;
-        $branch = auth()->user()->branch;
+        $branches = Branch::all();
+        $selectedBranchId = $request->get('branch_id');
+
+        $selectedBranch = null;
+        if ($selectedBranchId && $selectedBranchId !== 'all') {
+            $selectedBranch = Branch::find($selectedBranchId);
+        }
 
         $startDate = $request->filled('start_date') ? $request->start_date : now()->startOfMonth()->toDateString();
         $endDate = $request->filled('end_date') ? $request->end_date : now()->endOfMonth()->toDateString();
 
-        $revenue = Order::where('branch_id', $branchId)
-            ->where('payment_status', 'paid')
-            ->whereBetween(DB::raw('DATE(created_at)'), [$startDate, $endDate])
-            ->sum('total_price');
+        $orderQuery = Order::where('payment_status', 'paid')
+            ->whereBetween(DB::raw('DATE(created_at)'), [$startDate, $endDate]);
 
-        $totalOrders = Order::where('branch_id', $branchId)
-            ->where('payment_status', 'paid')
-            ->whereBetween(DB::raw('DATE(created_at)'), [$startDate, $endDate])
-            ->count();
+        $expenseQuery = Expense::whereBetween('date', [$startDate, $endDate]);
 
-        $expenses = Expense::where('branch_id', $branchId)
-            ->whereBetween('date', [$startDate, $endDate])
-            ->get();
+        if ($selectedBranchId && $selectedBranchId !== 'all') {
+            $orderQuery->where('branch_id', $selectedBranchId);
+            $expenseQuery->where('branch_id', $selectedBranchId);
+        }
 
+        $revenue = $orderQuery->sum('total_price');
+        $totalOrders = $orderQuery->count();
+
+        $expenses = $expenseQuery->with('branch')->get();
         $totalExpenses = $expenses->sum('amount');
-
         $expensesByCategory = $expenses->groupBy('category')->map(fn($group) => $group->sum('amount'));
 
         $netProfit = $revenue - $totalExpenses;
 
         return view('owner.reports', compact(
-            'branch', 'startDate', 'endDate', 'revenue', 'totalOrders', 'expenses', 'totalExpenses', 'expensesByCategory', 'netProfit'
+            'branches', 'selectedBranchId', 'selectedBranch', 'startDate', 'endDate', 'revenue', 'totalOrders', 'expenses', 'totalExpenses', 'expensesByCategory', 'netProfit'
         ));
     }
 
-    public function inventory()
+    public function inventory(Request $request)
     {
-        $branchId = auth()->user()->branch_id;
-        $branch = auth()->user()->branch;
+        $branches = Branch::all();
+        $selectedBranchId = $request->get('branch_id');
 
-        $inventories = Inventory::where('branch_id', $branchId)->orderBy('category')->get();
+        $selectedBranch = null;
+        if ($selectedBranchId && $selectedBranchId !== 'all') {
+            $selectedBranch = Branch::find($selectedBranchId);
+        }
+
+        $query = Inventory::with('branch')->orderBy('category');
+        if ($selectedBranchId && $selectedBranchId !== 'all') {
+            $query->where('branch_id', $selectedBranchId);
+        }
+
+        $inventories = $query->get();
         $totalValuation = $inventories->sum(fn($i) => $i->stock * $i->unit_price);
         $lowStockItems = $inventories->filter(fn($i) => $i->isLowStock());
 
-        return view('owner.inventory', compact('branch', 'inventories', 'totalValuation', 'lowStockItems'));
+        return view('owner.inventory', compact('branches', 'selectedBranchId', 'selectedBranch', 'inventories', 'totalValuation', 'lowStockItems'));
     }
 }

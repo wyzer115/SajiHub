@@ -22,19 +22,80 @@
             });
         };
     </script>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @endif
     <style>
         body {
             font-family: 'Outfit', sans-serif;
             background-color: #FAF8F5;
             color: #1C1917;
         }
+        /* QR Code Scanner Custom Styles */
+        #qr-reader {
+            border: none !important;
+            background: transparent !important;
+        }
+        #qr-reader img[alt="Info icon"],
+        #qr-reader__header_message,
+        #qr-reader__dashboard_section_csr,
+        #qr-reader__dashboard_section_swaplink,
+        #qr-reader__status_span,
+        #qr-reader canvas {
+            display: none !important;
+        }
+        #qr-reader__scan_region {
+            border: none !important;
+            background: transparent !important;
+        }
+        #qr-reader__scan_region video {
+            border-radius: 1rem !important;
+            object-fit: cover !important;
+            width: 100% !important;
+            max-height: 320px !important;
+        }
+        #qr-reader button {
+            background-color: #BD2000 !important;
+            color: white !important;
+            border-radius: 0.75rem !important;
+            padding: 0.6rem 1.2rem !important;
+            font-weight: 800 !important;
+            font-size: 0.8rem !important;
+            border: none !important;
+            cursor: pointer !important;
+            box-shadow: 0 4px 6px -1px rgba(189, 32, 0, 0.2) !important;
+            margin-top: 0.5rem !important;
+        }
+        #qr-reader select {
+            background-color: #FAF8F5 !important;
+            border: 1px solid #E7E5E4 !important;
+            border-radius: 0.75rem !important;
+            padding: 0.5rem 1rem !important;
+            font-size: 0.8rem !important;
+            font-weight: 700 !important;
+            color: #1C1917 !important;
+            margin-bottom: 0.5rem !important;
+        }
+
         .scrollbar-none::-webkit-scrollbar {
             display: none;
         }
         .scrollbar-none {
             -ms-overflow-style: none;
             scrollbar-width: none;
+        }
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(35px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+        .reveal-scale {
+            transform: scale(0.93);
+        }
+        .reveal-on-scroll.is-visible {
+            opacity: 1;
+            transform: translate(0) scale(1);
         }
     </style>
 </head>
@@ -79,7 +140,7 @@
                     </div>
                 @else
                     <a href="{{ route('login') }}" class="bg-[#BD2000] text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-[#8C0000] transition shadow-md inline-block">
-                        Masuk Akun
+                        Masuk
                     </a>
                 @endauth
             </div>
@@ -198,7 +259,7 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             @forelse($menus as $menu)
-                <div class="bg-white border border-stone-200 rounded-3xl p-5 shadow-sm hover:shadow-xl hover:border-[#BD2000]/40 transition-all duration-300 flex flex-col justify-between group">
+                <div class="bg-white border border-stone-200 rounded-3xl p-5 shadow-sm hover:shadow-xl hover:border-[#BD2000]/40 transition-all duration-300 flex flex-col justify-between group reveal-on-scroll reveal-scale">
                     <div>
                         {{-- Foto Makanan --}}
                         <div class="aspect-[4/3] rounded-2xl overflow-hidden relative mb-4 bg-stone-100 border border-stone-200">
@@ -295,24 +356,44 @@
     </footer>
 
     {{-- MODAL SCANNER QR CODE --}}
-    <div id="qr-scanner-modal" class="fixed inset-0 bg-stone-900/80 backdrop-blur-sm z-[9999] hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative border border-stone-200 animate-fade-in-up">
-            <button type="button" onclick="closeQrScannerModal()" class="absolute top-4 right-4 text-stone-400 hover:text-stone-700 p-2 rounded-full">
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-
-            <div class="text-center mb-4">
-                <h3 class="text-xl font-black text-[#8C0000] flex items-center justify-center gap-2">
-                    <svg class="w-5 h-5 text-[#BD2000]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 116 0z"/>
-                    </svg>
-                    Pindai QR Code Meja
+    <div id="qr-scanner-modal" class="fixed inset-0 bg-stone-900/80 backdrop-blur-sm z-[9999] opacity-0 pointer-events-none transition-all duration-300 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative border border-stone-200 animate-fade-in-up space-y-4 text-center">
+            <div class="flex justify-between items-center border-b border-stone-100 pb-3">
+                <h3 class="text-base font-black text-[#8C0000] uppercase tracking-wider flex items-center gap-2">
+                    <svg class="w-5 h-5 text-[#BD2000]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    <span>Pindai Kode QR Meja</span>
                 </h3>
-                <p class="text-slate-600 text-xs font-medium mt-1">Arahkan kamera ke QR Code yang berada di meja tempat duduk Anda.</p>
+                <button type="button" onclick="closeQrScannerModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-500 hover:text-stone-800 hover:bg-stone-200 flex items-center justify-center transition-colors cursor-pointer">
+                    ✕
+                </button>
             </div>
 
-            <div id="qr-reader" class="w-full rounded-2xl overflow-hidden border-2 border-dashed border-[#BD2000]"></div>
+            <p class="text-xs text-slate-600 font-medium leading-relaxed">
+                Arahkan kamera ponsel Anda ke stiker kode QR yang menempel di meja makan.
+            </p>
+
+            {{-- Camera Container with Viewfinder --}}
+            <div id="qr-reader-container" class="w-full bg-stone-950 rounded-2xl p-2 border border-stone-300/80 min-h-[260px] flex flex-col items-center justify-center relative overflow-hidden shadow-inner">
+                <div id="qr-reader" class="w-full rounded-xl overflow-hidden"></div>
+                
+                {{-- Glowing Viewfinder Target Box Overlay --}}
+                <div class="absolute inset-0 pointer-events-none flex items-center justify-center">
+                    <div class="w-48 h-48 border-2 border-[#BD2000]/80 rounded-2xl relative shadow-[0_0_25px_rgba(189,32,0,0.4)]">
+                        <div class="absolute -top-1 -left-1 w-5 h-5 border-t-4 border-l-4 border-[#FFBE0F] rounded-tl-lg"></div>
+                        <div class="absolute -top-1 -right-1 w-5 h-5 border-t-4 border-r-4 border-[#FFBE0F] rounded-tr-lg"></div>
+                        <div class="absolute -bottom-1 -left-1 w-5 h-5 border-b-4 border-l-4 border-[#FFBE0F] rounded-bl-lg"></div>
+                        <div class="absolute -bottom-1 -right-1 w-5 h-5 border-b-4 border-r-4 border-[#FFBE0F] rounded-br-lg"></div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Close Button --}}
+            <div class="pt-1">
+                <button type="button" onclick="closeQrScannerModal()" class="w-full py-3.5 bg-[#BD2000] hover:bg-[#8C0000] text-white font-extrabold text-xs uppercase tracking-wider rounded-2xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                    <span>Tutup Kamera</span>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -320,34 +401,63 @@
         let html5QrcodeScanner = null;
 
         function openQrScannerModal() {
-            document.getElementById('qr-scanner-modal').classList.remove('hidden');
+            const modal = document.getElementById('qr-scanner-modal');
+            modal.classList.remove('opacity-0', 'pointer-events-none', 'hidden');
+            modal.classList.add('opacity-100');
+
             if (!html5QrcodeScanner) {
                 html5QrcodeScanner = new Html5Qrcode("qr-reader");
             }
+            const config = { fps: 15 };
+
             html5QrcodeScanner.start(
                 { facingMode: "environment" },
-                { fps: 10, qrbox: { width: 250, height: 250 } },
+                config,
                 (decodedText) => {
                     closeQrScannerModal();
                     window.location.href = decodedText;
                 },
                 (errorMessage) => {}
             ).catch(err => {
-                alert("Gagal mengakses kamera: " + err);
+                html5QrcodeScanner.start({ facingMode: "user" }, config, (decodedText) => {
+                    closeQrScannerModal();
+                    window.location.href = decodedText;
+                }, () => {}).catch(e => console.log(e));
             });
         }
 
         function closeQrScannerModal() {
+            const modal = document.getElementById('qr-scanner-modal');
+            if (modal) {
+                modal.classList.remove('opacity-100');
+                modal.classList.add('opacity-0', 'pointer-events-none');
+            }
             if (html5QrcodeScanner) {
                 html5QrcodeScanner.stop().then(() => {
-                    document.getElementById('qr-scanner-modal').classList.add('hidden');
-                }).catch(() => {
-                    document.getElementById('qr-scanner-modal').classList.add('hidden');
-                });
-            } else {
-                document.getElementById('qr-scanner-modal').classList.add('hidden');
+                    console.log("Camera stopped.");
+                }).catch(() => {});
             }
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px 0px -50px 0px',
+                threshold: 0.08
+            };
+
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    } else {
+                        entry.target.classList.remove('is-visible');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.reveal-on-scroll').forEach(el => revealObserver.observe(el));
+        });
     </script>
 </body>
 </html>
