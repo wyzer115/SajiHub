@@ -120,7 +120,7 @@
     <div class="bg-white border border-stone-200 rounded-3xl overflow-hidden shadow-sm animate-fade-in-up">
         <div class="p-6 border-b border-stone-200 bg-stone-50 flex justify-between items-center">
             <h3 class="text-lg font-black text-[#8C0000]">Rincian Transaksi Selesai</h3>
-            <span class="text-xs text-slate-600 font-semibold">Menampilkan {{ $ordersList->count() }} transaksi</span>
+            <span class="text-xs text-slate-600 font-semibold">Total {{ $paginatedOrders->total() }} transaksi lunas</span>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
@@ -134,9 +134,9 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-stone-200">
-                    @forelse($ordersList as $order)
+                    @forelse($paginatedOrders as $order)
                     <tr class="hover:bg-stone-50 transition-colors">
-                        <td class="px-6 py-4 text-xs font-bold text-slate-500">{{ $loop->iteration }}</td>
+                        <td class="px-6 py-4 text-xs font-bold text-slate-500">{{ ($paginatedOrders->currentPage() - 1) * $paginatedOrders->perPage() + $loop->iteration }}</td>
                         <td class="px-6 py-4 text-sm text-slate-600 font-semibold">{{ $order->created_at->format('d M Y, H:i') }}</td>
                         <td class="px-6 py-4">
                             <div class="text-sm font-extrabold text-[#1C1917]">{{ $order->customer_name }}</div>
@@ -160,6 +160,11 @@
                 </tbody>
             </table>
         </div>
+        @if($paginatedOrders->hasPages())
+        <div class="px-6 py-4 border-t border-stone-200 bg-stone-50">
+            {{ $paginatedOrders->links() }}
+        </div>
+        @endif
     </div>
 </div>
 @endsection

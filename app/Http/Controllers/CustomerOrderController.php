@@ -90,15 +90,13 @@ class CustomerOrderController extends Controller
         $order = null;
 
         DB::transaction(function () use ($validated, $table, $customerName, $userId, &$order) {
-            $isInstantPayment = ($validated['payment_method'] === 'qris');
-
             $order = Order::create([
                 'branch_id'      => $validated['branch_id'],
                 'user_id'        => $userId,
                 'table_id'       => $table->id,
                 'customer_name'  => $customerName,
                 'order_status'   => 'pending',
-                'payment_status' => $isInstantPayment ? 'paid' : 'unpaid',
+                'payment_status' => 'unpaid', // Dine-in customer must confirm & pay at cashier
                 'payment_method' => $validated['payment_method'],
                 'total_price'    => 0,
             ]);
@@ -126,8 +124,11 @@ class CustomerOrderController extends Controller
                 if ($menu && $menu->ingredients) {
                     foreach ($menu->ingredients as $ingredient) {
                         if ($ingredient->inventory) {
-                            $usedQty = $ingredient->quantity * $item['quantity'];
-                            $ingredient->inventory->decrement('stock', $usedQty);
+                            $usedQty = (float) $ingredient->quantity * (int) $item['quantity'];
+                            $currentStock = (float) $ingredient->inventory->stock;
+                            $ingredient->inventory->update([
+                                'stock' => max(0, round($currentStock - $usedQty, 2))
+                            ]);
                         }
                     }
                 }
@@ -140,27 +141,30 @@ class CustomerOrderController extends Controller
                 'branch_id'      => $validated['branch_id'],
                 'amount'         => $totalPrice,
                 'payment_method' => $validated['payment_method'],
-                'status'         => $isInstantPayment ? 'completed' : 'pending',
-                'merchant_id'    => $isInstantPayment ? 'ID1026528881513' : null,
-                'paid_at'        => $isInstantPayment ? now() : null,
+                'status'         => 'pending',
+                'merchant_id'    => $validated['payment_method'] === 'qris' ? 'ID1026528881513' : null,
+                'paid_at'        => null,
             ]);
 
             // Update table status to occupied
             $table->update(['status' => 'occupied']);
         });
 
-        return redirect()->route('pesan', [
-            'branch_id' => $validated['branch_id'], 
-            'table_id'  => $validated['table_id'],
-            'receipt_id' => $order->id
-        ])
-            ->with('success', 'Pesanan Anda #' . $order->id . ' berhasil dikirim ke Kasir & Dapur!')
-            ->with('receipt_order_id', $order->id);
+        return redirect()->route('pesan.receipt', $order->id)
+            ->with('success', 'Pesanan Anda #' . $order->id . ' berhasil dibuat. Silakan tunjukkan QR Konfirmasi ke Kasir!');
     }
 
     public function showReceipt(Order $order)
     {
         $order->load(['items.menu', 'branch', 'table', 'transaction']);
         return view('customer.receipt', compact('order'));
+    }
+
+    public function checkStatus(Order $order)
+    {
+        return response()->json([
+            'payment_status' => $order->payment_status,
+            'order_status'   => $order->order_status,
+        ]);
     }
 }

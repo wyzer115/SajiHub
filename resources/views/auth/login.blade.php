@@ -83,73 +83,9 @@
                 </div>
             </form>
             
-            <!-- Quick Access 1-Click Demo Login Section -->
-            <div class="mt-6 border-t border-stone-200/80 pt-5">
-                <div class="grid grid-cols-2 gap-2 text-xs">
-                    <button type="button" onclick="quickLogin('owner_jkt', 'password')"
-                        class="flex items-center gap-2.5 p-2.5 rounded-xl border border-purple-200 bg-purple-50/60 hover:bg-purple-100/90 text-purple-900 transition-all text-left group cursor-pointer shadow-xs">
-                        <span class="w-7 h-7 rounded-lg bg-purple-200/80 flex items-center justify-center text-sm group-hover:scale-110 transition-transform shrink-0">👑</span>
-                        <div class="overflow-hidden">
-                            <div class="font-black text-[#1C1917] leading-tight">Owner</div>
-                            <div class="text-[10px] text-purple-700 font-semibold truncate">Financial Dashboard</div>
-                        </div>
-                    </button>
-
-                    <button type="button" onclick="quickLogin('spv_jkt', 'password')"
-                        class="flex items-center gap-2.5 p-2.5 rounded-xl border border-red-200 bg-red-50/60 hover:bg-red-100/90 text-red-900 transition-all text-left group cursor-pointer shadow-xs">
-                        <span class="w-7 h-7 rounded-lg bg-red-200/80 flex items-center justify-center text-sm group-hover:scale-110 transition-transform shrink-0">📋</span>
-                        <div class="overflow-hidden">
-                            <div class="font-black text-[#1C1917] leading-tight">Supervisor</div>
-                            <div class="text-[10px] text-red-700 font-semibold truncate">Stok & Audit Opname</div>
-                        </div>
-                    </button>
-
-                    <button type="button" onclick="quickLogin('kasir_jkt', 'password')"
-                        class="flex items-center gap-2.5 p-2.5 rounded-xl border border-emerald-200 bg-emerald-50/60 hover:bg-emerald-100/90 text-emerald-900 transition-all text-left group cursor-pointer shadow-xs">
-                        <span class="w-7 h-7 rounded-lg bg-emerald-200/80 flex items-center justify-center text-sm group-hover:scale-110 transition-transform shrink-0">💵</span>
-                        <div class="overflow-hidden">
-                            <div class="font-black text-[#1C1917] leading-tight">Kasir</div>
-                            <div class="text-[10px] text-emerald-700 font-semibold truncate">POS Transaksi</div>
-                        </div>
-                    </button>
-
-                    <button type="button" onclick="quickLogin('koki_jkt', 'password')"
-                        class="flex items-center gap-2.5 p-2.5 rounded-xl border border-amber-200 bg-amber-50/60 hover:bg-amber-100/90 text-amber-900 transition-all text-left group cursor-pointer shadow-xs">
-                        <span class="w-7 h-7 rounded-lg bg-amber-200/80 flex items-center justify-center text-sm group-hover:scale-110 transition-transform shrink-0">👨‍🍳</span>
-                        <div class="overflow-hidden">
-                            <div class="font-black text-[#1C1917] leading-tight">Koki / Dapur</div>
-                            <div class="text-[10px] text-amber-700 font-semibold truncate">KDS Layar Dapur</div>
-                        </div>
-                    </button>
-
-                    <button type="button" onclick="quickLogin('admin_jakarta', 'password')"
-                        class="flex items-center gap-2.5 p-2.5 rounded-xl border border-blue-200 bg-blue-50/60 hover:bg-blue-100/90 text-blue-900 transition-all text-left group cursor-pointer shadow-xs">
-                        <span class="w-7 h-7 rounded-lg bg-blue-200/80 flex items-center justify-center text-sm group-hover:scale-110 transition-transform shrink-0">⚙️</span>
-                        <div class="overflow-hidden">
-                            <div class="font-black text-[#1C1917] leading-tight">Admin Cabang</div>
-                            <div class="text-[10px] text-blue-700 font-semibold truncate">Kelola Menu & Staf</div>
-                        </div>
-                    </button>
-
-                    <button type="button" onclick="quickLogin('superadmin', 'password')"
-                        class="flex items-center gap-2.5 p-2.5 rounded-xl border border-stone-300 bg-stone-100 hover:bg-stone-200 text-stone-900 transition-all text-left group cursor-pointer shadow-xs">
-                        <span class="w-7 h-7 rounded-lg bg-stone-300 flex items-center justify-center text-sm group-hover:scale-110 transition-transform shrink-0">🌐</span>
-                        <div class="overflow-hidden">
-                            <div class="font-black text-[#1C1917] leading-tight">Super Admin</div>
-                            <div class="text-[10px] text-stone-600 font-semibold truncate">Pusat & All Branch</div>
-                        </div>
-                    </button>
-                </div>
-            </div>
         </div>
 
         <script>
-            function quickLogin(username, password) {
-                document.getElementById('login').value = username;
-                document.getElementById('password').value = password;
-                document.getElementById('login-form').submit();
-            }
-
             function togglePassword(inputId, iconId) {
                 const input = document.getElementById(inputId);
                 const icon = document.getElementById(iconId);

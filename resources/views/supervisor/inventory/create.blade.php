@@ -50,7 +50,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
                 <div>
                     <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">Jumlah Stok <span class="text-red-500">*</span></label>
-                    <input type="number" name="stock" value="{{ old('stock', 0) }}" required min="0"
+                    <input type="number" step="any" name="stock" value="{{ old('stock', 0) }}" required min="0"
                            class="w-full bg-stone-50 border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#BD2000]">
                 </div>
 
@@ -63,7 +63,7 @@
 
                 <div>
                     <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">Batas Min. Stok Warning <span class="text-red-500">*</span></label>
-                    <input type="number" name="min_stock" value="{{ old('min_stock', 5) }}" required min="0"
+                    <input type="number" step="any" name="min_stock" value="{{ old('min_stock', 5) }}" required min="0"
                            class="w-full bg-stone-50 border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#BD2000]">
                 </div>
             </div>

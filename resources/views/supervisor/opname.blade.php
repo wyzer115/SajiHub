@@ -1,471 +1,558 @@
 @extends('layouts.app')
-@section('title', 'Audit & Rekonsiliasi Stok Harian')
-@section('page-title', 'Lembar Audit & Rekonsiliasi Stok Harian (SPV)')
+@section('title', 'Cek & Sesuaikan Stok Bahan')
+@section('page-title', 'Cek & Sesuaikan Stok Bahan Dapur (Stock Opname)')
 
 @section('content')
 <div class="max-w-5xl mx-auto space-y-6 animate-fade-in-up">
 
-    <!-- Header info banner & Date Filter -->
+    <!-- Header Info Banner -->
     <div class="bg-white border border-stone-200 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
             <h2 class="text-xl font-black text-[#8C0000] flex items-center gap-2 mb-1">
-                <svg class="w-6 h-6 text-[#BD2000]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
-                <span>Lembar Rekonsiliasi Stok Harian (Opening - In - Out - Closing)</span>
+                <svg class="w-6 h-6 text-[#BD2000]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                <span>Cek & Sesuaikan Stok Bahan Dapur</span>
             </h2>
-            <p class="text-stone-600 text-xs font-medium">Bandingkan pemakaian fisik riil di dapur dengan data penjualan kasir (PLU) untuk mendeteksi kerugian & menjaga SOP resep.</p>
+            <p class="text-stone-600 text-xs font-medium">Cocokkan jumlah stok di sistem dengan kenyataan barang asli di dapur (misal: koreksi fisik, belanjaan baru masuk, atau barang basi/rusak).</p>
         </div>
         <form method="GET" action="{{ route('supervisor.opname.index') }}" class="flex items-center gap-2 shrink-0">
-            <label for="date" class="text-xs font-bold text-stone-600">Tanggal Audit:</label>
+            <label for="date" class="text-xs font-bold text-stone-600">Tanggal:</label>
             <input type="date" name="date" id="date" value="{{ $date }}" onchange="this.form.submit()"
                 class="bg-stone-50 border border-stone-300 text-stone-800 text-xs font-bold rounded-xl px-3 py-2 focus:border-[#BD2000] focus:outline-none">
         </form>
     </div>
 
-    <!-- Main Card -->
-    <div class="bg-white border border-stone-200 rounded-3xl p-8 shadow-sm space-y-6">
-
-        <!-- Mode Tab Selector: Form Audit vs Riwayat Log -->
-        <div class="flex items-center gap-3 p-1.5 bg-stone-100 rounded-2xl w-fit">
-            <button type="button" id="tab-audit" onclick="switchMainSection('audit')"
+    <!-- Main Navigation Tabs -->
+    <div class="bg-white border border-stone-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+        
+        <div class="flex flex-wrap items-center gap-2 p-1.5 bg-stone-100 rounded-2xl w-fit">
+            <button type="button" id="tab-quick-adjust" onclick="switchTab('quick-adjust')"
                 class="px-5 py-2.5 rounded-xl text-xs font-extrabold transition-all shadow-sm bg-white text-[#BD2000]">
-                📋 Form Audit Lembar Stok
+                ⚡ Sesuaikan Stok
             </button>
-            <button type="button" id="tab-history" onclick="switchMainSection('history')"
+            <button type="button" id="tab-add-item" onclick="switchTab('add-item')"
                 class="px-5 py-2.5 rounded-xl text-xs font-bold text-stone-600 hover:text-stone-900 transition-all">
-                📊 Riwayat Log Audit Harian
+                ➕ Tambah Bahan Baru
+            </button>
+            <button type="button" id="tab-log-history" onclick="switchTab('log-history')"
+                class="px-5 py-2.5 rounded-xl text-xs font-bold text-stone-600 hover:text-stone-900 transition-all">
+                📜 Riwayat Perubahan Stok
             </button>
         </div>
 
-        <!-- Section 1: Form Audit -->
-        <div id="section-audit-form" class="space-y-6">
-
-            <!-- Sub Tab: Existing vs New Item -->
-            <div class="flex items-center gap-2 border-b border-stone-100 pb-3">
-                <button type="button" id="subtab-existing" onclick="setMode('existing')"
-                    class="px-4 py-2 rounded-lg text-xs font-bold bg-stone-100 text-[#BD2000]">
-                    📦 Pilih Barang dari Inventaris
-                </button>
-                <button type="button" id="subtab-new" onclick="setMode('new')"
-                    class="px-4 py-2 rounded-lg text-xs font-bold text-stone-500 hover:text-stone-900">
-                    ➕ Tambah Barang Baru
-                </button>
-            </div>
-
-            <form action="{{ route('supervisor.opname.store') }}" method="POST" class="space-y-6" id="opname-form">
+        <!-- TAB 1: FORM SESUAIKAN STOK PRAKTIS -->
+        <div id="section-quick-adjust" class="space-y-6">
+            <form action="{{ route('supervisor.opname.store') }}" method="POST" id="form-adjust" class="space-y-6">
                 @csrf
                 <input type="hidden" name="date" value="{{ $date }}">
-                <input type="hidden" name="mode" id="form-mode" value="existing">
+                <input type="hidden" name="mode" value="existing">
+                <input type="hidden" name="action_type" id="input_action_type" value="set_actual">
 
-                <!-- Mode 1: Select Existing Item -->
-                <div id="section-existing" class="space-y-4">
-                    <div>
-                        <label for="inventory_id" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Pilih Bahan Baku Inventaris *</label>
-                        <select name="inventory_id" id="inventory_id" onchange="onInventorySelect()" required
-                            class="w-full bg-stone-50 border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-4 py-3.5 text-sm focus:border-[#BD2000] focus:outline-none transition-all">
-                            <option value="">-- Pilih Bahan Baku dari Inventaris Cabang --</option>
-                            @foreach($inventories as $inv)
-                                <option value="{{ $inv->id }}"
-                                    data-opening="{{ $inv->opening_stock }}"
-                                    data-plu="{{ $inv->plu_sales }}"
-                                    data-unit="{{ $inv->unit }}"
-                                    data-price="{{ $inv->unit_price }}"
-                                    data-name="{{ $inv->name }}"
-                                    {{ old('inventory_id') == $inv->id ? 'selected' : '' }}>
-                                    {{ $inv->name }} &nbsp;—&nbsp; Opening: {{ (float)$inv->opening_stock }} {{ $inv->unit }} | PLU Kasir: {{ (float)$inv->plu_sales }} {{ $inv->unit }} (Rp {{ number_format($inv->unit_price, 0, ',', '.') }}/{{ $inv->unit }})
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('inventory_id')
-                            <p class="text-red-600 text-xs mt-1 font-bold">{{ $message }}</p>
-                        @enderror
-                    </div>
+                <!-- 1. PILIH BAHAN BAKU -->
+                <div>
+                    <label for="select_inventory_id" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">
+                        1. Pilih Bahan Baku yang Ingin Disesuaikan *
+                    </label>
+                    <select name="inventory_id" id="select_inventory_id" onchange="onItemChange()" required
+                        class="w-full bg-stone-50 border border-stone-300 text-[#1C1917] font-semibold rounded-2xl px-4 py-3.5 text-sm focus:border-[#BD2000] focus:outline-none transition-all">
+                        <option value="">-- Ketuk untuk memilih bahan baku --</option>
+                        @foreach($inventories as $inv)
+                            <option value="{{ $inv->id }}"
+                                data-stock="{{ (float)$inv->stock }}"
+                                data-unit="{{ $inv->unit }}"
+                                data-price="{{ $inv->unit_price }}"
+                                data-min="{{ $inv->min_stock }}"
+                                data-name="{{ $inv->name }}"
+                                data-cat="{{ $inv->category }}"
+                                {{ old('inventory_id') == $inv->id ? 'selected' : '' }}>
+                                {{ $inv->name }} (Stok Sistem: {{ (float)$inv->stock }} {{ $inv->unit }})
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('inventory_id')
+                        <p class="text-red-600 text-xs mt-1 font-bold">{{ $message }}</p>
+                    @enderror
                 </div>
 
-                <!-- Mode 2: Form Tambah Barang Baru Saja -->
-                <div id="section-new" class="hidden space-y-5 bg-stone-50 border border-stone-200 p-6 rounded-2xl">
-                    <h3 class="text-xs font-extrabold text-[#8C0000] uppercase tracking-wider flex items-center gap-2">
-                        <span>✨ Tambah Barang / Bahan Baku Baru ke Inventaris</span>
-                    </h3>
-
-                    <div>
-                        <label for="item_name" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Nama Bahan Baku Baru *</label>
-                        <input type="text" name="item_name" id="item_name" value="{{ old('item_name') }}"
-                            class="w-full bg-white border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-4 py-3 text-sm focus:border-[#BD2000] focus:outline-none transition-all"
-                            placeholder="Contoh: Es Batu, Sirup Hazelnut, Susu Oat...">
-                        @error('item_name')
-                            <p class="text-red-600 text-xs mt-1 font-bold">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- CARD PREVIEW INFORMASI BARANG (MUNCUL OTOMATIS) -->
+                <div id="item-preview-card" class="hidden p-5 bg-gradient-to-r from-stone-50 to-stone-100/60 border border-stone-200 rounded-2xl animate-fade-in-up">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
-                            <label for="category" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Kategori Barang *</label>
-                            <select name="category" id="category"
-                                class="w-full bg-white border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-4 py-3 text-sm focus:border-[#BD2000] focus:outline-none transition-all">
-                                <option value="bahan_makanan">Bahan Makanan</option>
-                                <option value="bahan_minuman">Bahan Minuman</option>
-                                <option value="peralatan">Peralatan / Alat Masak</option>
-                            </select>
+                            <span id="preview-cat-badge" class="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-stone-200 text-stone-700"></span>
+                            <h3 id="preview-name" class="text-lg font-black text-[#1C1917] mt-1"></h3>
+                            <p class="text-xs text-stone-500 font-medium mt-0.5">
+                                Harga HPP: <span id="preview-price" class="font-bold text-stone-700"></span>
+                            </p>
                         </div>
-
-                        <div>
-                            <label for="unit" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Satuan (UOM) *</label>
-                            <input type="text" name="unit" id="unit" list="unit-suggestions" value="{{ old('unit') }}"
-                                class="w-full bg-white border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-4 py-3 text-sm focus:border-[#BD2000] focus:outline-none transition-all"
-                                placeholder="Contoh: pack, kg, liter, ml, pcs, botol...">
-                            <datalist id="unit-suggestions">
-                                <option value="kg"></option>
-                                <option value="gram"></option>
-                                <option value="liter"></option>
-                                <option value="ml"></option>
-                                <option value="pcs"></option>
-                                <option value="pack"></option>
-                                <option value="botol"></option>
-                            </datalist>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label for="stock" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Jumlah Stok Awal *</label>
-                            <input type="number" step="0.001" name="stock" id="stock" value="{{ old('stock', 0) }}" min="0"
-                                class="w-full bg-white border border-stone-300 text-[#1C1917] font-black rounded-xl px-4 py-3 text-sm focus:border-[#BD2000] focus:outline-none transition-all"
-                                placeholder="Contoh: 10">
-                        </div>
-
-                        <div>
-                            <label for="unit_price" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Harga Satuan HPP (Rp) *</label>
-                            <input type="number" name="unit_price" id="unit_price" value="{{ old('unit_price', 0) }}" min="0" step="100"
-                                class="w-full bg-white border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-4 py-3 text-sm focus:border-[#BD2000] focus:outline-none transition-all"
-                                placeholder="Contoh: 20000">
-                        </div>
-
-                        <div>
-                            <label for="min_stock" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Min. Stok Warning</label>
-                            <input type="number" step="0.001" name="min_stock" id="min_stock" value="{{ old('min_stock', 5) }}" min="0"
-                                class="w-full bg-white border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-4 py-3 text-sm focus:border-[#BD2000] focus:outline-none transition-all"
-                                placeholder="Default: 5">
+                        <div class="bg-white border border-stone-200 rounded-xl px-5 py-3 text-right shrink-0 shadow-xs">
+                            <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Stok Sistem Saat Ini</span>
+                            <div class="text-2xl font-black text-[#BD2000]">
+                                <span id="preview-stock">0</span> <span id="preview-unit" class="text-sm font-bold text-stone-600"></span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Audit Fields Section (HANYA MUNCUL PADA MODE EXISTING) -->
-                <div id="section-audit-fields" class="space-y-6">
-                    <!-- Input Elements Grid: Opening, In, Out, Closing, PLU -->
-                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 pt-2">
-                        <div>
-                            <label for="opening_stock" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Opening (Stok Pagi)</label>
-                            <input type="number" step="0.001" name="opening_stock" id="opening_stock" value="{{ old('opening_stock', 0) }}" oninput="calculateReconciliation()"
-                                class="w-full bg-stone-50 border border-stone-300 text-[#1C1917] font-bold rounded-xl px-3.5 py-3 text-sm focus:border-[#BD2000] focus:outline-none transition-all">
+                <!-- 2. PILIHAN CARA PENYESUAIAN (3 PILIHAN PRAKTIS) -->
+                <div class="space-y-3">
+                    <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider">
+                        2. Pilih Jenis Penyesuaian *
+                    </label>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <!-- Opsi A: Set Fisik Nyata (Paling sering) -->
+                        <div onclick="selectActionType('set_actual')" id="card-act-set_actual"
+                            class="cursor-pointer border-2 border-[#BD2000] bg-[#BD2000]/5 rounded-2xl p-4 transition-all flex items-start gap-3">
+                            <input type="radio" name="radio_action" id="radio_set_actual" checked class="mt-1 text-[#BD2000]">
+                            <div>
+                                <h4 class="text-sm font-extrabold text-[#1C1917] flex items-center gap-1.5">
+                                    <span>🎯</span>
+                                    <span>Koreksi Stok Fisik Dapur</span>
+                                </h4>
+                                <p class="text-[11px] text-stone-600 mt-1 leading-snug">Cukup ketik berapa jumlah riil barang yang dihitung di dapur saat ini.</p>
+                            </div>
                         </div>
 
-                        <div>
-                            <label for="stock_in" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">In (Belanja Masuk)</label>
-                            <input type="number" step="0.001" name="stock_in" id="stock_in" value="{{ old('stock_in', 0) }}" oninput="calculateReconciliation()"
-                                class="w-full bg-emerald-50/50 border border-emerald-300 text-emerald-900 font-bold rounded-xl px-3.5 py-3 text-sm focus:border-emerald-600 focus:outline-none transition-all">
+                        <!-- Opsi B: Tambah Stok Masuk -->
+                        <div onclick="selectActionType('add')" id="card-act-add"
+                            class="cursor-pointer border border-stone-200 bg-white hover:border-emerald-400 rounded-2xl p-4 transition-all flex items-start gap-3">
+                            <input type="radio" name="radio_action" id="radio_add" class="mt-1 text-emerald-600">
+                            <div>
+                                <h4 class="text-sm font-extrabold text-[#1C1917] flex items-center gap-1.5">
+                                    <span>📥</span>
+                                    <span>Tambah Stok (Restok)</span>
+                                </h4>
+                                <p class="text-[11px] text-stone-600 mt-1 leading-snug">Ada barang baru dibeli atau pasokan baru masuk ke dapur.</p>
+                            </div>
                         </div>
 
-                        <div>
-                            <label for="stock_out_waste" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Out (Waste/Basi)</label>
-                            <input type="number" step="0.001" name="stock_out_waste" id="stock_out_waste" value="{{ old('stock_out_waste', 0) }}" oninput="calculateReconciliation()"
-                                class="w-full bg-red-50/50 border border-red-300 text-red-900 font-bold rounded-xl px-3.5 py-3 text-sm focus:border-red-600 focus:outline-none transition-all">
-                        </div>
-
-                        <div>
-                            <label for="closing_stock" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Closing (Hitung Malam) *</label>
-                            <input type="number" step="0.001" name="closing_stock" id="closing_stock" value="{{ old('closing_stock') }}" required min="0" oninput="calculateReconciliation()"
-                                class="w-full bg-stone-50 border border-stone-300 text-[#1C1917] font-black text-base rounded-xl px-3.5 py-3 focus:border-[#BD2000] focus:outline-none transition-all"
-                                placeholder="Stok fisik malam...">
-                            @error('closing_stock')
-                                <p class="text-red-600 text-xs mt-1 font-bold">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">PLU (Penjualan Kasir)</label>
-                            <div class="bg-blue-50 border border-blue-200 text-blue-900 font-black rounded-xl px-3.5 py-3 text-base flex items-center justify-between">
-                                <span id="display-plu">0</span>
-                                <span id="display-plu-unit" class="text-xs text-blue-600 font-semibold"></span>
+                        <!-- Opsi C: Kurangi Stok Rusak/Basi -->
+                        <div onclick="selectActionType('reduce')" id="card-act-reduce"
+                            class="cursor-pointer border border-stone-200 bg-white hover:border-red-400 rounded-2xl p-4 transition-all flex items-start gap-3">
+                            <input type="radio" name="radio_action" id="radio_reduce" class="mt-1 text-red-600">
+                            <div>
+                                <h4 class="text-sm font-extrabold text-[#1C1917] flex items-center gap-1.5">
+                                    <span>🗑️</span>
+                                    <span>Kurangi (Rusak / Basi)</span>
+                                </h4>
+                                <p class="text-[11px] text-stone-600 mt-1 leading-snug">Ada bahan yang basi, tumpah, atau dibuang (waste).</p>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Live Calculation & Summary Banner -->
-                    <div id="live-recon-card" class="hidden p-5 rounded-2xl border transition-all space-y-3">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-b border-stone-200 pb-3 text-xs">
-                            <div>
-                                <span class="text-stone-500 font-medium">Pemakaian Fisik (Use = Opening + In - Out - Closing):</span>
-                                <div class="text-base font-extrabold text-stone-900" id="calc-use">-</div>
-                            </div>
-                            <div>
-                                <span class="text-stone-500 font-medium">Selisih (Diff = Use - PLU Kasir):</span>
-                                <div class="text-base font-extrabold" id="calc-diff">-</div>
+                <!-- 3. INPUT JUMLAH & KALKULASI PRAKTIS -->
+                <div class="bg-stone-50 border border-stone-200 rounded-2xl p-5 space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 items-center">
+                        <div>
+                            <label for="input_stock_value" id="label-stock-value" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">
+                                Masukkan Jumlah Stok Fisik di Dapur Sekarang *
+                            </label>
+                            <div class="relative">
+                                <input type="number" step="0.001" min="0" required name="actual_stock" id="input_stock_value"
+                                    oninput="calculateLivePreview()"
+                                    placeholder="Contoh: 45"
+                                    class="w-full bg-white border border-stone-300 text-[#1C1917] font-black text-xl rounded-xl px-4 py-3.5 focus:border-[#BD2000] focus:outline-none transition-all">
+                                <span id="input-unit-badge" class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-extrabold text-stone-500 bg-stone-100 px-2.5 py-1 rounded-md">unit</span>
                             </div>
                         </div>
 
-                        <div class="flex items-start gap-3">
-                            <div id="diff-icon" class="mt-0.5"></div>
-                            <div>
-                                <h4 id="diff-title" class="text-xs font-black uppercase tracking-wider"></h4>
-                                <p id="diff-desc" class="text-xs font-medium mt-0.5"></p>
+                        <!-- Ringkasan Live Perubahan -->
+                        <div id="live-calc-box" class="bg-white border border-stone-200 rounded-xl p-4 space-y-1.5">
+                            <span class="text-[10px] font-extrabold uppercase tracking-wider text-stone-400">Hasil Penyesuaian:</span>
+                            <div id="live-calc-text" class="text-sm font-extrabold text-stone-700">
+                                Silakan pilih barang dan masukkan jumlah di sebelah kiri.
                             </div>
                         </div>
                     </div>
 
                     <!-- Alasan & Catatan -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-stone-200">
                         <div>
-                            <label for="reason" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Alasan Penyesuaian / Selisih *</label>
+                            <label for="reason" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Alasan Penyesuaian *</label>
                             <select name="reason" id="reason" required 
-                                class="w-full bg-stone-50 border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-4 py-3.5 text-sm focus:border-[#BD2000] focus:outline-none transition-all">
-                                <option value="selisih_hitung">Selisih Hitung Rutin</option>
-                                <option value="rusak_basi">Barang Basi / Rusak (Waste)</option>
-                                <option value="lost_hilang">Lost / Hilang</option>
-                                <option value="koreksi_stok">Koreksi Data Input Manual</option>
+                                class="w-full bg-white border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-4 py-3 text-sm focus:border-[#BD2000] focus:outline-none transition-all">
+                                <option value="koreksi_stok">Pengecekan Rutin Fisik Dapur</option>
+                                <option value="rusak_basi">Bahan Basi / Rusak / Expired</option>
+                                <option value="selisih_hitung">Selisih Hitungan / Koreksi Manual</option>
+                                <option value="lost_hilang">Bahan Hilang / Tumpah</option>
                             </select>
                         </div>
-
                         <div>
-                            <label for="notes" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Catatan Audit Tambahan (Opsional)</label>
-                            <textarea name="notes" id="notes" rows="2" 
-                                class="w-full bg-stone-50 border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-4 py-3 text-sm focus:border-[#BD2000] focus:outline-none transition-all"
-                                placeholder="Catatan penyebab selisih atau keterangan tambahan..."></textarea>
+                            <label for="notes" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Keterangan / Catatan (Opsional)</label>
+                            <input type="text" name="notes" id="notes" placeholder="Contoh: Daging ayam sisa semalam di chiller..."
+                                class="w-full bg-white border border-stone-300 text-[#1C1917] font-medium rounded-xl px-4 py-3 text-sm focus:border-[#BD2000] focus:outline-none transition-all">
                         </div>
                     </div>
                 </div>
 
-                <!-- Submit Action Buttons -->
-                <div class="pt-4 flex justify-end space-x-4 border-t border-stone-100">
-                    <a href="{{ route('supervisor.inventory.index') }}" class="bg-stone-100 hover:bg-stone-200 text-stone-700 border border-stone-300 px-6 py-3 rounded-xl transition-all font-bold text-xs">Batal</a>
-                    <button type="submit" id="submit-btn" class="bg-[#BD2000] hover:bg-[#8C0000] text-white font-extrabold px-8 py-3 rounded-xl transition-all shadow-md cursor-pointer text-xs">
-                        Simpan & Auditing Stok Harian
+                <!-- Tombol Aksi Simpan -->
+                <div class="flex justify-end pt-2">
+                    <button type="submit" class="bg-[#BD2000] hover:bg-[#8C0000] text-white font-extrabold text-sm px-8 py-3.5 rounded-2xl transition-all shadow-md hover:shadow-lg flex items-center gap-2 cursor-pointer">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                        <span>Simpan & Perbarui Stok Sekarang</span>
                     </button>
                 </div>
             </form>
         </div>
 
-        <!-- Section 2: Riwayat Audit Table -->
-        <div id="section-audit-history" class="hidden space-y-4">
-            <h3 class="text-sm font-extrabold text-stone-800">Riwayat Audit Lembar Stok Cabang</h3>
+        <!-- TAB 2: FORM TAMBAH BARANG BARU -->
+        <div id="section-add-item" class="hidden space-y-6">
+            <form action="{{ route('supervisor.opname.store') }}" method="POST" class="space-y-5 bg-stone-50 border border-stone-200 p-6 rounded-2xl">
+                @csrf
+                <input type="hidden" name="mode" value="new">
+                <input type="hidden" name="date" value="{{ $date }}">
 
-            <div class="overflow-x-auto border border-stone-200 rounded-2xl">
-                <table class="w-full text-left text-xs text-stone-700">
-                    <thead class="bg-stone-100 text-stone-700 uppercase font-black tracking-wider text-[11px] border-b border-stone-200">
-                        <tr>
-                            <th class="px-4 py-3">Tanggal</th>
-                            <th class="px-4 py-3">Bahan Baku</th>
-                            <th class="px-4 py-3">Opening</th>
-                            <th class="px-4 py-3">In</th>
-                            <th class="px-4 py-3">Out</th>
-                            <th class="px-4 py-3">Closing</th>
-                            <th class="px-4 py-3">Use (Fisik)</th>
-                            <th class="px-4 py-3">PLU (Kasir)</th>
-                            <th class="px-4 py-3">Diff (Selisih)</th>
-                            <th class="px-4 py-3">Kerugian (Rp)</th>
-                            <th class="px-4 py-3">Auditor</th>
+                <h3 class="text-sm font-black text-[#8C0000] uppercase tracking-wider flex items-center gap-2">
+                    <span>✨ Tambah Bahan Baku Baru ke Inventaris Cabang</span>
+                </h3>
+
+                <div>
+                    <label for="item_name" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Nama Bahan Baku Baru *</label>
+                    <input type="text" name="item_name" id="item_name" required value="{{ old('item_name') }}"
+                        class="w-full bg-white border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-4 py-3 text-sm focus:border-[#BD2000] focus:outline-none transition-all"
+                        placeholder="Contoh: Bawang Merah Kupas, Sirup Karamel, Susu UHT...">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="category" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Kategori Bahan *</label>
+                        <select name="category" id="category"
+                            class="w-full bg-white border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-4 py-3 text-sm focus:border-[#BD2000] focus:outline-none transition-all">
+                            <option value="bahan_makanan">Bahan Makanan</option>
+                            <option value="bahan_minuman">Bahan Minuman</option>
+                            <option value="peralatan">Peralatan / Perlengkapan</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="unit" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Satuan (UOM) *</label>
+                        <input type="text" name="unit" id="unit" list="unit-suggestions" required value="{{ old('unit', 'kg') }}"
+                            class="w-full bg-white border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-4 py-3 text-sm focus:border-[#BD2000] focus:outline-none transition-all"
+                            placeholder="kg, liter, gram, pcs, botol...">
+                        <datalist id="unit-suggestions">
+                            <option value="kg"></option>
+                            <option value="gram"></option>
+                            <option value="liter"></option>
+                            <option value="ml"></option>
+                            <option value="pcs"></option>
+                            <option value="pack"></option>
+                            <option value="botol"></option>
+                        </datalist>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label for="new_stock" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Stok Awal Masuk *</label>
+                        <input type="number" step="0.001" name="stock" id="new_stock" value="{{ old('stock', 10) }}" min="0" required
+                            class="w-full bg-white border border-stone-300 text-[#1C1917] font-black rounded-xl px-4 py-3 text-sm focus:border-[#BD2000] focus:outline-none transition-all">
+                    </div>
+                    <div>
+                        <label for="new_unit_price" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Harga Beli / Satuan (Rp) *</label>
+                        <input type="number" name="unit_price" id="new_unit_price" value="{{ old('unit_price', 25000) }}" min="0" step="500" required
+                            class="w-full bg-white border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-4 py-3 text-sm focus:border-[#BD2000] focus:outline-none transition-all">
+                    </div>
+                    <div>
+                        <label for="new_min_stock" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Peringatan Stok Menipis</label>
+                        <input type="number" step="0.001" name="min_stock" id="new_min_stock" value="{{ old('min_stock', 5) }}" min="0"
+                            class="w-full bg-white border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-4 py-3 text-sm focus:border-[#BD2000] focus:outline-none transition-all">
+                    </div>
+                </div>
+
+                <div class="flex justify-end pt-2">
+                    <button type="submit" class="bg-[#BD2000] hover:bg-[#8C0000] text-white font-extrabold text-xs px-6 py-3 rounded-xl transition-all shadow-md">
+                        Simpan Bahan Baru ke Inventaris
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- TAB 3: RIWAYAT PERUBAHAN STOK -->
+        <div id="section-log-history" class="hidden space-y-4">
+            <h3 class="text-sm font-black text-stone-800 uppercase tracking-wider">Catatan Riwayat Penyesuaian Stok</h3>
+            
+            <div class="overflow-x-auto border border-stone-200 rounded-2xl shadow-xs">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-stone-100 text-stone-700 font-extrabold uppercase tracking-wider border-b border-stone-200">
+                            <th class="py-3.5 px-4">Tanggal</th>
+                            <th class="py-3.5 px-4">Nama Bahan</th>
+                            <th class="py-3.5 px-4 text-center">Stok Sebelum</th>
+                            <th class="py-3.5 px-4 text-center">Stok Akhir</th>
+                            <th class="py-3.5 px-4 text-center">Selisih</th>
+                            <th class="py-3.5 px-4">Alasan & Catatan</th>
+                            <th class="py-3.5 px-4">Petugas</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-stone-100">
+                    <tbody class="divide-y divide-stone-100 font-medium">
                         @forelse($recentReconciliations as $recon)
                             <tr class="hover:bg-stone-50 transition-colors">
-                                <td class="px-4 py-3 font-semibold whitespace-nowrap">{{ $recon->date->format('d/m/Y') }}</td>
-                                <td class="px-4 py-3 font-extrabold text-stone-900">{{ $recon->inventory->name ?? '-' }}</td>
-                                <td class="px-4 py-3 font-medium">{{ (float)$recon->opening_stock }} {{ $recon->inventory->unit ?? '' }}</td>
-                                <td class="px-4 py-3 font-semibold text-emerald-700">+{{ (float)$recon->stock_in }}</td>
-                                <td class="px-4 py-3 font-semibold text-red-600">-{{ (float)$recon->stock_out_waste }}</td>
-                                <td class="px-4 py-3 font-extrabold text-stone-900">{{ (float)$recon->closing_stock }}</td>
-                                <td class="px-4 py-3 font-black text-stone-800">{{ (float)$recon->use_physical }}</td>
-                                <td class="px-4 py-3 font-black text-blue-700">{{ (float)$recon->plu_sales }}</td>
-                                <td class="px-4 py-3 font-black">
-                                    @if($recon->diff > 0)
-                                        <span class="text-red-600">+{{ (float)$recon->diff }} (Minus)</span>
-                                    @elseif($recon->diff < 0)
-                                        <span class="text-amber-600">{{ (float)$recon->diff }} (Plus)</span>
+                                <td class="py-3 px-4 font-bold text-stone-700">{{ $recon->date->format('d/m/Y') }}</td>
+                                <td class="py-3 px-4 font-black text-[#1C1917]">{{ $recon->inventory->name ?? '-' }}</td>
+                                <td class="py-3 px-4 text-center text-stone-600">{{ (float)$recon->opening_stock }} {{ $recon->inventory->unit ?? '' }}</td>
+                                <td class="py-3 px-4 text-center font-bold text-[#BD2000]">{{ (float)$recon->closing_stock }} {{ $recon->inventory->unit ?? '' }}</td>
+                                <td class="py-3 px-4 text-center">
+                                    @php
+                                        $diffVal = (float)$recon->closing_stock - (float)$recon->opening_stock;
+                                    @endphp
+                                    @if($diffVal > 0)
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800">+{{ $diffVal }}</span>
+                                    @elseif($diffVal < 0)
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-red-100 text-red-800">{{ $diffVal }}</span>
                                     @else
-                                        <span class="text-emerald-600">0 (Pas)</span>
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-stone-100 text-stone-600">0 (Sesuai)</span>
                                     @endif
                                 </td>
-                                <td class="px-4 py-3 font-bold text-stone-800">
-                                    @if($recon->loss_cost > 0)
-                                        <span class="text-red-600 font-extrabold">Rp {{ number_format($recon->loss_cost, 0, ',', '.') }}</span>
-                                    @else
-                                        <span class="text-stone-400">Rp 0</span>
+                                <td class="py-3 px-4 text-stone-600">
+                                    <span class="font-bold text-stone-800 capitalize">{{ str_replace('_', ' ', $recon->reason ?? '-') }}</span>
+                                    @if($recon->notes)
+                                        <p class="text-[11px] text-stone-500 mt-0.5">{{ $recon->notes }}</p>
                                     @endif
                                 </td>
-                                <td class="px-4 py-3 text-stone-600 font-medium">{{ $recon->user->name ?? 'System' }}</td>
+                                <td class="py-3 px-4 text-stone-600 font-semibold">{{ $recon->user->name ?? 'Supervisor' }}</td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="11" class="px-4 py-8 text-center text-stone-400 font-semibold">
-                                    Belum ada log rekonsiliasi stok harian.
+                                <td colspan="7" class="py-8 text-center text-stone-400 font-bold">
+                                    Belum ada catatan riwayat penyesuaian stok.
                                 </td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
-
-            <div class="pt-2">
+            <div class="mt-4">
                 {{ $recentReconciliations->links() }}
             </div>
         </div>
+
     </div>
+
+    <!-- TABEL MONITOR KONTROL SELURUH BAHAN BAKU CABANG -->
+    <div class="bg-white border border-stone-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-100 pb-4">
+            <div>
+                <h3 class="text-base font-black text-[#1C1917] flex items-center gap-2">
+                    <svg class="w-5 h-5 text-[#BD2000]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                    <span>Daftar Stok Bahan Saat Ini</span>
+                </h3>
+                <p class="text-xs text-stone-500">Klik tombol <strong>"⚡ Sesuaikan"</strong> pada salah satu baris untuk langsung mengisi form di atas.</p>
+            </div>
+            <span class="text-xs font-bold bg-stone-100 text-stone-700 px-3 py-1.5 rounded-xl w-fit">
+                Total: {{ $inventories->count() }} Bahan Baku
+            </span>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                    <tr class="bg-stone-50 text-stone-700 font-extrabold uppercase tracking-wider border-b border-stone-200">
+                        <th class="py-3 px-4">Nama Bahan</th>
+                        <th class="py-3 px-4">Kategori</th>
+                        <th class="py-3 px-4 text-center">Stok Tersedia</th>
+                        <th class="py-3 px-4 text-center">Batas Minimum</th>
+                        <th class="py-3 px-4 text-right">Harga HPP</th>
+                        <th class="py-3 px-4 text-center">Aksi Cepat</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-stone-100 font-medium">
+                    @foreach($inventories as $inv)
+                        @php
+                            $isWarning = $inv->stock <= $inv->min_stock;
+                            $isZero = $inv->stock <= 0;
+                        @endphp
+                        <tr class="hover:bg-stone-50/80 transition-colors">
+                            <td class="py-3 px-4 font-black text-[#1C1917] text-sm">{{ $inv->name }}</td>
+                            <td class="py-3 px-4">
+                                <span class="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-stone-100 text-stone-700 capitalize">
+                                    {{ str_replace('_', ' ', $inv->category) }}
+                                </span>
+                            </td>
+                            <td class="py-3 px-4 text-center">
+                                @if($isZero)
+                                    <span class="px-3 py-1 rounded-full text-xs font-black bg-red-100 text-red-700 border border-red-200">
+                                        0 {{ $inv->unit }} (HABIS)
+                                    </span>
+                                @elseif($isWarning)
+                                    <span class="px-3 py-1 rounded-full text-xs font-black bg-amber-100 text-amber-800 border border-amber-300">
+                                        {{ (float)$inv->stock }} {{ $inv->unit }} (MENIPIS)
+                                    </span>
+                                @else
+                                    <span class="px-3 py-1 rounded-full text-xs font-black bg-emerald-50 text-emerald-800 border border-emerald-200">
+                                        {{ (float)$inv->stock }} {{ $inv->unit }}
+                                    </span>
+                                @endif
+                            </td>
+                            <td class="py-3 px-4 text-center text-stone-500 font-semibold">{{ (float)$inv->min_stock }} {{ $inv->unit }}</td>
+                            <td class="py-3 px-4 text-right font-bold text-stone-700">Rp {{ number_format($inv->unit_price, 0, ',', '.') }}</td>
+                            <td class="py-3 px-4 text-center">
+                                <button type="button" onclick="selectFromTable({{ $inv->id }})"
+                                    class="bg-stone-100 hover:bg-[#BD2000] hover:text-white text-[#BD2000] font-extrabold text-[11px] px-3.5 py-1.5 rounded-xl border border-stone-200 hover:border-transparent transition-all shadow-2xs cursor-pointer">
+                                    ⚡ Sesuaikan
+                                </button>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+
 </div>
 
 <script>
-    let currentMode = 'existing';
-    let selectedPlu = 0;
-    let selectedUnit = '';
-    let selectedUnitPrice = 0;
+    let currentActionType = 'set_actual';
+    let currentSelectedStock = 0;
+    let currentSelectedUnit = '';
 
-    function switchMainSection(section) {
-        const tabAudit = document.getElementById('tab-audit');
-        const tabHistory = document.getElementById('tab-history');
-        const secForm = document.getElementById('section-audit-form');
-        const secHistory = document.getElementById('section-audit-history');
+    function switchTab(tab) {
+        document.getElementById('section-quick-adjust').classList.toggle('hidden', tab !== 'quick-adjust');
+        document.getElementById('section-add-item').classList.toggle('hidden', tab !== 'add-item');
+        document.getElementById('section-log-history').classList.toggle('hidden', tab !== 'log-history');
 
-        if (section === 'audit') {
-            tabAudit.className = "px-5 py-2.5 rounded-xl text-xs font-extrabold transition-all shadow-sm bg-white text-[#BD2000]";
-            tabHistory.className = "px-5 py-2.5 rounded-xl text-xs font-bold text-stone-600 hover:text-stone-900 transition-all";
-            secForm.classList.remove('hidden');
-            secHistory.classList.add('hidden');
+        const btnAdjust = document.getElementById('tab-quick-adjust');
+        const btnAdd = document.getElementById('tab-add-item');
+        const btnLog = document.getElementById('tab-log-history');
+
+        [btnAdjust, btnAdd, btnLog].forEach(btn => {
+            btn.className = "px-5 py-2.5 rounded-xl text-xs font-bold text-stone-600 hover:text-stone-900 transition-all";
+        });
+
+        if (tab === 'quick-adjust') {
+            btnAdjust.className = "px-5 py-2.5 rounded-xl text-xs font-extrabold transition-all shadow-sm bg-white text-[#BD2000]";
+        } else if (tab === 'add-item') {
+            btnAdd.className = "px-5 py-2.5 rounded-xl text-xs font-extrabold transition-all shadow-sm bg-white text-[#BD2000]";
         } else {
-            tabHistory.className = "px-5 py-2.5 rounded-xl text-xs font-extrabold transition-all shadow-sm bg-white text-[#BD2000]";
-            tabAudit.className = "px-5 py-2.5 rounded-xl text-xs font-bold text-stone-600 hover:text-stone-900 transition-all";
-            secHistory.classList.remove('hidden');
-            secForm.classList.add('hidden');
+            btnLog.className = "px-5 py-2.5 rounded-xl text-xs font-extrabold transition-all shadow-sm bg-white text-[#BD2000]";
         }
     }
 
-    function setMode(mode) {
-        currentMode = mode;
-        const subtabExisting = document.getElementById('subtab-existing');
-        const subtabNew = document.getElementById('subtab-new');
-        const secExisting = document.getElementById('section-existing');
-        const secNew = document.getElementById('section-new');
-        const auditFields = document.getElementById('section-audit-fields');
-        const submitBtn = document.getElementById('submit-btn');
-        const modeInput = document.getElementById('form-mode');
+    function onItemChange() {
+        const select = document.getElementById('select_inventory_id');
+        const previewCard = document.getElementById('item-preview-card');
+        const opt = select.options[select.selectedIndex];
 
-        modeInput.value = mode;
-
-        if (mode === 'existing') {
-            subtabExisting.className = "px-4 py-2 rounded-lg text-xs font-bold bg-stone-100 text-[#BD2000]";
-            subtabNew.className = "px-4 py-2 rounded-lg text-xs font-bold text-stone-500 hover:text-stone-900";
-            secExisting.classList.remove('hidden');
-            secNew.classList.add('hidden');
-            auditFields.classList.remove('hidden');
-            submitBtn.innerHTML = 'Simpan & Auditing Stok Harian';
-            
-            document.getElementById('inventory_id').required = true;
-            document.getElementById('item_name').required = false;
-            document.getElementById('unit').required = false;
-            document.getElementById('unit_price').required = false;
-            document.getElementById('stock').required = false;
-            document.getElementById('closing_stock').required = true;
-            document.getElementById('reason').required = true;
-            onInventorySelect();
-        } else {
-            subtabNew.className = "px-4 py-2 rounded-lg text-xs font-bold bg-stone-100 text-[#BD2000]";
-            subtabExisting.className = "px-4 py-2 rounded-lg text-xs font-bold text-stone-500 hover:text-stone-900";
-            secNew.classList.remove('hidden');
-            secExisting.classList.add('hidden');
-            auditFields.classList.add('hidden');
-            submitBtn.innerHTML = '✨ Simpan Barang Baru';
-
-            document.getElementById('inventory_id').required = false;
-            document.getElementById('item_name').required = true;
-            document.getElementById('unit').required = true;
-            document.getElementById('unit_price').required = true;
-            document.getElementById('stock').required = true;
-            document.getElementById('closing_stock').required = false;
-            document.getElementById('reason').required = false;
-            document.getElementById('live-recon-card').classList.add('hidden');
-        }
-    }
-
-    function onInventorySelect() {
-        const select = document.getElementById('inventory_id');
-        const selectedOption = select.options[select.selectedIndex];
-
-        if (select.value && selectedOption) {
-            const opening = parseFloat(selectedOption.getAttribute('data-opening')) || 0;
-            selectedPlu = parseFloat(selectedOption.getAttribute('data-plu')) || 0;
-            selectedUnit = selectedOption.getAttribute('data-unit') || '';
-            selectedUnitPrice = parseFloat(selectedOption.getAttribute('data-price')) || 0;
-
-            document.getElementById('opening_stock').value = opening;
-            document.getElementById('display-plu').innerText = selectedPlu;
-            document.getElementById('display-plu-unit').innerText = selectedUnit;
-        } else {
-            selectedPlu = 0;
-            selectedUnit = '';
-            selectedUnitPrice = 0;
-            document.getElementById('opening_stock').value = 0;
-            document.getElementById('display-plu').innerText = 0;
-            document.getElementById('display-plu-unit').innerText = '';
-        }
-        calculateReconciliation();
-    }
-
-    function calculateReconciliation() {
-        const opening = parseFloat(document.getElementById('opening_stock').value) || 0;
-        const stockIn = parseFloat(document.getElementById('stock_in').value) || 0;
-        const stockOut = parseFloat(document.getElementById('stock_out_waste').value) || 0;
-        const closingInput = document.getElementById('closing_stock');
-        const liveCard = document.getElementById('live-recon-card');
-        const titleEl = document.getElementById('diff-title');
-        const descEl = document.getElementById('diff-desc');
-        const iconEl = document.getElementById('diff-icon');
-
-        if (closingInput.value === '' || (currentMode === 'existing' && !document.getElementById('inventory_id').value)) {
-            liveCard.classList.add('hidden');
+        if (!opt || !opt.value) {
+            previewCard.classList.add('hidden');
+            currentSelectedStock = 0;
+            currentSelectedUnit = '';
+            document.getElementById('input-unit-badge').innerText = 'unit';
+            calculateLivePreview();
             return;
         }
 
-        const closing = parseFloat(closingInput.value) || 0;
+        currentSelectedStock = parseFloat(opt.dataset.stock) || 0;
+        currentSelectedUnit = opt.dataset.unit || 'unit';
+        const price = parseFloat(opt.dataset.price) || 0;
+        const name = opt.dataset.name || '';
+        const cat = opt.dataset.cat ? opt.dataset.cat.replace('_', ' ') : 'Bahan';
 
-        // Formula: Use = Opening + In - Out - Closing
-        const usePhysical = opening + stockIn - stockOut - closing;
+        document.getElementById('preview-name').innerText = name;
+        document.getElementById('preview-cat-badge').innerText = cat;
+        document.getElementById('preview-stock').innerText = currentSelectedStock;
+        document.getElementById('preview-unit').innerText = currentSelectedUnit;
+        document.getElementById('preview-price').innerText = 'Rp ' + Number(price).toLocaleString('id-ID') + ' / ' + currentSelectedUnit;
+        document.getElementById('input-unit-badge').innerText = currentSelectedUnit;
 
-        // Formula: Diff = Use - PLU
-        const diff = usePhysical - selectedPlu;
+        previewCard.classList.remove('hidden');
 
-        document.getElementById('calc-use').innerText = `${usePhysical.toFixed(2)} ${selectedUnit}`;
-        
-        const diffEl = document.getElementById('calc-diff');
-        liveCard.classList.remove('hidden');
+        // Pre-fill input with current stock if set_actual mode
+        const inputVal = document.getElementById('input_stock_value');
+        if (currentActionType === 'set_actual' && (!inputVal.value || inputVal.value == 0)) {
+            inputVal.value = currentSelectedStock;
+        }
+        calculateLivePreview();
+    }
 
-        if (diff > 0) {
-            const wasteCost = Math.abs(diff) * selectedUnitPrice;
-            diffEl.innerText = `+${diff.toFixed(2)} ${selectedUnit} (Minus / Loss)`;
-            diffEl.className = "text-base font-extrabold text-red-600";
-            
-            liveCard.className = "p-5 rounded-2xl border transition-all bg-red-50 border-red-200 text-red-800 space-y-3";
-            iconEl.innerHTML = `<svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`;
-            titleEl.innerText = `🔴 Varian Minus (Pemakaian Fisik > Penjualan Kasir)`;
-            descEl.innerText = `Pemakaian fisik lebih besar ${diff.toFixed(2)} ${selectedUnit} dari kasir. Potensi kerugian Rp ${Number(wasteCost).toLocaleString('id-ID')} akan otomatis dicatat ke Pengeluaran.`;
-        } else if (diff > 0) {
-            diffEl.innerText = `${diff.toFixed(2)} ${selectedUnit} (Plus / Kelebihan)`;
-            diffEl.className = "text-base font-extrabold text-amber-600";
+    function selectActionType(type) {
+        currentActionType = type;
+        document.getElementById('input_action_type').value = type;
 
-            liveCard.className = "p-5 rounded-2xl border transition-all bg-amber-50 border-amber-200 text-amber-800 space-y-3";
-            iconEl.innerHTML = `<svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
-            titleEl.innerText = `🟡 Varian Plus (Penjualan Kasir > Pemakaian Fisik)`;
-            descEl.innerText = `Penjualan kasir tercatat lebih banyak dari fisik terpakai. Evaluasi porsi/takaran resep koki/barista agar sesuai SOP.`;
-        } else {
-            diffEl.innerText = `0 ${selectedUnit} (Pas / Match)`;
-            diffEl.className = "text-base font-extrabold text-emerald-600";
+        const cardSet = document.getElementById('card-act-set_actual');
+        const cardAdd = document.getElementById('card-act-add');
+        const cardReduce = document.getElementById('card-act-reduce');
 
-            liveCard.className = "p-5 rounded-2xl border transition-all bg-emerald-50 border-emerald-200 text-emerald-800 space-y-3";
-            iconEl.innerHTML = `<svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
-            titleEl.innerText = `🟢 Audit Sempurna (Presisi 100%)`;
-            descEl.innerText = `Pemakaian fisik di lapangan persis cocok dengan catatan penjualan kasir.`;
+        [cardSet, cardAdd, cardReduce].forEach(c => {
+            c.className = "cursor-pointer border border-stone-200 bg-white hover:border-stone-400 rounded-2xl p-4 transition-all flex items-start gap-3";
+        });
+
+        document.getElementById('radio_set_actual').checked = (type === 'set_actual');
+        document.getElementById('radio_add').checked = (type === 'add');
+        document.getElementById('radio_reduce').checked = (type === 'reduce');
+
+        const label = document.getElementById('label-stock-value');
+        const input = document.getElementById('input_stock_value');
+        const reasonSelect = document.getElementById('reason');
+
+        if (type === 'set_actual') {
+            cardSet.className = "cursor-pointer border-2 border-[#BD2000] bg-[#BD2000]/5 rounded-2xl p-4 transition-all flex items-start gap-3";
+            label.innerText = "Masukkan Jumlah Stok Fisik di Dapur Sekarang *";
+            input.name = "actual_stock";
+            input.placeholder = "Contoh: 45";
+            if (currentSelectedStock > 0 && !input.value) {
+                input.value = currentSelectedStock;
+            }
+            reasonSelect.value = "koreksi_stok";
+        } else if (type === 'add') {
+            cardAdd.className = "cursor-pointer border-2 border-emerald-600 bg-emerald-50/50 rounded-2xl p-4 transition-all flex items-start gap-3";
+            label.innerText = "Jumlah Stok Baru Masuk / Dibeli *";
+            input.name = "qty_change";
+            input.placeholder = "Contoh: 10";
+            input.value = '';
+            reasonSelect.value = "koreksi_stok";
+        } else if (type === 'reduce') {
+            cardReduce.className = "cursor-pointer border-2 border-red-600 bg-red-50/50 rounded-2xl p-4 transition-all flex items-start gap-3";
+            label.innerText = "Jumlah Stok yang Berkurang / Basi / Rusak *";
+            input.name = "qty_change";
+            input.placeholder = "Contoh: 3";
+            input.value = '';
+            reasonSelect.value = "rusak_basi";
+        }
+
+        calculateLivePreview();
+    }
+
+    function calculateLivePreview() {
+        const inputVal = parseFloat(document.getElementById('input_stock_value').value);
+        const resultBox = document.getElementById('live-calc-text');
+
+        if (isNaN(inputVal)) {
+            resultBox.innerHTML = '<span class="text-stone-400">Masukkan angka pada kolom input untuk melihat hasil perhitungan.</span>';
+            return;
+        }
+
+        if (currentActionType === 'set_actual') {
+            const diff = inputVal - currentSelectedStock;
+            if (diff === 0) {
+                resultBox.innerHTML = `<span class="text-emerald-700">✅ Stok dikonfirmasi sama dengan sistem: <strong>${inputVal} ${currentSelectedUnit}</strong> (Tidak ada selisih).</span>`;
+            } else if (diff > 0) {
+                resultBox.innerHTML = `<span class="text-emerald-700">📈 Stok bertambah dari <strong>${currentSelectedStock}</strong> menjadi <strong>${inputVal} ${currentSelectedUnit}</strong> (+${diff.toFixed(2)} ${currentSelectedUnit}).</span>`;
+            } else {
+                resultBox.innerHTML = `<span class="text-red-700">📉 Stok berkurang dari <strong>${currentSelectedStock}</strong> menjadi <strong>${inputVal} ${currentSelectedUnit}</strong> (${diff.toFixed(2)} ${currentSelectedUnit}).</span>`;
+            }
+        } else if (currentActionType === 'add') {
+            const newTotal = currentSelectedStock + inputVal;
+            resultBox.innerHTML = `<span class="text-emerald-700">📦 Stok bertambah: <strong>${currentSelectedStock} + ${inputVal} = ${newTotal.toFixed(2)} ${currentSelectedUnit}</strong>.</span>`;
+        } else if (currentActionType === 'reduce') {
+            const newTotal = Math.max(0, currentSelectedStock - inputVal);
+            resultBox.innerHTML = `<span class="text-red-700">🗑️ Stok berkurang: <strong>${currentSelectedStock} - ${inputVal} = ${newTotal.toFixed(2)} ${currentSelectedUnit}</strong>.</span>`;
         }
     }
 
+    function selectFromTable(inventoryId) {
+        switchTab('quick-adjust');
+        const select = document.getElementById('select_inventory_id');
+        select.value = inventoryId;
+        onItemChange();
+        window.scrollTo({ top: document.getElementById('form-adjust').offsetTop - 80, behavior: 'smooth' });
+    }
+
+    // Auto-trigger if old input was present
     document.addEventListener('DOMContentLoaded', function() {
-        setMode('existing');
+        const select = document.getElementById('select_inventory_id');
+        if (select && select.value) {
+            onItemChange();
+        }
     });
 </script>
 @endsection

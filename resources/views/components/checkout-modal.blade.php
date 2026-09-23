@@ -181,6 +181,28 @@
                         </div>
                     </div>
 
+                    <!-- Foto / Upload Bukti Transfer Manual -->
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider">
+                            Foto Bukti Transfer Customer <span class="text-red-500">*</span>
+                        </label>
+                        <input type="file" id="checkout_qris_proof" accept="image/*" capture="environment" @change="handleProofUpload($event)" class="hidden">
+                        
+                        <div class="flex gap-2 items-center">
+                            <button type="button" @click="document.getElementById('checkout_qris_proof').click()"
+                                    class="py-2 px-3 bg-stone-100 hover:bg-stone-200 border border-stone-300 text-stone-800 font-bold text-xs rounded-xl transition-all flex items-center gap-1.5 cursor-pointer">
+                                <svg class="w-4 h-4 text-stone-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                <span>Ambil Foto / Upload Bukti</span>
+                            </button>
+                            <span class="text-xs text-stone-500 font-medium truncate max-w-[180px]" x-text="proofFileName || 'Belum ada foto'"></span>
+                        </div>
+
+                        <!-- Image Preview -->
+                        <div x-show="proofPreviewUrl" class="p-2 bg-stone-50 rounded-2xl border border-stone-200 inline-block">
+                            <img :src="proofPreviewUrl" alt="Bukti Transfer" class="max-h-36 rounded-xl object-contain border border-stone-200 shadow-xs">
+                        </div>
+                    </div>
+
                     <!-- Verifikasi Manual Kasir -->
                     <div class="pt-2">
                         <button type="button" @click="triggerQrisApprove()" 
@@ -237,6 +259,10 @@
             timerInterval: null,
             autoApproveTimeout: null,
 
+            proofFile: null,
+            proofFileName: '',
+            proofPreviewUrl: '',
+
             get timerDisplay() {
                 const mins = Math.floor(this.timerSeconds / 60);
                 const secs = this.timerSeconds % 60;
@@ -256,6 +282,9 @@
                 this.qrisApproved = false;
                 this.cashSuccess = false;
                 this.isProcessing = false;
+                this.proofFile = null;
+                this.proofFileName = '';
+                this.proofPreviewUrl = '';
                 this.isOpen = true;
 
                 if (this.paymentMethod === 'qris') {
@@ -272,8 +301,19 @@
                 }
             },
 
+            handleProofUpload(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    this.proofFile = file;
+                    this.proofFileName = file.name;
+                    const reader = new FileReader();
+                    reader.onload = (evt) => { this.proofPreviewUrl = evt.target.result; };
+                    reader.readAsDataURL(file);
+                }
+            },
+
             calculateChange() {
-                this.cashChange = Math.max(0, (this.cashPaid || 0) - this.totalAmount);
+                this.cashChange = Math.max(0, (parseFloat(this.cashPaid) || 0) - this.totalAmount);
             },
 
             setExactCash() {
@@ -352,34 +392,48 @@
             },
 
             async triggerQrisApprove() {
+                if (!this.proofFile) {
+                    if (window.showToast) window.showToast('Silakan ambil foto atau upload bukti transfer QRIS terlebih dahulu!', 'warning');
+                    else alert('Silakan ambil foto atau upload bukti transfer QRIS terlebih dahulu!');
+                    return;
+                }
+
                 this.stopQrisSimulation();
-                this.qrisApproved = true;
+                this.isProcessing = true;
 
                 try {
+                    const formData = new FormData();
+                    formData.append('payment_method', 'qris');
+                    formData.append('status', 'completed');
+                    formData.append('merchant_id', 'ID1026528881513');
+                    formData.append('payment_proof', this.proofFile);
+
                     const response = await fetch(`/kasir/orders/${this.orderId}/process-payment`, {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': '{{ csrf_token() }}'
                         },
-                        body: JSON.stringify({
-                            payment_method: 'qris',
-                            status: 'completed',
-                            merchant_id: 'ID1026528881513',
-                        })
+                        body: formData
                     });
 
                     const data = await response.json();
 
-                    setTimeout(() => {
-                        this.closeModal();
-                        if (data.receipt_url) {
-                            window.open(data.receipt_url, '_blank');
-                        }
-                        window.location.reload();
-                    }, 1500);
+                    if (response.ok && data.success) {
+                        this.qrisApproved = true;
+                        setTimeout(() => {
+                            this.closeModal();
+                            if (data.receipt_url) {
+                                window.open(data.receipt_url, '_blank');
+                            }
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        alert(data.message || 'Gagal memproses verifikasi QRIS.');
+                    }
                 } catch (e) {
                     alert('Gagal memproses verifikasi QRIS.');
+                } finally {
+                    this.isProcessing = false;
                 }
             },
 

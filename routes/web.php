@@ -54,6 +54,7 @@ Route::get('/order', [CustomerOrderController::class, 'index'])->name('order.qr'
 Route::get('/pesan', [CustomerOrderController::class, 'index'])->name('pesan');
 Route::post('/pesan', [CustomerOrderController::class, 'store'])->name('pesan.store');
 Route::get('/pesan/{order}/receipt', [CustomerOrderController::class, 'showReceipt'])->name('pesan.receipt');
+Route::get('/pesan/{order}/status', [CustomerOrderController::class, 'checkStatus'])->name('pesan.status');
 
 
 // Super Admin Routes
@@ -90,6 +91,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin_cabang'])->name('admin.'
 Route::prefix('owner')->middleware(['auth', 'role:owner'])->name('owner.')->group(function () {
     Route::get('/dashboard', [OwnerController::class, 'index'])->name('dashboard');
     Route::get('/reports', [OwnerController::class, 'reports'])->name('reports');
+    Route::get('/reports/export', [OwnerController::class, 'exportReports'])->name('reports.export');
     Route::get('/inventory', [OwnerController::class, 'inventory'])->name('inventory');
 });
 
@@ -102,8 +104,8 @@ Route::prefix('supervisor')->middleware(['auth', 'role:supervisor'])->name('supe
     Route::put('/inventory/{inventory}', [InventoryController::class, 'update'])->name('inventory.update');
     Route::delete('/inventory/{inventory}', [InventoryController::class, 'destroy'])->name('inventory.destroy');
 
-    // Stock Opname & Operational Expenses
-    Route::get('/stock-opname', [InventoryController::class, 'opname'])->name('opname.index');
+    // Redirect old stock-opname to unified inventory
+    Route::get('/stock-opname', fn() => redirect()->route('supervisor.inventory.index'))->name('opname.index');
     Route::post('/stock-opname', [InventoryController::class, 'storeOpname'])->name('opname.store');
     Route::resource('expenses', \App\Http\Controllers\Supervisor\SupervisorExpenseController::class);
 });
@@ -124,6 +126,10 @@ Route::prefix('kasir')->middleware(['auth', 'role:kasir'])->name('kasir.')->grou
         Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
         Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     });
+
+    Route::get('/orders/scan', [OrderController::class, 'scan'])->name('orders.scan');
+    Route::post('/orders/lookup', [OrderController::class, 'lookupOrder'])->name('orders.lookup');
+    Route::post('/orders/{order}/confirm-payment', [OrderController::class, 'confirmPayment'])->name('orders.confirm-payment');
 
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::get('/orders/{order}/receipt', [OrderController::class, 'receipt'])->name('orders.receipt');

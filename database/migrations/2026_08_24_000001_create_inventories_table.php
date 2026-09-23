@@ -13,9 +13,9 @@ return new class extends Migration
             $table->foreignId('branch_id')->constrained('branches')->onDelete('cascade');
             $table->string('name');
             $table->enum('category', ['bahan_makanan', 'bahan_minuman', 'peralatan'])->default('bahan_makanan');
-            $table->integer('stock')->default(0);
+            $table->decimal('stock', 10, 2)->default(0);
             $table->string('unit')->default('pcs'); // kg, gram, liter, pcs, unit, pack
-            $table->integer('min_stock')->default(5);
+            $table->decimal('min_stock', 10, 2)->default(5);
             $table->decimal('unit_price', 12, 2)->default(0);
             $table->text('notes')->nullable();
             $table->timestamps();

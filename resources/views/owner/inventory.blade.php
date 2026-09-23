@@ -83,7 +83,7 @@
                         <td class="px-6 py-4 text-xs font-bold text-stone-600"><span class="px-2 py-0.5 rounded-md bg-stone-100 border border-stone-200">{{ $item->branch->name ?? '-' }}</span></td>
                         <td class="px-6 py-4 font-extrabold text-[#1C1917] text-sm">{{ $item->name }}</td>
                         <td class="px-6 py-4 text-xs uppercase text-slate-600 font-bold">{{ str_replace('_', ' ', $item->category) }}</td>
-                        <td class="px-6 py-4 text-sm font-black text-[#1C1917]">{{ $item->stock }} <span class="text-xs font-semibold text-slate-500">{{ $item->unit }}</span></td>
+                        <td class="px-6 py-4 text-sm font-black text-[#1C1917]">{{ (float)$item->stock }} <span class="text-xs font-semibold text-slate-500">{{ $item->unit }}</span></td>
                         <td class="px-6 py-4 text-sm text-slate-700 font-bold">Rp {{ number_format($item->unit_price, 0, ',', '.') }}</td>
                         <td class="px-6 py-4 text-sm font-black text-[#BD2000]">Rp {{ number_format($subtotal, 0, ',', '.') }}</td>
                         <td class="px-6 py-4 text-right">
@@ -100,6 +100,11 @@
                 </tbody>
             </table>
         </div>
+        @if($inventories->hasPages())
+        <div class="px-6 py-4 border-t border-stone-200 bg-stone-50">
+            {{ $inventories->links() }}
+        </div>
+        @endif
     </div>
 </div>
 @endsection

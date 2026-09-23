@@ -226,7 +226,7 @@
                     ];
 
                     $slidesData = $heroTopMenus->map(function($menu, $idx) use ($fallbackImages) {
-                        $img = $menu->image ? asset('storage/' . $menu->image) : ($menu->image_url ?? $fallbackImages[$idx % 3]);
+                        $img = $menu->image_url ?? $fallbackImages[$idx % 3];
                         return [
                             'name' => $menu->name,
                             'category' => $menu->category->name ?? 'Kuliner Otentik',
@@ -355,8 +355,8 @@
                         <div>
                             {{-- Container Foto Makanan (Rasio 4:3) --}}
                             <div class="aspect-[4/3] rounded-xl overflow-hidden relative mb-4 bg-stone-100 border border-stone-200 w-full">
-                                @if($menu->image_url || $menu->image)
-                                    <img src="{{ $menu->image_url ?? asset('storage/' . $menu->image) }}" 
+                                @if($menu->image_url)
+                                    <img src="{{ $menu->image_url }}" 
                                          alt="{{ $menu->name }}" 
                                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                 @else
@@ -536,20 +536,6 @@
                     <p class="text-stone-200 text-sm leading-relaxed font-medium">
                         SajiHUB berkomitmen menghadirkan pengalaman kuliner khas Nusantara terbaik dengan bumbu rempah otentik meresap, bahan segar, serta pelayanan prima di setiap restoran kami.
                     </p>
-
-                    {{-- Form Langganan Email --}}
-                    <div class="pt-2 space-y-2">
-                        <label for="newsletter-email" class="block text-xs font-bold uppercase tracking-wider text-stone-200">
-                            Langganan Promo Terbaru
-                        </label>
-                        <form onsubmit="event.preventDefault(); alert('Terima kasih telah berlangganan promo SajiHUB!');" class="flex gap-2">
-                            <input type="email" id="newsletter-email" placeholder="Masukkan alamat email Anda" required
-                                   class="w-full bg-white/10 border border-white/20 text-white placeholder-stone-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#FFBE0F]">
-                            <button type="submit" class="bg-[#FFBE0F] hover:bg-[#e5ab0e] text-[#1C1917] font-black px-4 py-2.5 rounded-xl transition-all shadow-md text-sm cursor-pointer whitespace-nowrap">
-                                Kirim
-                            </button>
-                        </form>
-                    </div>
                 </div>
 
                 {{-- Kolom 2: Navigasi Cepat --}}
@@ -584,7 +570,7 @@
 
                 {{-- Kolom 4: Alamat Resto --}}
                 <div class="lg:col-span-3 space-y-4">
-                    <h4 class="font-extrabold text-white text-base uppercase tracking-wider">Alamat Restoran</h4>
+                    <h4 class="font-extrabold text-white text-base uppercase tracking-wider">Alamat Kantor Restoran</h4>
                     <p class="text-sm text-stone-200 leading-relaxed font-medium">
                         Jl. Raya Kuliner Nusantara No. 88, Jakarta Selatan, Indonesia.
                     </p>

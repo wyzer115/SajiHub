@@ -51,6 +51,7 @@ class ReportController extends Controller
             ->whereBetween('created_at', [$startDate, $endDate]);
 
         $ordersList = (clone $ordersQuery)->with(['table', 'user'])->latest()->get();
+        $paginatedOrders = (clone $ordersQuery)->with(['table', 'user'])->latest()->paginate(10)->withQueryString();
 
         $totalRevenue = $ordersList->sum('total_price');
         $totalOrders = $ordersList->count();
@@ -131,6 +132,7 @@ class ReportController extends Controller
             'averageOrderValue',
             'paymentMethods',
             'ordersList',
+            'paginatedOrders',
             'chartLabels',
             'chartData',
             'chartOrderCounts'

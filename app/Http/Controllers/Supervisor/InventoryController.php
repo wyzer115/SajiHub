@@ -40,9 +40,9 @@ class InventoryController extends Controller
         $validated = $request->validate([
             'name'       => 'required|string|max:255',
             'category'   => 'required|in:bahan_makanan,bahan_minuman,peralatan',
-            'stock'      => 'required|integer|min:0',
+            'stock'      => 'required|numeric|min:0',
             'unit'       => 'required|string|max:50',
-            'min_stock'  => 'required|integer|min:0',
+            'min_stock'  => 'required|numeric|min:0',
             'unit_price' => 'required|numeric|min:0',
             'notes'      => 'nullable|string|max:1000',
         ]);
@@ -85,9 +85,9 @@ class InventoryController extends Controller
         $validated = $request->validate([
             'name'       => 'required|string|max:255',
             'category'   => 'required|in:bahan_makanan,bahan_minuman,peralatan',
-            'stock'      => 'required|integer|min:0',
+            'stock'      => 'required|numeric|min:0',
             'unit'       => 'required|string|max:50',
-            'min_stock'  => 'required|integer|min:0',
+            'min_stock'  => 'required|numeric|min:0',
             'unit_price' => 'required|numeric|min:0',
             'notes'      => 'nullable|string|max:1000',
         ]);
@@ -230,22 +230,59 @@ class InventoryController extends Controller
                 ->with('success', 'Barang baru "' . $inventory->name . '" berhasil ditambahkan ke inventaris cabang dengan stok awal ' . $inventory->stock . ' ' . $inventory->unit . '.');
         }
 
-        // Mode Audit Stock Reconciliation (Existing Item)
+        // Practical Adjustment & Stock Opname Handler
+        $actionType = $request->input('action_type', 'set_actual'); // 'set_actual', 'add', 'reduce'
+
         $validated = $request->validate([
-            'date'            => 'required|date',
-            'inventory_id'   => 'required|exists:inventories,id',
-            'opening_stock'  => 'nullable|numeric|min:0',
-            'stock_in'       => 'nullable|numeric|min:0',
-            'stock_out_waste'=> 'nullable|numeric|min:0',
-            'closing_stock'  => 'required|numeric|min:0',
-            'reason'         => 'required|in:rusak_basi,lost_hilang,selisih_hitung,koreksi_stok',
-            'notes'          => 'nullable|string|max:500',
+            'date'            => 'nullable|date',
+            'inventory_id'    => 'required|exists:inventories,id',
+            'action_type'     => 'nullable|in:set_actual,add,reduce',
+            'actual_stock'    => 'nullable|numeric|min:0',
+            'qty_change'      => 'nullable|numeric|min:0',
+            // Legacy / direct fallback
+            'opening_stock'   => 'nullable|numeric',
+            'stock_in'        => 'nullable|numeric|min:0',
+            'stock_out_waste' => 'nullable|numeric|min:0',
+            'closing_stock'   => 'nullable|numeric|min:0',
+            'reason'          => 'required|string|max:100',
+            'notes'           => 'nullable|string|max:500',
         ]);
 
-        $date = $validated['date'];
+        $date = $validated['date'] ?? Carbon::today()->toDateString();
         $inventory = Inventory::where('branch_id', $branchId)->findOrFail($validated['inventory_id']);
         $unit = $inventory->unit;
         $unitPrice = (float) $inventory->unit_price;
+        $openingStock = (float) $inventory->stock;
+
+        $stockIn = 0;
+        $stockOutWaste = 0;
+        $closingStock = $openingStock;
+        $changeNote = '';
+
+        if ($actionType === 'add') {
+            $qty = (float) ($request->input('qty_change') ?? $request->input('stock_in') ?? 0);
+            $stockIn = $qty;
+            $closingStock = $openingStock + $qty;
+            $changeNote = "+{$qty} {$unit} (Restok Masuk)";
+        } elseif ($actionType === 'reduce') {
+            $qty = (float) ($request->input('qty_change') ?? $request->input('stock_out_waste') ?? 0);
+            $stockOutWaste = $qty;
+            $closingStock = max(0, $openingStock - $qty);
+            $changeNote = "-{$qty} {$unit} (Pengurangan / Rusak)";
+        } else {
+            // 'set_actual' or fallback closing_stock
+            $closingStock = (float) ($request->input('actual_stock') ?? $request->input('closing_stock') ?? $openingStock);
+            $diffQty = $closingStock - $openingStock;
+            if ($diffQty > 0) {
+                $stockIn = $diffQty;
+                $changeNote = "Koreksi Fisik dari {$openingStock} ke {$closingStock} {$unit} (+{$diffQty} {$unit})";
+            } elseif ($diffQty < 0) {
+                $stockOutWaste = abs($diffQty);
+                $changeNote = "Koreksi Fisik dari {$openingStock} ke {$closingStock} {$unit} ({$diffQty} {$unit})";
+            } else {
+                $changeNote = "Stok dicek & dikonfirmasi tetap {$closingStock} {$unit}";
+            }
+        }
 
         // Calculate PLU Sales for this item on the specified date
         $orders = Order::where('branch_id', $branchId)
@@ -267,33 +304,13 @@ class InventoryController extends Controller
             }
         }
 
-        // Determine Opening Stock
-        if (isset($validated['opening_stock']) && $validated['opening_stock'] !== '') {
-            $openingStock = (float) $validated['opening_stock'];
-        } else {
-            $prevDate = Carbon::parse($date)->subDay()->toDateString();
-            $prevRecon = StockReconciliation::where('branch_id', $branchId)
-                ->where('inventory_id', $inventory->id)
-                ->whereDate('date', $prevDate)
-                ->first();
-
-            $openingStock = $prevRecon ? (float)$prevRecon->closing_stock : (float)$inventory->stock;
-        }
-
-        $stockIn = (float) ($validated['stock_in'] ?? 0);
-        $stockOutWaste = (float) ($validated['stock_out_waste'] ?? 0);
-        $closingStock = (float) $validated['closing_stock'];
-
-        // Formula: Use = Opening + In - Out - Closing
-        $usePhysical = $openingStock + $stockIn - $stockOutWaste - $closingStock;
-
-        // Formula: Diff = Use - PLU
-        $diff = $usePhysical - $pluSales;
-
-        // Loss cost calculation if diff > 0 (Use > PLU means physical loss)
+        // Calculate physical usage and difference
+        $usePhysical = ($openingStock + $stockIn - $stockOutWaste) - $closingStock;
+        $diff = $closingStock - $openingStock;
         $lossCost = 0;
-        if ($diff > 0 && $unitPrice > 0) {
-            $lossCost = $diff * $unitPrice;
+
+        if ($stockOutWaste > 0 && $unitPrice > 0 && in_array($validated['reason'], ['rusak_basi', 'lost_hilang'])) {
+            $lossCost = $stockOutWaste * $unitPrice;
         }
 
         // Update current inventory stock
@@ -302,41 +319,46 @@ class InventoryController extends Controller
         ]);
 
         // Record or Update Stock Reconciliation
-        $reconciliation = StockReconciliation::updateOrCreate(
-            [
-                'branch_id'    => $branchId,
-                'inventory_id' => $inventory->id,
-                'date'         => $date,
-            ],
-            [
-                'user_id'         => $userId,
-                'opening_stock'   => $openingStock,
-                'stock_in'        => $stockIn,
-                'stock_out_waste' => $stockOutWaste,
-                'closing_stock'   => $closingStock,
-                'use_physical'    => $usePhysical,
-                'plu_sales'       => $pluSales,
-                'diff'            => $diff,
-                'unit_price'      => $unitPrice,
-                'loss_cost'       => $lossCost,
-                'reason'          => $validated['reason'],
-                'notes'           => $validated['notes'] ?? null,
-            ]
-        );
+        $reconciliation = StockReconciliation::create([
+            'branch_id'       => $branchId,
+            'inventory_id'    => $inventory->id,
+            'user_id'         => $userId,
+            'date'            => $date,
+            'opening_stock'   => $openingStock,
+            'stock_in'        => $stockIn,
+            'stock_out_waste' => $stockOutWaste,
+            'closing_stock'   => $closingStock,
+            'use_physical'    => $usePhysical,
+            'plu_sales'       => $pluSales,
+            'diff'            => $diff,
+            'unit_price'      => $unitPrice,
+            'loss_cost'       => $lossCost,
+            'reason'          => $validated['reason'],
+            'notes'           => $changeNote . ($validated['notes'] ? ' | ' . $validated['notes'] : ''),
+        ]);
 
-        // If diff > 0 (loss), create automatic Expense entry
-        if ($lossCost > 0) {
+        // If add action, record expense for purchase
+        if ($actionType === 'add' && $stockIn > 0 && $unitPrice > 0) {
             Expense::create([
                 'branch_id' => $branchId,
-                'title'     => 'Stock Loss (Diff Audit): ' . $inventory->name,
+                'title'     => 'Restok Bahan: ' . $inventory->name,
+                'category'  => $inventory->category === 'peralatan' ? 'peralatan' : 'pembelian_bahan',
+                'amount'    => $stockIn * $unitPrice,
+                'date'      => $date,
+                'notes'     => 'Penambahan stok +' . $stockIn . ' ' . $unit . ' dari penyesuaian stok. ' . ($validated['notes'] ?? ''),
+            ]);
+        } elseif ($lossCost > 0) {
+            Expense::create([
+                'branch_id' => $branchId,
+                'title'     => 'Barang Rusak/Basi: ' . $inventory->name,
                 'category'  => 'pembelian_bahan',
                 'amount'    => $lossCost,
                 'date'      => $date,
-                'notes'     => 'Stock Reconciliation Selisih (' . round($diff, 2) . ' ' . $inventory->unit . ' @ Rp ' . number_format($unitPrice, 0, ',', '.') . '). Alasan: ' . str_replace('_', ' ', $validated['reason']) . '. ' . ($validated['notes'] ?? ''),
+                'notes'     => 'Stok susut/rusak ' . $stockOutWaste . ' ' . $unit . ' @ Rp ' . number_format($unitPrice, 0, ',', '.') . '. ' . ($validated['notes'] ?? ''),
             ]);
         }
 
         return redirect()->route('supervisor.opname.index', ['date' => $date])
-            ->with('success', 'Rekonsiliasi Stok "' . $inventory->name . '" berhasil disimpan. Use Fisik: ' . $usePhysical . ' ' . $inventory->unit . ' | PLU Kasir: ' . $pluSales . ' ' . $inventory->unit . ' | Diff: ' . round($diff, 2) . ' ' . $inventory->unit . '.');
+            ->with('success', 'Stok "' . $inventory->name . '" berhasil diperbarui menjadi ' . (float)$closingStock . ' ' . $unit . ' (' . $changeNote . ').');
     }
 }

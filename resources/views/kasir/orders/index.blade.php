@@ -10,10 +10,16 @@
             <a href="{{ route('kasir.orders.index', ['status' => 'active']) }}" class="px-4 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap {{ request('status') == 'active' ? 'bg-[#BD2000] text-white shadow-sm' : 'bg-white border border-stone-200 text-stone-700 hover:bg-stone-100' }}">Sedang Aktif</a>
             <a href="{{ route('kasir.orders.index', ['status' => 'pending']) }}" class="px-4 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap {{ request('status') == 'pending' ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-white border border-stone-200 text-stone-700 hover:bg-stone-100' }}">Menunggu</a>
         </div>
-        <a href="{{ route('kasir.orders.create') }}" class="bg-[#BD2000] hover:bg-[#8C0000] text-white font-extrabold px-6 py-3 rounded-xl transition-all shadow-md flex items-center space-x-2 whitespace-nowrap cursor-pointer">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
-            <span>Buat Pesanan Baru</span>
-        </a>
+        <div class="flex items-center gap-3">
+            <a href="{{ route('kasir.orders.scan') }}" class="group bg-white hover:bg-[#BD2000] text-[#BD2000] hover:text-white border-2 border-[#BD2000] font-extrabold px-5 py-3 rounded-xl transition-all shadow-xs flex items-center space-x-2 whitespace-nowrap cursor-pointer text-xs">
+                <svg class="w-4 h-4 text-[#BD2000] group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+                <span>Scan QR Konfirmasi</span>
+            </a>
+            <a href="{{ route('kasir.orders.create') }}" class="bg-[#BD2000] hover:bg-[#8C0000] text-white font-extrabold px-5 py-3 rounded-xl transition-all shadow-md flex items-center space-x-2 whitespace-nowrap cursor-pointer text-xs">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+                <span>Buat Pesanan Baru</span>
+            </a>
+        </div>
     </div>
 
     <div class="bg-white border border-stone-200 rounded-3xl overflow-hidden shadow-sm animate-fade-in-up">

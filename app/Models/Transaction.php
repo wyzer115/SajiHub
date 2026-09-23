@@ -18,6 +18,7 @@ class Transaction extends Model
         'merchant_id',
         'cash_paid',
         'cash_change',
+        'payment_proof',
         'paid_at',
     ];
 

@@ -15,13 +15,38 @@ class Menu extends Model
         ];
     }
 
+    public const LOCKED_DEFAULT_IMAGES = [
+        'Nasi Goreng Spesial' => 'images/landing/nasi-goreng.jpg',
+        'Mie Goreng Seafood'  => 'images/landing/mie-goreng.jpg',
+        'Ayam Bakar Madu'     => 'images/landing/ayam-bakar.jpg',
+        'Sate Ayam'           => 'images/landing/sate.jpg',
+        'French Fries'        => 'images/landing/french-fries.jpg',
+        'Pisang Goreng Keju'  => 'images/landing/pisang-goreng.jpg',
+        'Es Teh Manis'        => 'images/landing/es-teh.jpg',
+        'Jus Alpukat'         => 'images/landing/jus-alpukat.jpg',
+        'Kopi Hitam Spesial'  => 'images/landing/kopi-hitam.jpg',
+    ];
+
     public function getImageUrlAttribute(): ?string
     {
-        if (!$this->image) return null;
-        if (str_starts_with($this->image, 'http://') || str_starts_with($this->image, 'https://')) {
-            return $this->image;
+        $img = $this->image;
+
+        // If no image is set, lock to standard default menu image
+        if (!$img) {
+            $img = self::LOCKED_DEFAULT_IMAGES[$this->name] ?? null;
         }
-        return asset('storage/' . $this->image);
+
+        if (!$img) return null;
+
+        if (str_starts_with($img, 'http://') || str_starts_with($img, 'https://')) {
+            return $img;
+        }
+
+        if (str_starts_with($img, 'images/')) {
+            return asset($img);
+        }
+
+        return asset('storage/' . $img);
     }
 
     public function branch()

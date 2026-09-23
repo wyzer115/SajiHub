@@ -23,8 +23,8 @@
             @endphp
             <div class="bg-white border {{ $isSoldOut ? 'border-red-300 bg-red-50/50' : 'border-stone-200 hover:border-[#BD2000]/40' }} rounded-2xl overflow-hidden flex flex-col group menu-item shadow-sm transition-all" data-category="{{ $catType }}">
                 <div class="h-32 bg-stone-100 relative border-b border-stone-200">
-                    @if($menu->image)
-                        <img src="{{ asset('storage/' . $menu->image) }}" class="w-full h-full object-cover {{ $isSoldOut ? 'grayscale opacity-60' : '' }}">
+                    @if($menu->image_url)
+                        <img src="{{ $menu->image_url }}" class="w-full h-full object-cover {{ $isSoldOut ? 'grayscale opacity-60' : '' }}">
                     @else
                         <div class="w-full h-full flex items-center justify-center text-stone-400">
                             <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.701 2.701 0 00-1.5-.454M9 6v2m3-2v2m3-2v2M9 3h.01M12 3h.01M15 3h.01M21 21v-7a2 2 0 00-2-2H5a2 2 0 00-2 2v7h18zm-3-9v-2a2 2 0 00-2-2H8a2 2 0 00-2 2v2h12z"></path></svg>
@@ -109,63 +109,20 @@
                     </div>
                 </div>
 
-                <!-- Tipe Pesanan: Dine In vs Takeaway -->
+                <!-- Info Tipe Pesanan Kasir (Strictly Takeaway) -->
                 <div>
-                    <label class="block text-stone-700 text-[11px] font-bold uppercase tracking-wider mb-1.5">Tipe Pesanan <span class="text-red-500">*</span></label>
-                    <input type="hidden" name="order_type" id="order_type_input" value="dine_in">
+                    <label class="block text-stone-700 text-[11px] font-bold uppercase tracking-wider mb-1.5">Tipe Pesanan</label>
+                    <input type="hidden" name="order_type" id="order_type_input" value="takeaway">
                     <input type="hidden" name="table_id" id="selected_table_id" value="">
                     
-                    <div class="grid grid-cols-2 gap-2.5 mb-2.5">
-                        <button type="button" id="type-dine-in" onclick="setOrderType('dine_in')"
-                            class="py-2.5 px-3 rounded-xl border text-xs font-bold text-center transition-all bg-[#BD2000] text-white border-[#BD2000] cursor-pointer flex items-center justify-center gap-1.5 shadow-sm">
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                            <span>Makan di Tempat</span>
-                        </button>
-                        <button type="button" id="type-takeaway" onclick="setOrderType('takeaway')"
-                            class="py-2.5 px-3 rounded-xl border border-stone-300 text-xs font-bold text-center text-stone-600 hover:text-[#BD2000] transition-all cursor-pointer flex items-center justify-center gap-1.5">
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
-                            <span>Bawa Pulang</span>
-                        </button>
-                    </div>
-
-                    <!-- Wrapper: Pilih Meja (Dine In) -->
-                    <div id="table-selection-wrapper" class="space-y-2">
-                        <div class="flex items-center justify-between">
-                            <span class="text-[11px] font-bold text-stone-700 uppercase tracking-wider">Pilih Meja Restoran:</span>
-                            <a href="{{ route('kasir.tables.index') }}" class="text-[11px] font-extrabold text-[#BD2000] hover:underline flex items-center gap-1">
-                                + Kelola / Tambah Meja
-                            </a>
-                        </div>
-
-                        <div class="grid grid-cols-3 gap-2 max-h-40 overflow-y-auto pr-1 scrollbar-thin">
-                            @forelse($tables as $t)
-                                <div onclick="selectTable(this)" 
-                                     data-id="{{ $t->id }}" 
-                                     data-number="{{ $t->table_number }}" 
-                                     data-status="{{ $t->status }}"
-                                     class="table-box p-2 rounded-xl border text-center transition-all cursor-pointer text-xs font-bold flex flex-col justify-center items-center gap-0.5 {{ $t->status === 'occupied' ? 'bg-red-50 border-red-200 text-red-500 cursor-not-allowed opacity-75' : 'bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100' }}">
-                                    <span>{{ $t->table_number }}</span>
-                                    <span class="text-[9px] font-medium opacity-80">
-                                        {{ $t->status === 'occupied' ? 'Terisi' : 'Tersedia (' . ($t->capacity ?? 4) . ' krs)' }}
-                                    </span>
-                                </div>
-                            @empty
-                                <div class="col-span-3 text-center py-3 text-stone-400 text-xs font-medium">
-                                    Belum ada meja. <a href="{{ route('kasir.tables.index') }}" class="text-[#BD2000] font-bold underline">+ Tambah Meja</a>
-                                </div>
-                            @endforelse
-                        </div>
-                    </div>
-
-                    <!-- Wrapper: Info Bawa Pulang (Takeaway) -->
-                    <div id="takeaway-info-wrapper" class="hidden p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-[11px] font-semibold flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <div class="p-1.5 rounded-lg bg-amber-100 text-amber-800 shrink-0">
+                    <div class="p-3 rounded-2xl bg-amber-50 border border-amber-200 text-amber-950 text-xs font-semibold flex items-center justify-between shadow-xs">
+                        <div class="flex items-center gap-2.5">
+                            <div class="p-2 rounded-xl bg-amber-100 text-amber-800 shrink-0">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
                             </div>
                             <div>
-                                <p class="font-extrabold text-amber-950">Pesanan Bawa Pulang</p>
-                                <p class="text-[10px] text-amber-800 font-medium">Otomatis tanpa meja. Dibungkus oleh Dapur.</p>
+                                <p class="font-extrabold text-amber-950">🛍️ Pesanan Bawa Pulang (Takeaway)</p>
+                                <p class="text-[10px] text-amber-800 font-medium">Khusus pesanan langsung di kasir (tanpa meja). Pelanggan makan di tempat wajib pesan via scan QR meja.</p>
                             </div>
                         </div>
                     </div>
@@ -325,26 +282,17 @@
             return;
         }
 
-        const orderTypeInput = document.getElementById('order_type_input');
-        const orderType = orderTypeInput ? orderTypeInput.value : 'dine_in';
-        const tableId = document.getElementById('selected_table_id').value;
-
-        if (orderType === 'dine_in' && !tableId) {
-            alert('Silakan pilih nomor meja restoran terlebih dahulu untuk pesanan Makan di Tempat!');
-            return;
-        }
-
         const paymentMethodInput = document.getElementById('kasir_payment_method_input');
         const paymentMethod = paymentMethodInput ? paymentMethodInput.value : 'cash';
         const submitBtn = document.getElementById('submit-btn');
         submitBtn.disabled = true;
-        submitBtn.innerText = '⏳ Menyimpan Draft Pesanan...';
+        submitBtn.innerText = '⏳ Menyimpan Pesanan...';
 
         try {
             const payload = {
                 customer_name: customerName,
-                order_type: orderType,
-                table_id: orderType === 'dine_in' ? tableId : null,
+                order_type: 'takeaway',
+                table_id: null,
                 payment_method: paymentMethod,
                 items: cart.map(item => ({
                     menu_id: item.id,
@@ -366,20 +314,20 @@
             const data = await response.json();
 
             if (response.ok && data.success) {
-                // MUST TRIGGER OPEN CHECKOUT PAYMENT MODAL IMMEDIATELY
+                // Open checkout payment modal
                 window.dispatchEvent(new CustomEvent('open-checkout', {
                     detail: {
                         orderId: data.order.id,
                         customerName: data.order.customer_name,
-                        tableNumber: data.order.table_number,
+                        tableNumber: '🛍️ Bawa Pulang',
                         totalAmount: data.order.total_price,
                         paymentMethod: paymentMethod,
                         items: data.order.items
                     }
                 }));
             } else {
-                if (window.showToast) window.showToast('Gagal menyimpan pesanan draft: ' + (data.message || 'Silakan cek kembali inputan.'), 'error');
-                else alert('Gagal menyimpan pesanan draft: ' + (data.message || 'Silakan cek kembali inputan.'));
+                if (window.showToast) window.showToast('Gagal menyimpan pesanan: ' + (data.message || 'Silakan cek kembali inputan.'), 'error');
+                else alert('Gagal menyimpan pesanan: ' + (data.message || 'Silakan cek kembali inputan.'));
             }
         } catch (err) {
             if (window.showToast) window.showToast('Terjadi kesalahan jaringan saat mengirim pesanan.', 'error');
@@ -389,36 +337,6 @@
             submitBtn.innerText = 'Pesan Sekarang & Buka Pembayaran';
         }
     });
-
-    function setOrderType(type) {
-        const btnDineIn = document.getElementById('type-dine-in');
-        const btnTakeaway = document.getElementById('type-takeaway');
-        const inputType = document.getElementById('order_type_input');
-        const tableWrapper = document.getElementById('table-selection-wrapper');
-        const takeawayWrapper = document.getElementById('takeaway-info-wrapper');
-        const selectedTableInput = document.getElementById('selected_table_id');
-
-        if (inputType) inputType.value = type;
-
-        if (type === 'dine_in') {
-            if (btnDineIn) btnDineIn.className = "py-2.5 px-3 rounded-xl border text-xs font-bold text-center transition-all bg-[#BD2000] text-white border-[#BD2000] cursor-pointer flex items-center justify-center gap-1.5 shadow-sm";
-            if (btnTakeaway) btnTakeaway.className = "py-2.5 px-3 rounded-xl border border-stone-300 text-xs font-bold text-center text-stone-600 hover:text-[#BD2000] transition-all cursor-pointer flex items-center justify-center gap-1.5";
-            if (tableWrapper) tableWrapper.classList.remove('hidden');
-            if (takeawayWrapper) takeawayWrapper.classList.add('hidden');
-        } else {
-            if (btnTakeaway) btnTakeaway.className = "py-2.5 px-3 rounded-xl border text-xs font-bold text-center transition-all bg-[#BD2000] text-white border-[#BD2000] cursor-pointer flex items-center justify-center gap-1.5 shadow-sm";
-            if (btnDineIn) btnDineIn.className = "py-2.5 px-3 rounded-xl border border-stone-300 text-xs font-bold text-center text-stone-600 hover:text-[#BD2000] transition-all cursor-pointer flex items-center justify-center gap-1.5";
-            if (tableWrapper) tableWrapper.classList.add('hidden');
-            if (takeawayWrapper) takeawayWrapper.classList.remove('hidden');
-            if (selectedTableInput) selectedTableInput.value = '';
-
-            document.querySelectorAll('.table-box').forEach(box => {
-                if (box.getAttribute('data-status') === 'empty') {
-                    box.className = 'table-box py-3 px-2 rounded-xl border text-center transition-all cursor-pointer border-emerald-300 bg-emerald-50 text-emerald-700 hover:bg-emerald-100';
-                }
-            });
-        }
-    }
 
     function setKasirPaymentMethod(method) {
         const btnCash = document.getElementById('kasir-pay-cash');
@@ -439,27 +357,6 @@
             if (btnQris) btnQris.className = "py-2.5 px-3 rounded-xl border text-xs font-bold text-center transition-all bg-[#BD2000] text-white border-[#BD2000] cursor-pointer flex items-center justify-center gap-1.5 shadow-sm";
             if (qrisGuide) qrisGuide.classList.remove('hidden');
         }
-    }
-
-    function selectTable(el) {
-        if (el.getAttribute('data-status') === 'occupied') {
-            if (window.showToast) {
-                window.showToast('Meja ' + el.getAttribute('data-number') + ' sedang TERISI dan tidak dapat dipilih!', 'error');
-            } else {
-                alert('Meja ' + el.getAttribute('data-number') + ' sedang TERISI dan tidak dapat dipilih!');
-            }
-            return;
-        }
-        
-        document.querySelectorAll('.table-box').forEach(box => {
-            if (box.getAttribute('data-status') === 'empty') {
-                box.className = 'table-box py-3 px-2 rounded-xl border text-center transition-all cursor-pointer border-emerald-300 bg-emerald-50 text-emerald-700 hover:bg-emerald-100';
-            }
-        });
-        
-        el.className = 'table-box py-3 px-2 rounded-xl border text-center transition-all cursor-pointer border-[#BD2000] bg-[#BD2000] text-white shadow-md ring-2 ring-[#BD2000]/30';
-        
-        document.getElementById('selected_table_id').value = el.getAttribute('data-id');
     }
 </script>
 @endpush

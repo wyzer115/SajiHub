@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Dasbor Owner - SajiHUB')
-@section('page-title', 'Dasbor Pemilik Cabang')
+@section('page-title', 'Dasbor Utama Owner')
 
 @section('content')
 <div class="space-y-8 animate-fade-in-up">
@@ -20,6 +20,15 @@
                     <option value="{{ $b->id }}" {{ $selectedBranchId == $b->id ? 'selected' : '' }}>🏢 {{ $b->name }}</option>
                 @endforeach
             </select>
+            @if(request('period'))
+                <input type="hidden" name="period" value="{{ request('period') }}">
+            @endif
+            @if(request('start_date'))
+                <input type="hidden" name="start_date" value="{{ request('start_date') }}">
+            @endif
+            @if(request('end_date'))
+                <input type="hidden" name="end_date" value="{{ request('end_date') }}">
+            @endif
         </form>
     </div>
 
@@ -62,13 +71,45 @@
     <!-- Visual Sales & Expenses Charts Section -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 bg-white border border-stone-200 rounded-3xl p-6 shadow-sm">
-            <div class="flex items-center justify-between mb-4">
+            <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4 mb-4">
                 <div>
                     <h3 class="text-lg font-black text-[#8C0000] flex items-center gap-2">
                         <svg class="w-5 h-5 text-[#8C0000]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>
-                        <span>Grafik Pemasukan vs Pengeluaran (7 Hari Terakhir)</span>
+                        <span>Grafik Pemasukan vs Pengeluaran ({{ $periodLabel }})</span>
                     </h3>
-                    <p class="text-slate-500 text-xs font-semibold mt-0.5">Tren arus kas harian</p>
+                    <p class="text-slate-500 text-xs font-semibold mt-0.5">Tren arus kas berdasarkan periode waktu yang dipilih</p>
+                </div>
+
+                <!-- Tombol Periode: Hari Ini, Minggu Ini, Bulan Ini + Pilihan Tanggal Kustom -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <div class="flex items-center gap-1 bg-stone-100 p-1 rounded-2xl">
+                        <a href="{{ route('owner.dashboard', array_filter(['branch_id' => $selectedBranchId, 'period' => 'today'])) }}"
+                           class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all {{ $period === 'today' ? 'bg-[#BD2000] text-white shadow-xs' : 'text-stone-600 hover:text-stone-900' }}">
+                            Hari Ini
+                        </a>
+                        <a href="{{ route('owner.dashboard', array_filter(['branch_id' => $selectedBranchId, 'period' => 'week'])) }}"
+                           class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all {{ $period === 'week' ? 'bg-[#BD2000] text-white shadow-xs' : 'text-stone-600 hover:text-stone-900' }}">
+                            Minggu Ini
+                        </a>
+                        <a href="{{ route('owner.dashboard', array_filter(['branch_id' => $selectedBranchId, 'period' => 'month'])) }}"
+                           class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all {{ $period === 'month' ? 'bg-[#BD2000] text-white shadow-xs' : 'text-stone-600 hover:text-stone-900' }}">
+                            Bulan Ini
+                        </a>
+                    </div>
+
+                    <!-- Form Tanggal Kustom (Tetap Mempertahankan Pilihan Tanggal) -->
+                    <form method="GET" action="{{ route('owner.dashboard') }}" class="flex items-center gap-1.5 bg-stone-50 border border-stone-200 rounded-2xl p-1">
+                        @if($selectedBranchId && $selectedBranchId !== 'all')
+                            <input type="hidden" name="branch_id" value="{{ $selectedBranchId }}">
+                        @endif
+                        <input type="hidden" name="period" value="custom">
+                        <input type="date" name="start_date" value="{{ $startDate }}" class="text-[11px] bg-white border border-stone-300 rounded-xl px-2.5 py-1 text-stone-700 font-semibold focus:outline-none focus:border-[#BD2000]">
+                        <span class="text-xs text-stone-400 font-bold">-</span>
+                        <input type="date" name="end_date" value="{{ $endDate }}" class="text-[11px] bg-white border border-stone-300 rounded-xl px-2.5 py-1 text-stone-700 font-semibold focus:outline-none focus:border-[#BD2000]">
+                        <button type="submit" class="px-3 py-1 bg-stone-800 hover:bg-[#8C0000] text-white rounded-xl text-xs font-extrabold transition-all shadow-xs cursor-pointer" title="Terapkan Rentang Tanggal">
+                            Filter
+                        </button>
+                    </form>
                 </div>
             </div>
             <div class="relative h-64 w-full">
@@ -132,10 +173,10 @@
                 <tbody class="divide-y divide-stone-200">
                     @forelse($inventories->take(5) as $inv)
                     <tr class="hover:bg-stone-50 transition-colors">
-                        <td class="p-3 font-bold text-[#1C1917]">{{ $inv->item_name }}</td>
+                        <td class="p-3 font-bold text-[#1C1917]">{{ $inv->name }}</td>
                         <td class="p-3 text-xs text-slate-500 font-semibold">{{ ucfirst(str_replace('_', ' ', $inv->category)) }}</td>
-                        <td class="p-3 font-black text-[#1C1917]">{{ number_format($inv->stock, 0) }} {{ $inv->unit }}</td>
-                        <td class="p-3 text-xs text-slate-500 font-semibold">{{ number_format($inv->min_stock, 0) }} {{ $inv->unit }}</td>
+                        <td class="p-3 font-black text-[#1C1917]">{{ (float)$inv->stock }} {{ $inv->unit }}</td>
+                        <td class="p-3 text-xs text-slate-500 font-semibold">{{ (float)$inv->min_stock }} {{ $inv->unit }}</td>
                         <td class="p-3">
                             @if($inv->isLowStock())
                             <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">Menipis</span>

@@ -63,33 +63,54 @@
             </p>
         </div>
 
-        {{-- Status Badge Header --}}
-        <div class="bg-stone-50 rounded-2xl p-4 border border-stone-200/80 space-y-2">
-            <div class="flex items-center justify-between">
-                <span class="text-xs text-stone-500 font-bold uppercase tracking-wider">Status Pembayaran</span>
-                @if ($order->payment_status === 'paid' || $order->payment_method === 'qris')
+        {{-- Status Badge Header & Confirmation Ticket --}}
+        @if ($order->payment_status !== 'paid')
+            <div class="bg-amber-50/90 rounded-3xl p-5 border-2 border-dashed border-amber-300 text-center space-y-3.5 shadow-sm animate-fade-in">
+                <div class="inline-flex items-center gap-1.5 px-3.5 py-1 bg-amber-200/70 text-amber-900 rounded-full text-xs font-black uppercase tracking-wider">
+                    <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+                    <span>Menunggu Konfirmasi Kasir</span>
+                </div>
+                
+                <h2 class="text-base font-black text-stone-900">
+                    Tiket Konfirmasi Pesanan
+                </h2>
+                <p class="text-xs text-stone-600 font-medium max-w-xs mx-auto leading-relaxed">
+                    Tunjukkan QR Code ini ke Kasir untuk verifikasi pesanan dan menyelesaikan pembayaran 
+                    <strong class="text-[#BD2000] uppercase font-black">({{ $order->payment_method === 'qris' ? 'QRIS' : 'Tunai' }})</strong>.
+                </p>
+
+                {{-- QR Code for Kasir Scanner --}}
+                <div class="inline-block p-3.5 bg-white rounded-2xl border border-stone-200 shadow-md">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=SAJI-ORD-{{ $order->id }}" 
+                         alt="QR Konfirmasi Order #{{ $order->id }}" 
+                         class="w-48 h-48 mx-auto object-contain">
+                </div>
+
+                <div class="flex items-center justify-center gap-2">
+                    <span class="text-[11px] text-stone-500 font-bold uppercase tracking-wider">Kode Tiket:</span>
+                    <span class="text-xs font-mono font-black text-[#BD2000] bg-white py-1 px-3 rounded-xl border border-stone-200 shadow-xs">
+                        SAJI-ORD-{{ $order->id }}
+                    </span>
+                </div>
+
+                <div class="pt-2 text-[11px] text-amber-800 font-medium">
+                    <span class="inline-block animate-pulse">⏳ Halaman ini akan otomatis ter-update saat kasir mengonfirmasi pesanan Anda.</span>
+                </div>
+            </div>
+        @else
+            <div class="bg-emerald-50 rounded-2xl p-4 border border-emerald-200 space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-emerald-800 font-bold uppercase tracking-wider">Status Pembayaran</span>
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-black uppercase tracking-wider">
                         <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                        <span>LUNAS (QRIS)</span>
+                        <span>LUNAS ({{ strtoupper($order->payment_method) }})</span>
                     </span>
-                @else
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-black uppercase tracking-wider">
-                        <svg class="w-3.5 h-3.5 text-amber-600 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        <span>BELUM DIBAYAR (TUNAI)</span>
-                    </span>
-                @endif
+                </div>
+                <p class="text-[11px] text-emerald-700 bg-white/70 border border-emerald-200 rounded-xl p-2.5 font-medium leading-relaxed">
+                    ✨ Pembayaran berhasil dikonfirmasi! Pesanan Anda sedang disiapkan oleh koki di Dapur.
+                </p>
             </div>
-
-            @if ($order->payment_method === 'cash' && $order->payment_status !== 'paid')
-                <p class="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-2.5 font-medium leading-relaxed">
-                    💡 Silakan tunjukkan nama <strong>{{ $order->customer_name }}</strong> atau nomor nota <strong>#ORD-{{ $order->id }}</strong> ke Kasir untuk melunasi pembayaran pesanan Anda.
-                </p>
-            @else
-                <p class="text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl p-2.5 font-medium leading-relaxed">
-                    ✨ Pembayaran QRIS berhasil dikonfirmasi! Pesanan sedang langsung disiapkan oleh koki di Dapur.
-                </p>
-            @endif
-        </div>
+        @endif
 
         {{-- Order Metadata --}}
         <div class="text-xs space-y-2 border-b border-stone-200 pb-4 font-medium">
@@ -196,6 +217,21 @@
         </div>
 
     </div>
+
+    @if ($order->payment_status !== 'paid')
+    <script>
+        setInterval(() => {
+            fetch("{{ route('pesan.status', $order->id) }}")
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.payment_status === 'paid') {
+                        window.location.reload();
+                    }
+                })
+                .catch(err => console.log('Checking order status...'));
+        }, 3500);
+    </script>
+    @endif
 
 </body>
 </html>

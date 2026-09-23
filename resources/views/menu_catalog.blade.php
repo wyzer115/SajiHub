@@ -263,8 +263,8 @@
                     <div>
                         {{-- Foto Makanan --}}
                         <div class="aspect-[4/3] rounded-2xl overflow-hidden relative mb-4 bg-stone-100 border border-stone-200">
-                            @if($menu->image_url || $menu->image)
-                                <img src="{{ $menu->image_url ?? asset('storage/' . $menu->image) }}" 
+                            @if($menu->image_url)
+                                <img src="{{ $menu->image_url }}" 
                                      alt="{{ $menu->name }}" 
                                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                             @else

@@ -34,6 +34,18 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        // Owner Utama (Pemilik Bisnis Multi-Cabang)
+        User::firstOrCreate(
+            ['username' => 'owner'],
+            [
+                'name'      => 'Owner SajiHUB',
+                'email'     => 'owner@sajihub.com',
+                'password'  => Hash::make('password'),
+                'role'      => 'owner',
+                'branch_id' => null,
+            ]
+        );
+
         $branchesData = [
             [
                 'key'        => 'jakarta',
@@ -152,16 +164,16 @@ class DatabaseSeeder extends Seeder
                 );
             }
 
-            Menu::firstOrCreate(['branch_id' => $branch->id, 'name' => 'Nasi Goreng Spesial'], ['category_id' => $catMakanan->id, 'price' => 35000]);
-            Menu::firstOrCreate(['branch_id' => $branch->id, 'name' => 'Mie Goreng Seafood'], ['category_id' => $catMakanan->id, 'price' => 38000]);
-            Menu::firstOrCreate(['branch_id' => $branch->id, 'name' => 'Ayam Bakar Madu'], ['category_id' => $catMakanan->id, 'price' => 42000]);
-            Menu::firstOrCreate(['branch_id' => $branch->id, 'name' => 'Sate Ayam'], ['category_id' => $catMakanan->id, 'price' => 30000]);
-            Menu::firstOrCreate(['branch_id' => $branch->id, 'name' => 'French Fries'], ['category_id' => $catMakanan->id, 'price' => 18000]);
-            Menu::firstOrCreate(['branch_id' => $branch->id, 'name' => 'Pisang Goreng Keju'], ['category_id' => $catMakanan->id, 'price' => 20000]);
+            Menu::firstOrCreate(['branch_id' => $branch->id, 'name' => 'Nasi Goreng Spesial'], ['category_id' => $catMakanan->id, 'price' => 35000, 'image' => 'images/landing/nasi-goreng.jpg']);
+            Menu::firstOrCreate(['branch_id' => $branch->id, 'name' => 'Mie Goreng Seafood'], ['category_id' => $catMakanan->id, 'price' => 38000, 'image' => 'images/landing/mie-goreng.jpg']);
+            Menu::firstOrCreate(['branch_id' => $branch->id, 'name' => 'Ayam Bakar Madu'], ['category_id' => $catMakanan->id, 'price' => 42000, 'image' => 'images/landing/ayam-bakar.jpg']);
+            Menu::firstOrCreate(['branch_id' => $branch->id, 'name' => 'Sate Ayam'], ['category_id' => $catMakanan->id, 'price' => 30000, 'image' => 'images/landing/sate.jpg']);
+            Menu::firstOrCreate(['branch_id' => $branch->id, 'name' => 'French Fries'], ['category_id' => $catMakanan->id, 'price' => 18000, 'image' => 'images/landing/french-fries.jpg']);
+            Menu::firstOrCreate(['branch_id' => $branch->id, 'name' => 'Pisang Goreng Keju'], ['category_id' => $catMakanan->id, 'price' => 20000, 'image' => 'images/landing/pisang-goreng.jpg']);
 
-            Menu::firstOrCreate(['branch_id' => $branch->id, 'name' => 'Es Teh Manis'], ['category_id' => $catMinuman->id, 'price' => 8000]);
-            Menu::firstOrCreate(['branch_id' => $branch->id, 'name' => 'Jus Alpukat'], ['category_id' => $catMinuman->id, 'price' => 18000]);
-            Menu::firstOrCreate(['branch_id' => $branch->id, 'name' => 'Kopi Hitam Spesial'], ['category_id' => $catMinuman->id, 'price' => 15000]);
+            Menu::firstOrCreate(['branch_id' => $branch->id, 'name' => 'Es Teh Manis'], ['category_id' => $catMinuman->id, 'price' => 8000, 'image' => 'images/landing/es-teh.jpg']);
+            Menu::firstOrCreate(['branch_id' => $branch->id, 'name' => 'Jus Alpukat'], ['category_id' => $catMinuman->id, 'price' => 18000, 'image' => 'images/landing/jus-alpukat.jpg']);
+            Menu::firstOrCreate(['branch_id' => $branch->id, 'name' => 'Kopi Hitam Spesial'], ['category_id' => $catMinuman->id, 'price' => 15000, 'image' => 'images/landing/kopi-hitam.jpg']);
 
             // Seed Inventories
             $invAyam = Inventory::firstOrCreate(
@@ -188,6 +200,18 @@ class DatabaseSeeder extends Seeder
                 ['branch_id' => $branch->id, 'name' => 'Minyak Goreng'],
                 ['category' => 'bahan_makanan', 'stock' => 40, 'unit' => 'liter', 'min_stock' => 8, 'unit_price' => 16000, 'notes' => 'Minyak komersial']
             );
+            $invMie = Inventory::firstOrCreate(
+                ['branch_id' => $branch->id, 'name' => 'Mie Basah & Seafood'],
+                ['category' => 'bahan_makanan', 'stock' => 35, 'unit' => 'kg', 'min_stock' => 5, 'unit_price' => 32000, 'notes' => 'Bahan mie & seafood']
+            );
+            $invKentang = Inventory::firstOrCreate(
+                ['branch_id' => $branch->id, 'name' => 'Kentang Potong Beku'],
+                ['category' => 'bahan_makanan', 'stock' => 40, 'unit' => 'kg', 'min_stock' => 8, 'unit_price' => 25000, 'notes' => 'Bahan french fries kentang']
+            );
+            $invPisang = Inventory::firstOrCreate(
+                ['branch_id' => $branch->id, 'name' => 'Pisang & Keju Parut'],
+                ['category' => 'bahan_makanan', 'stock' => 35, 'unit' => 'kg', 'min_stock' => 6, 'unit_price' => 22000, 'notes' => 'Pisang kepok & keju cheddar']
+            );
             $invTeh = Inventory::firstOrCreate(
                 ['branch_id' => $branch->id, 'name' => 'Daun Teh Hitam'],
                 ['category' => 'bahan_minuman', 'stock' => 15, 'unit' => 'kg', 'min_stock' => 3, 'unit_price' => 50000, 'notes' => 'Teh racikan']
@@ -200,6 +224,10 @@ class DatabaseSeeder extends Seeder
                 ['branch_id' => $branch->id, 'name' => 'Sirup Alpukat / Buah'],
                 ['category' => 'bahan_minuman', 'stock' => 25, 'unit' => 'liter', 'min_stock' => 5, 'unit_price' => 45000, 'notes' => 'Bahan es & jus']
             );
+            $invKopi = Inventory::firstOrCreate(
+                ['branch_id' => $branch->id, 'name' => 'Bubuk Kopi Robusta'],
+                ['category' => 'bahan_minuman', 'stock' => 20, 'unit' => 'kg', 'min_stock' => 4, 'unit_price' => 60000, 'notes' => 'Biji kopi pilihan roasted']
+            );
             Inventory::firstOrCreate(
                 ['branch_id' => $branch->id, 'name' => 'Wajan Goreng Stainless Steel'],
                 ['category' => 'peralatan', 'stock' => 8, 'unit' => 'unit', 'min_stock' => 2, 'unit_price' => 250000, 'notes' => 'Peralatan dapur']
@@ -209,7 +237,8 @@ class DatabaseSeeder extends Seeder
                 ['category' => 'peralatan', 'stock' => 4, 'unit' => 'unit', 'min_stock' => 1, 'unit_price' => 850000, 'notes' => 'Peralatan bar minuman']
             );
 
-            // Seed Multi-Ingredient Recipes (BOM)
+            // Seed Multi-Ingredient Recipes (BOM) for All 9 Menus
+            // 1. Nasi Goreng Spesial
             $menuNasgor = Menu::where('branch_id', $branch->id)->where('name', 'Nasi Goreng Spesial')->first();
             if ($menuNasgor) {
                 \App\Models\MenuIngredient::firstOrCreate(['menu_id' => $menuNasgor->id, 'inventory_id' => $invBeras->id], ['quantity' => 0.20]);
@@ -218,6 +247,16 @@ class DatabaseSeeder extends Seeder
                 \App\Models\MenuIngredient::firstOrCreate(['menu_id' => $menuNasgor->id, 'inventory_id' => $invBumbu->id], ['quantity' => 0.02]);
             }
 
+            // 2. Mie Goreng Seafood
+            $menuMieGoreng = Menu::where('branch_id', $branch->id)->where('name', 'Mie Goreng Seafood')->first();
+            if ($menuMieGoreng) {
+                \App\Models\MenuIngredient::firstOrCreate(['menu_id' => $menuMieGoreng->id, 'inventory_id' => $invMie->id], ['quantity' => 0.20]);
+                \App\Models\MenuIngredient::firstOrCreate(['menu_id' => $menuMieGoreng->id, 'inventory_id' => $invTelur->id], ['quantity' => 1.00]);
+                \App\Models\MenuIngredient::firstOrCreate(['menu_id' => $menuMieGoreng->id, 'inventory_id' => $invMinyak->id], ['quantity' => 0.05]);
+                \App\Models\MenuIngredient::firstOrCreate(['menu_id' => $menuMieGoreng->id, 'inventory_id' => $invBumbu->id], ['quantity' => 0.02]);
+            }
+
+            // 3. Ayam Bakar Madu
             $menuAyamBakar = Menu::where('branch_id', $branch->id)->where('name', 'Ayam Bakar Madu')->first();
             if ($menuAyamBakar) {
                 \App\Models\MenuIngredient::firstOrCreate(['menu_id' => $menuAyamBakar->id, 'inventory_id' => $invAyam->id], ['quantity' => 0.25]);
@@ -225,10 +264,47 @@ class DatabaseSeeder extends Seeder
                 \App\Models\MenuIngredient::firstOrCreate(['menu_id' => $menuAyamBakar->id, 'inventory_id' => $invBumbu->id], ['quantity' => 0.03]);
             }
 
+            // 4. Sate Ayam
+            $menuSate = Menu::where('branch_id', $branch->id)->where('name', 'Sate Ayam')->first();
+            if ($menuSate) {
+                \App\Models\MenuIngredient::firstOrCreate(['menu_id' => $menuSate->id, 'inventory_id' => $invAyam->id], ['quantity' => 0.20]);
+                \App\Models\MenuIngredient::firstOrCreate(['menu_id' => $menuSate->id, 'inventory_id' => $invMadu->id], ['quantity' => 0.04]);
+                \App\Models\MenuIngredient::firstOrCreate(['menu_id' => $menuSate->id, 'inventory_id' => $invBumbu->id], ['quantity' => 0.02]);
+            }
+
+            // 5. French Fries
+            $menuFries = Menu::where('branch_id', $branch->id)->where('name', 'French Fries')->first();
+            if ($menuFries) {
+                \App\Models\MenuIngredient::firstOrCreate(['menu_id' => $menuFries->id, 'inventory_id' => $invKentang->id], ['quantity' => 0.15]);
+                \App\Models\MenuIngredient::firstOrCreate(['menu_id' => $menuFries->id, 'inventory_id' => $invMinyak->id], ['quantity' => 0.05]);
+            }
+
+            // 6. Pisang Goreng Keju
+            $menuPisang = Menu::where('branch_id', $branch->id)->where('name', 'Pisang Goreng Keju')->first();
+            if ($menuPisang) {
+                \App\Models\MenuIngredient::firstOrCreate(['menu_id' => $menuPisang->id, 'inventory_id' => $invPisang->id], ['quantity' => 0.20]);
+                \App\Models\MenuIngredient::firstOrCreate(['menu_id' => $menuPisang->id, 'inventory_id' => $invMinyak->id], ['quantity' => 0.05]);
+            }
+
+            // 7. Es Teh Manis
             $menuEsTeh = Menu::where('branch_id', $branch->id)->where('name', 'Es Teh Manis')->first();
             if ($menuEsTeh) {
                 \App\Models\MenuIngredient::firstOrCreate(['menu_id' => $menuEsTeh->id, 'inventory_id' => $invTeh->id], ['quantity' => 0.05]);
                 \App\Models\MenuIngredient::firstOrCreate(['menu_id' => $menuEsTeh->id, 'inventory_id' => $invGula->id], ['quantity' => 0.03]);
+            }
+
+            // 8. Jus Alpukat
+            $menuJus = Menu::where('branch_id', $branch->id)->where('name', 'Jus Alpukat')->first();
+            if ($menuJus) {
+                \App\Models\MenuIngredient::firstOrCreate(['menu_id' => $menuJus->id, 'inventory_id' => $invSirup->id], ['quantity' => 0.10]);
+                \App\Models\MenuIngredient::firstOrCreate(['menu_id' => $menuJus->id, 'inventory_id' => $invGula->id], ['quantity' => 0.03]);
+            }
+
+            // 9. Kopi Hitam Spesial
+            $menuKopi = Menu::where('branch_id', $branch->id)->where('name', 'Kopi Hitam Spesial')->first();
+            if ($menuKopi) {
+                \App\Models\MenuIngredient::firstOrCreate(['menu_id' => $menuKopi->id, 'inventory_id' => $invKopi->id], ['quantity' => 0.02]);
+                \App\Models\MenuIngredient::firstOrCreate(['menu_id' => $menuKopi->id, 'inventory_id' => $invGula->id], ['quantity' => 0.02]);
             }
 
             // Seed Expenses

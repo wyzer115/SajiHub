@@ -81,9 +81,9 @@
                             @endif
                         </td>
                         <td class="px-6 py-4">
-                            <div class="text-base font-black text-[#1C1917]">{{ $item->stock }} <span class="text-xs font-semibold text-slate-500">{{ $item->unit }}</span></div>
+                            <div class="text-base font-black text-[#1C1917]">{{ (float)$item->stock }} <span class="text-xs font-semibold text-slate-500">{{ $item->unit }}</span></div>
                         </td>
-                        <td class="px-6 py-4 text-xs text-slate-600 font-semibold">{{ $item->min_stock }} {{ $item->unit }}</td>
+                        <td class="px-6 py-4 text-xs text-slate-600 font-semibold">{{ (float)$item->min_stock }} {{ $item->unit }}</td>
                         <td class="px-6 py-4 text-sm text-slate-700 font-bold">Rp {{ number_format($item->unit_price, 0, ',', '.') }}</td>
                         <td class="px-6 py-4">
                             @if($item->isLowStock())
@@ -101,8 +101,9 @@
                         <td class="px-6 py-4 text-right">
                             <div class="flex items-center justify-end gap-2">
                                 <a href="{{ route('supervisor.inventory.edit', $item->id) }}"
-                                   class="p-2 bg-stone-100 hover:bg-[#BD2000] text-stone-700 hover:text-white rounded-xl transition-colors border border-stone-200" title="Edit / Restok">
-                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                   class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-stone-100 hover:bg-[#BD2000] text-stone-700 hover:text-white rounded-xl text-xs font-bold transition-all border border-stone-200 hover:border-transparent shadow-2xs" title="Edit / Update Stok">
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                    <span>Update Stok</span>
                                 </a>
                                 <form action="{{ route('supervisor.inventory.destroy', $item->id) }}" method="POST" onsubmit="return showConfirm(event, 'Apakah Anda yakin ingin menghapus data inventaris ini?', 'Hapus Inventaris', 'Ya, Hapus');">
                                     @csrf @method('DELETE')
