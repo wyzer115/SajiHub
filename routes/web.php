@@ -57,6 +57,18 @@ Route::get('/pesan/{order}/receipt', [CustomerOrderController::class, 'showRecei
 Route::get('/pesan/{order}/status', [CustomerOrderController::class, 'checkStatus'])->name('pesan.status');
 
 
+use App\Http\Controllers\SuperAdmin\MaintenanceController;
+
+// Emergency Bypass Route for Maintenance
+Route::get('/maintenance/bypass', function (\Illuminate\Http\Request $request) {
+    $secret = $request->query('secret') ?? $request->query('token');
+    $validSecret = \App\Models\SystemSetting::get('maintenance_secret');
+    if ($secret && $validSecret && hash_equals($validSecret, $secret)) {
+        return redirect()->route('login')->withCookie(cookie('sajihub_maintenance_bypass', $validSecret, 1440))->with('success', 'Bypass maintenance aktif untuk perangkat Anda selama 24 jam.');
+    }
+    return redirect()->route('landing')->with('error', 'Token bypass tidak valid.');
+})->name('maintenance.bypass');
+
 // Super Admin Routes
 Route::prefix('superadmin')->middleware(['auth', 'role:superadmin'])->name('superadmin.')->group(function () {
     Route::get('/dashboard', [SuperAdminDashboard::class, 'index'])->name('dashboard');
@@ -66,6 +78,13 @@ Route::prefix('superadmin')->middleware(['auth', 'role:superadmin'])->name('supe
     Route::resource('branches', BranchController::class);
     Route::resource('users', SuperAdminUserController::class);
     Route::get('/reports', [SuperAdminReportController::class, 'index'])->name('reports');
+    
+    // Maintenance Mode Routes
+    Route::get('/maintenance', [MaintenanceController::class, 'index'])->name('maintenance.index');
+    Route::post('/maintenance', [MaintenanceController::class, 'update'])->name('maintenance.update');
+    Route::post('/maintenance/toggle', [MaintenanceController::class, 'toggle'])->name('maintenance.toggle');
+    Route::post('/maintenance/regenerate-secret', [MaintenanceController::class, 'regenerateSecret'])->name('maintenance.regenerate-secret');
+    Route::get('/maintenance/preview', [MaintenanceController::class, 'preview'])->name('maintenance.preview');
 });
 
 // Impersonate Leave Route

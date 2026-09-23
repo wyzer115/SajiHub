@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
             \App\Http\Middleware\BlockImpersonatorModifications::class,
+            \App\Http\Middleware\CheckSystemMaintenance::class,
         ]);
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,

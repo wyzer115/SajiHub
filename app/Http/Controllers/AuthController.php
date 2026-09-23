@@ -11,6 +11,12 @@ class AuthController extends Controller
     public function showLogin()
     {
         if (Auth::check()) {
+            if (\App\Models\SystemSetting::isMaintenanceMode() && !Auth::user()->isSuperAdmin()) {
+                Auth::logout();
+                session()->invalidate();
+                session()->regenerateToken();
+                return view('auth.login')->with('warning', 'Website sedang dalam mode pemeliharaan. Hanya Super Admin yang diizinkan masuk.');
+            }
             return redirect($this->redirectBasedOnRole(Auth::user()));
         }
         return view('auth.login');
@@ -59,8 +65,19 @@ class AuthController extends Controller
         ];
 
         if (Auth::attempt($credentials)) {
+            $user = Auth::user();
+
+            if (\App\Models\SystemSetting::isMaintenanceMode() && !$user->isSuperAdmin()) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+                return back()->withErrors([
+                    'login' => 'Sistem sedang dalam masa pemeliharaan (Maintenance Mode). Hanya Super Admin yang diizinkan masuk saat ini.',
+                ])->onlyInput('login');
+            }
+
             $request->session()->regenerate();
-            return redirect()->intended($this->redirectBasedOnRole(Auth::user()));
+            return redirect()->intended($this->redirectBasedOnRole($user));
         }
 
         return back()->withErrors([

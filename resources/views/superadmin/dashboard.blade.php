@@ -4,6 +4,55 @@
 
 @section('content')
 
+@php
+    $sysMaintenance = \App\Models\SystemSetting::getMaintenanceData();
+@endphp
+
+<!-- Website Maintenance Status Bar -->
+<div class="mb-8 rounded-3xl p-5 border transition-all shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4
+    {{ $sysMaintenance['active'] ? 'bg-red-500/10 border-red-500/30' : 'bg-white border-stone-200' }}">
+    <div class="flex items-center gap-4">
+        <div class="p-3 rounded-2xl {{ $sysMaintenance['active'] ? 'bg-red-500 text-white' : 'bg-emerald-50 text-emerald-600 border border-emerald-200' }} shrink-0">
+            @if($sysMaintenance['active'])
+                <svg class="w-6 h-6 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+            @else
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            @endif
+        </div>
+        <div>
+            <div class="flex items-center gap-2">
+                <span class="text-xs font-black uppercase tracking-wider {{ $sysMaintenance['active'] ? 'text-red-600' : 'text-emerald-600' }}">
+                    Status Website: {{ $sysMaintenance['active'] ? 'MODE MAINTENANCE (NON-AKTIF)' : 'ONLINE NORMAL' }}
+                </span>
+                <span class="w-2 h-2 rounded-full {{ $sysMaintenance['active'] ? 'bg-red-500 animate-ping' : 'bg-emerald-500' }}"></span>
+            </div>
+            <p class="text-xs text-stone-500 mt-0.5">
+                {{ $sysMaintenance['active'] 
+                    ? 'Pengunjung publik dan akun kasir/koki dialihkan ke halaman pemeliharaan 503.' 
+                    : 'Seluruh akses pelanggan dan operasional cabang berfungsi optimal.' }}
+            </p>
+        </div>
+    </div>
+    <div class="flex items-center gap-2 shrink-0">
+        <form action="{{ route('superadmin.maintenance.toggle') }}" method="POST" onsubmit="return confirm('{{ $sysMaintenance['active'] ? 'Kembalikan website online untuk publik?' : 'Aktifkan mode maintenance sekarang? Website akan non-aktif untuk umum.' }}')">
+            @csrf
+            <button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer
+                {{ $sysMaintenance['active'] 
+                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
+                    : 'bg-stone-100 hover:bg-red-50 text-stone-700 hover:text-red-600 border border-stone-200 hover:border-red-200' }}">
+                {{ $sysMaintenance['active'] ? 'Matikan Maintenance (Go Online)' : 'Aktifkan Maintenance' }}
+            </button>
+        </form>
+        <a href="{{ route('superadmin.maintenance.index') }}" class="px-4 py-2 rounded-xl text-xs font-bold bg-[#BD2000] hover:bg-[#8C0000] text-white shadow-sm transition-all">
+            Kelola
+        </a>
+    </div>
+</div>
+
 <!-- Stat Cards -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
     <!-- Card 1 -->

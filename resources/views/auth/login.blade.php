@@ -40,6 +40,29 @@
 
             <h2 class="text-xl font-black text-[#8C0000] mb-6 text-center">Masuk ke Akun Anda</h2>
             
+            @php
+                $isSysMaint = \App\Models\SystemSetting::isMaintenanceMode();
+            @endphp
+
+            @if($isSysMaint)
+                <div class="mb-5 bg-amber-50 border border-amber-300 text-amber-800 px-4 py-3 rounded-2xl text-xs flex items-start gap-2.5 shadow-sm">
+                    <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    <div>
+                        <span class="block font-black text-amber-900">Mode Maintenance Sedang Aktif</span>
+                        <span class="font-semibold text-amber-700">Akses publik & staf dinonaktifkan sementara. Hanya Super Admin yang diizinkan masuk.</span>
+                    </div>
+                </div>
+            @endif
+
+            @if(session('warning'))
+                <div class="mb-5 bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded-2xl text-xs font-bold flex items-center gap-2">
+                    <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span>{{ session('warning') }}</span>
+                </div>
+            @endif
+
             @if($errors->any())
                 <div class="mb-6 bg-red-500/10 border border-red-500/20 text-red-600 px-4 py-3 rounded-2xl text-xs font-bold flex items-center gap-2">
                     <svg class="w-4 h-4 text-red-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>

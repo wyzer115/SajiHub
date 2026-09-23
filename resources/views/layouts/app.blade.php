@@ -85,6 +85,7 @@
 <body class="bg-dark-950 text-dark-300 font-sans antialiased overflow-x-hidden">
     <x-impersonate-banner />
     <x-branch-status-banner />
+    <x-maintenance-banner />
     <x-checkout-modal />
 
     @php
@@ -143,6 +144,26 @@
                     <a href="{{ route('superadmin.users.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all {{ request()->routeIs('superadmin.users.*') ? 'bg-[#BD2000]/10 text-[#BD2000] border-l-4 border-[#BD2000] font-extrabold shadow-sm' : 'text-stone-600 hover:bg-stone-100 hover:text-[#BD2000] font-semibold' }}">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                         <span>Kelola Admin Cabang</span>
+                    </a>
+
+                    <div class="h-px bg-stone-200 my-3"></div>
+
+                    @php
+                        $isSysMaint = \App\Models\SystemSetting::isMaintenanceMode();
+                    @endphp
+                    <a href="{{ route('superadmin.maintenance.index') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm transition-all {{ request()->routeIs('superadmin.maintenance.*') ? 'bg-[#BD2000]/10 text-[#BD2000] border-l-4 border-[#BD2000] font-extrabold shadow-sm' : 'text-stone-600 hover:bg-stone-100 hover:text-[#BD2000] font-semibold' }}">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 {{ $isSysMaint ? 'text-red-600 animate-pulse' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            <span>Mode Maintenance</span>
+                        </div>
+                        @if($isSysMaint)
+                            <span class="px-2 py-0.5 text-[10px] font-black rounded-full bg-red-100 text-red-700 border border-red-200">AKTIF</span>
+                        @else
+                            <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200">Online</span>
+                        @endif
                     </a>
                 @endif
 
