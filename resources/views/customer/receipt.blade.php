@@ -6,9 +6,7 @@
     <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
     <title>Struk Digital #ORD-{{ $order->id }} — SajiHUB</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @endif
+    @include('partials.head-assets')
     <style>
         body {
             font-family: 'Outfit', sans-serif;

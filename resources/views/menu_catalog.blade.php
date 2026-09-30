@@ -22,9 +22,7 @@
             });
         };
     </script>
-    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @endif
+    @include('partials.head-assets')
     <style>
         body {
             font-family: 'Outfit', sans-serif;

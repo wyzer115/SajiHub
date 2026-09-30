@@ -6,9 +6,7 @@
     <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
     <title>Login - SajiHUB Enterprise</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @endif
+    @include('partials.head-assets')
 </head>
 <body class="bg-[#FAF8F5] text-[#1C1917] font-sans antialiased min-h-screen flex items-center justify-center relative overflow-y-auto py-8">
     
