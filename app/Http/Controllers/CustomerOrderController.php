@@ -63,7 +63,13 @@ class CustomerOrderController extends Controller
             $selectedBranch = $selectedTable->branch;
         }
 
+        if ($selectedBranch && $selectedBranch->status !== 'buka') {
+            $statusText = $selectedBranch->status === 'maintenance' ? 'sedang dalam pemeliharaan (maintenance)' : 'saat ini sedang tutup';
+            return redirect()->route('landing')->with('error', 'Mohon maaf, cabang ' . $selectedBranch->name . ' ' . $statusText . '. Silakan hubungi staf kami.');
+        }
+
         $menus = Menu::where('branch_id', $selectedBranch->id)
+            ->where('status', 'available')
             ->with(['category', 'ingredients.inventory'])
             ->get();
 
@@ -82,90 +88,145 @@ class CustomerOrderController extends Controller
             'payment_method' => 'required|in:cash,qris',
             'items'          => 'required|array|min:1',
             'items.*.menu_id'  => 'required|exists:menus,id',
-            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.quantity' => 'required|integer|min:1|max:100',
             'items.*.notes'    => 'nullable|string|max:500',
         ]);
 
-        $table = Table::findOrFail($validated['table_id']);
+        $branch = Branch::findOrFail($validated['branch_id']);
+        if ($branch->status !== 'buka') {
+            return redirect()->back()->with('error', 'Cabang ini sedang tidak dapat menerima pesanan (' . ucfirst($branch->status) . ').');
+        }
+
+        // Keamanan: Pastikan meja benar-benar milik cabang yang dipilih
+        $table = Table::where('id', $validated['table_id'])
+            ->where('branch_id', $branch->id)
+            ->first();
+
+        if (!$table) {
+            return redirect()->back()->with('error', 'Meja yang dipilih tidak valid untuk cabang ini.')->withInput();
+        }
+
         $customerName = trim($validated['customer_name']);
         $userId = auth()->check() ? auth()->id() : null;
 
         $order = null;
 
-        DB::transaction(function () use ($validated, $table, $customerName, $userId, &$order) {
-            $order = Order::create([
-                'branch_id'      => $validated['branch_id'],
-                'user_id'        => $userId,
-                'table_id'       => $table->id,
-                'customer_name'  => $customerName,
-                'order_status'   => 'pending',
-                'payment_status' => 'unpaid', // Dine-in customer must confirm & pay at cashier
-                'payment_method' => $validated['payment_method'],
-                'total_price'    => 0,
-                'confirmed_at'   => null, // Must be confirmed via QR scan by cashier
-            ]);
-
-            $totalPrice = 0;
-            $itemIdx = 0;
-            foreach ($validated['items'] as $item) {
-                $menu = Menu::with('ingredients.inventory')->find($item['menu_id']);
-                $itemNotes = $item['notes'] ?? null;
-                if ($itemIdx === 0 && !empty($validated['order_notes'])) {
-                    $itemNotes = $itemNotes ? ($itemNotes . ' | Note: ' . $validated['order_notes']) : ('Note: ' . $validated['order_notes']);
-                }
-                
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'menu_id'  => $menu->id,
-                    'quantity' => $item['quantity'],
-                    'price'    => $menu->price,
-                    'notes'    => $itemNotes,
+        try {
+            DB::transaction(function () use ($validated, $branch, $table, $customerName, $userId, &$order) {
+                $order = Order::create([
+                    'branch_id'      => $branch->id,
+                    'user_id'        => $userId,
+                    'table_id'       => $table->id,
+                    'customer_name'  => $customerName,
+                    'order_status'   => 'pending',
+                    'payment_status' => 'unpaid', // Dine-in customer must confirm & pay at cashier
+                    'payment_method' => $validated['payment_method'],
+                    'total_price'    => 0,
+                    'confirmed_at'   => null, // Must be confirmed via QR scan by cashier
                 ]);
-                $totalPrice += $menu->price * $item['quantity'];
-                $itemIdx++;
 
-                // Deduct inventory stock based on recipe (BOM)
-                if ($menu && $menu->ingredients) {
-                    foreach ($menu->ingredients as $ingredient) {
-                        if ($ingredient->inventory) {
-                            $usedQty = (float) $ingredient->quantity * (int) $item['quantity'];
-                            $currentStock = (float) $ingredient->inventory->stock;
-                            $ingredient->inventory->update([
-                                'stock' => max(0, round($currentStock - $usedQty, 2))
-                            ]);
+                $totalPrice = 0;
+                $itemIdx = 0;
+                foreach ($validated['items'] as $item) {
+                    // Keamanan: Pastikan menu aktif dan milik cabang yang valid
+                    $menu = Menu::with('ingredients.inventory')
+                        ->where('branch_id', $branch->id)
+                        ->where('status', 'available')
+                        ->find($item['menu_id']);
+
+                    if (!$menu) {
+                        throw new \Exception('Salah satu menu yang dipilih tidak tersedia di cabang ini.');
+                    }
+
+                    $itemNotes = $item['notes'] ?? null;
+                    if ($itemIdx === 0 && !empty($validated['order_notes'])) {
+                        $itemNotes = $itemNotes ? ($itemNotes . ' | Note: ' . $validated['order_notes']) : ('Note: ' . $validated['order_notes']);
+                    }
+                    
+                    OrderItem::create([
+                        'order_id' => $order->id,
+                        'menu_id'  => $menu->id,
+                        'quantity' => $item['quantity'],
+                        'price'    => $menu->price,
+                        'notes'    => $itemNotes,
+                    ]);
+                    $totalPrice += $menu->price * $item['quantity'];
+                    $itemIdx++;
+
+                    // Deduct inventory stock safely with row-level locking to avoid race condition
+                    if ($menu->ingredients) {
+                        foreach ($menu->ingredients as $ingredient) {
+                            if ($ingredient->inventory_id) {
+                                $inv = \App\Models\Inventory::where('id', $ingredient->inventory_id)
+                                    ->where('branch_id', $branch->id)
+                                    ->lockForUpdate()
+                                    ->first();
+
+                                if ($inv) {
+                                    $usedQty = (float) $ingredient->quantity * (int) $item['quantity'];
+                                    $currentStock = (float) $inv->stock;
+                                    $inv->update([
+                                        'stock' => max(0, round($currentStock - $usedQty, 2))
+                                    ]);
+                                }
+                            }
                         }
                     }
                 }
-            }
 
-            $order->update(['total_price' => $totalPrice]);
+                $order->update(['total_price' => $totalPrice]);
 
-            Transaction::create([
-                'order_id'       => $order->id,
-                'branch_id'      => $validated['branch_id'],
-                'amount'         => $totalPrice,
-                'payment_method' => $validated['payment_method'],
-                'status'         => 'pending',
-                'merchant_id'    => $validated['payment_method'] === 'qris' ? 'ID1026528881513' : null,
-                'paid_at'        => null,
-            ]);
+                Transaction::create([
+                    'order_id'       => $order->id,
+                    'branch_id'      => $branch->id,
+                    'amount'         => $totalPrice,
+                    'payment_method' => $validated['payment_method'],
+                    'status'         => 'pending',
+                    'merchant_id'    => $validated['payment_method'] === 'qris' ? 'ID1026528881513' : null,
+                    'paid_at'        => null,
+                ]);
 
-            // Update table status to occupied
-            $table->update(['status' => 'occupied']);
-        });
+                // Update table status to occupied
+                $table->update(['status' => 'occupied']);
+            });
 
-        return redirect()->route('pesan.receipt', $order->id)
-            ->with('success', 'Pesanan Anda #' . $order->id . ' berhasil dibuat. Silakan tunjukkan QR Konfirmasi ke Kasir!');
+            // Berikan izin akses struk di sesi pelanggan (Mencegah IDOR enumeration)
+            session()->put("customer_order_{$order->id}", true);
+            session()->push('customer_orders', $order->id);
+
+            return redirect()->route('pesan.receipt', $order->id)
+                ->with('success', 'Pesanan Anda #' . $order->id . ' berhasil dibuat. Silakan tunjukkan QR Konfirmasi ke Kasir!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal memproses pesanan: ' . $e->getMessage())->withInput();
+        }
     }
 
     public function showReceipt(Order $order)
     {
+        // Keamanan IDOR: Hanya izinkan pemilik sesi pesanan atau staf terautentikasi
+        if (!auth()->check()) {
+            $hasAccess = session()->get("customer_order_{$order->id}") 
+                || in_array($order->id, session()->get('customer_orders', []));
+            if (!$hasAccess) {
+                return redirect()->route('landing')->with('error', 'Sesi struk pesanan tidak ditemukan atau telah berakhir.');
+            }
+        }
+
         $order->load(['items.menu', 'branch', 'table', 'transaction']);
         return view('customer.receipt', compact('order'));
     }
 
     public function checkStatus(Order $order)
     {
+        // Keamanan IDOR: Hanya izinkan pemilik sesi pesanan atau staf terautentikasi
+        if (!auth()->check()) {
+            $hasAccess = session()->get("customer_order_{$order->id}") 
+                || in_array($order->id, session()->get('customer_orders', []));
+            if (!$hasAccess) {
+                return response()->json(['error' => 'Unauthorized'], 403);
+            }
+        }
+
         return response()->json([
             'payment_status' => $order->payment_status,
             'order_status'   => $order->order_status,

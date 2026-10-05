@@ -70,6 +70,8 @@
             min-height: 260px !important;
             max-height: 380px !important;
             display: block !important;
+            transform: scaleX(1) !important;
+            -webkit-transform: scaleX(1) !important;
         }
         #qr-reader img[alt="Info icon"],
         #qr-reader__header_message,
@@ -770,6 +772,8 @@
                     videoEl.style.minHeight = '260px';
                     videoEl.style.objectFit = 'cover';
                     videoEl.style.display = 'block';
+                    videoEl.style.transform = 'scaleX(1)';
+                    videoEl.style.webkitTransform = 'scaleX(1)';
                 }
             }).catch(err => {
                 console.warn("Primary camera start failed for", currentFacingMode, err);
@@ -789,6 +793,8 @@
                         videoEl.style.minHeight = '260px';
                         videoEl.style.objectFit = 'cover';
                         videoEl.style.display = 'block';
+                        videoEl.style.transform = 'scaleX(1)';
+                        videoEl.style.webkitTransform = 'scaleX(1)';
                     }
                 }).catch(e => {
                     // Final fallback: unconstrained any camera device
@@ -805,6 +811,8 @@
                             videoEl.style.minHeight = '260px';
                             videoEl.style.objectFit = 'cover';
                             videoEl.style.display = 'block';
+                            videoEl.style.transform = 'scaleX(1)';
+                            videoEl.style.webkitTransform = 'scaleX(1)';
                         }
                     }).catch(e2 => {
                         console.error("Camera error:", e2);

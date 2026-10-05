@@ -79,16 +79,22 @@
         }
     </script>
     @endif
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
 </head>
 <body class="bg-dark-950 text-dark-300 font-sans antialiased overflow-x-hidden">
-    <x-impersonate-banner />
-    <x-branch-status-banner />
-    <x-maintenance-banner />
-    <x-checkout-modal />
-
     @php
         $user = auth()->user();
     @endphp
+
+    <x-impersonate-banner />
+    <x-branch-status-banner />
+    <x-maintenance-banner />
+    
+    @if($user && $user->isKasir())
+        <x-checkout-modal />
+    @endif
 
     <div class="flex h-screen overflow-hidden">
 
@@ -99,8 +105,11 @@
         <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-50 w-[260px] bg-white border-r border-stone-200 transform -translate-x-full lg:translate-x-0 sidebar-transition flex flex-col h-full shadow-xl">
             <!-- Logo Area -->
             <div class="h-16 flex items-center px-6 border-b border-stone-200 bg-white">
-                <a href="{{ route('landing') }}" class="flex items-center">
-                    <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-9 w-auto object-contain drop-shadow-sm">
+                <a href="{{ route('landing') }}" class="flex items-center gap-2.5 group">
+                    <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-9 w-auto object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-300">
+                    <span class="font-black text-xl tracking-tight text-[#8C0000] leading-none group-hover:opacity-90 transition-opacity">
+                        Saji<span class="text-[#FFBE0F]">HUB</span>
+                    </span>
                 </a>
             </div>
 
@@ -281,12 +290,12 @@
         <!-- Main Content Area -->
         <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
             <!-- Header Bar -->
-            <header class="h-16 bg-white border-b border-stone-200 flex items-center justify-between px-6 z-30 shadow-sm">
-                <div class="flex items-center gap-4">
-                    <button id="sidebar-toggle" class="p-2 text-stone-500 hover:text-[#BD2000] lg:hidden rounded-xl hover:bg-stone-100 transition-colors">
+            <header class="h-16 bg-white border-b border-stone-200 flex items-center justify-between px-4 sm:px-6 z-30 shadow-sm">
+                <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+                    <button id="sidebar-toggle" class="p-2 text-stone-500 hover:text-[#BD2000] lg:hidden rounded-xl hover:bg-stone-100 transition-colors shrink-0" aria-label="Buka Menu">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                     </button>
-                    <div>
+                    <div class="min-w-0">
                         <!-- Breadcrumb -->
                         <nav class="hidden sm:flex items-center gap-1.5 text-[11px] font-semibold text-stone-400 mb-0.5" aria-label="Breadcrumb">
                             @hasSection('breadcrumb')
@@ -308,14 +317,14 @@
                                 <span class="text-stone-600 font-bold">@yield('page-title', 'Beranda')</span>
                             @endif
                         </nav>
-                        <h1 class="text-base sm:text-lg font-black text-[#8C0000] tracking-tight leading-tight">@yield('page-title', 'Beranda')</h1>
+                        <h1 class="text-base sm:text-lg font-black text-[#8C0000] tracking-tight leading-tight truncate">@yield('page-title', 'Beranda')</h1>
                     </div>
                 </div>
 
                 <!-- User Dropdown & Status -->
-                <div class="flex items-center gap-3 sm:gap-4">
+                <div class="flex items-center gap-2 sm:gap-4 shrink-0">
                     <!-- Status Kasir Online Badge -->
-                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold shadow-xs">
+                    <div class="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] sm:text-xs font-bold shadow-xs">
                         <span class="relative flex h-2 w-2">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                             <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -326,7 +335,7 @@
                     </div>
 
                     @if($user)
-                    <div class="flex items-center gap-3 border-l border-stone-200 pl-3 sm:pl-4">
+                    <div class="flex items-center gap-2 sm:gap-3 border-l border-stone-200 pl-2.5 sm:pl-4">
                         <div class="text-right hidden sm:block">
                             <div class="text-sm font-extrabold text-[#1C1917] leading-tight">{{ $user->name }}</div>
                             <div class="text-xs text-[#BD2000] font-bold capitalize">
@@ -339,7 +348,7 @@
                                 @else {{ $user->role }} @endif
                             </div>
                         </div>
-                        <div class="w-9 h-9 rounded-full bg-[#BD2000]/10 border border-[#BD2000]/30 flex items-center justify-center text-[#BD2000] font-black text-sm">
+                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#BD2000]/10 border border-[#BD2000]/30 flex items-center justify-center text-[#BD2000] font-black text-xs sm:text-sm shadow-xs shrink-0">
                             {{ substr($user->name, 0, 1) }}
                         </div>
                     </div>
@@ -348,7 +357,7 @@
             </header>
 
             <!-- Main Content Container -->
-            <main class="flex-1 overflow-y-auto p-6 md:p-8 bg-[#FAF8F5] text-[#1C1917]">
+            <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-[#FAF8F5] text-[#1C1917] overflow-x-hidden">
                 <x-alert />
                 @yield('content')
             </main>

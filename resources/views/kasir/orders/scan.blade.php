@@ -9,24 +9,24 @@
 @endsection
 
 @section('content')
-<div class="max-w-6xl mx-auto space-y-6 animate-fade-in-up">
+<div class="max-w-6xl mx-auto space-y-4 sm:space-y-6 animate-fade-in-up overflow-x-hidden">
     <!-- 1. Banner Header Atas -->
-    <div class="bg-gradient-to-r from-[#BD2000] via-[#A01600] to-[#8C0000] rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative overflow-hidden">
-        <div class="space-y-2 z-10 max-w-xl">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-white/15 text-white backdrop-blur-sm border border-white/20">
+    <div class="bg-gradient-to-r from-[#BD2000] via-[#A01600] to-[#8C0000] rounded-2xl sm:rounded-3xl p-5 sm:p-8 text-white shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-6 relative overflow-hidden">
+        <div class="space-y-1.5 sm:space-y-2 z-10 max-w-xl">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] sm:text-xs font-bold uppercase tracking-wider bg-white/15 text-white backdrop-blur-sm border border-white/20">
                 <span class="relative flex h-2 w-2">
                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                     <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
                 </span>
                 <span>Kamera Siap</span>
             </div>
-            <h2 class="text-2xl sm:text-3xl font-black tracking-tight leading-tight">Pindai QR Pelanggan</h2>
+            <h2 class="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight leading-tight">Pindai QR Pelanggan</h2>
             <p class="text-xs sm:text-sm text-stone-100 font-medium leading-relaxed">
                 Arahkan kamera ke kode QR pelanggan untuk memeriksa rincian pesanan dan menyelesaikan pembayaran.
             </p>
         </div>
-        <div class="z-10 shrink-0 flex items-center gap-3">
-            <a href="{{ route('kasir.orders.index') }}" class="px-4 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 active:scale-95 text-white text-xs font-bold border border-white/25 transition-all flex items-center gap-2 shadow-xs">
+        <div class="z-10 w-full sm:w-auto shrink-0 flex items-center">
+            <a href="{{ route('kasir.orders.index') }}" class="w-full sm:w-auto justify-center px-4 py-3 sm:py-2.5 rounded-xl bg-white/15 hover:bg-white/25 active:scale-95 text-white text-xs sm:text-sm font-bold border border-white/25 transition-all flex items-center gap-2 shadow-xs min-h-[44px] sm:min-h-0">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                 <span>Lihat Daftar Pesanan</span>
             </a>
@@ -37,13 +37,13 @@
     </div>
 
     <!-- 2. Area Utama: 2 Kartu Berdampingan yang Sejajar -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6 items-stretch">
         <!-- Kartu Kiri: Kamera Scanner -->
-        <div class="bg-white border border-stone-200 rounded-3xl p-6 shadow-sm h-full flex flex-col justify-between space-y-5">
+        <div class="bg-white border border-stone-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-sm h-full flex flex-col justify-between space-y-4 sm:space-y-5">
             <!-- Header Kartu Kiri -->
-            <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-stone-200">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 sm:pb-4 border-b border-stone-200">
                 <div class="flex items-center gap-2.5">
-                    <div class="w-9 h-9 rounded-xl bg-[#BD2000]/10 text-[#BD2000] flex items-center justify-center font-bold text-sm">
+                    <div class="w-9 h-9 rounded-xl bg-[#BD2000]/10 text-[#BD2000] flex items-center justify-center font-bold text-sm shrink-0">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -56,37 +56,37 @@
                 </div>
 
                 <!-- Controls & Action Button -->
-                <div class="flex items-center gap-2">
+                <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                     <select id="camera-select" onchange="changeSelectedCamera(this.value)" class="hidden text-xs bg-stone-100 hover:bg-stone-200 border border-stone-300 rounded-xl px-2.5 py-1.5 font-bold text-stone-700 focus:outline-none cursor-pointer">
                     </select>
 
-                    <button type="button" id="torch-btn" onclick="toggleTorch()" class="hidden px-2.5 py-1.5 rounded-xl bg-stone-100 hover:bg-amber-100 text-stone-700 hover:text-amber-800 text-xs font-bold transition-all border border-stone-200 flex items-center gap-1 cursor-pointer" title="Nyalakan Lampu Senter">
+                    <button type="button" id="torch-btn" onclick="toggleTorch()" class="hidden px-2.5 py-2 sm:py-1.5 rounded-xl bg-stone-100 hover:bg-amber-100 text-stone-700 hover:text-amber-800 text-xs font-bold transition-all border border-stone-200 flex items-center gap-1 cursor-pointer" title="Nyalakan Lampu Senter">
                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                         </svg>
                         <span>Senter</span>
                     </button>
 
-                    <button type="button" id="zoom-btn" onclick="cycleZoom()" class="hidden px-2.5 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold transition-all border border-stone-200 flex items-center gap-1 cursor-pointer" title="Zoom Kamera">
+                    <button type="button" id="zoom-btn" onclick="cycleZoom()" class="hidden px-2.5 py-2 sm:py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold transition-all border border-stone-200 flex items-center gap-1 cursor-pointer" title="Zoom Kamera">
                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/>
                         </svg>
                         <span id="zoom-text">1x</span>
                     </button>
 
-                    <button type="button" id="flip-cam-btn" onclick="toggleCameraFacing()" class="px-2.5 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold transition-all border border-stone-200 flex items-center gap-1.5 cursor-pointer shadow-xs" title="Ganti Kamera Depan atau Belakang">
+                    <button type="button" id="flip-cam-btn" onclick="toggleCameraFacing()" class="flex-1 sm:flex-none justify-center px-3 py-2.5 sm:py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold transition-all border border-stone-200 flex items-center gap-1.5 cursor-pointer shadow-xs min-h-[44px] sm:min-h-0" title="Ganti Kamera Depan atau Belakang">
                         <svg class="w-3.5 h-3.5 text-[#BD2000]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                         </svg>
                         <span id="flip-cam-text">Kamera Depan</span>
                     </button>
 
-                    <button type="button" onclick="startScanner()" id="start-btn" class="px-3.5 py-1.5 rounded-xl bg-[#BD2000] hover:bg-[#8C0000] active:scale-95 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer">
-                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/></svg>
+                    <button type="button" onclick="startScanner()" id="start-btn" class="w-full sm:w-auto justify-center px-4 py-3 sm:py-1.5 rounded-xl bg-[#BD2000] hover:bg-[#8C0000] active:scale-95 text-white text-xs sm:text-sm font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer min-h-[44px] sm:min-h-0">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/></svg>
                         <span>Nyalakan Kamera</span>
                     </button>
 
-                    <button type="button" onclick="stopScanner()" id="stop-btn" class="hidden px-3.5 py-1.5 rounded-xl bg-stone-200 hover:bg-stone-300 active:scale-95 text-stone-700 text-xs font-bold transition-all flex items-center gap-1 cursor-pointer">
+                    <button type="button" onclick="stopScanner()" id="stop-btn" class="hidden w-full sm:w-auto justify-center px-4 py-3 sm:py-1.5 rounded-xl bg-stone-200 hover:bg-stone-300 active:scale-95 text-stone-700 text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 cursor-pointer min-h-[44px] sm:min-h-0">
                         <span>Matikan Kamera</span>
                     </button>
                 </div>
@@ -94,12 +94,12 @@
 
             <!-- Viewfinder Area Container: Perfect Centering -->
             <div class="flex-1 flex flex-col justify-center">
-                <div id="scanner-viewfinder-container" class="relative bg-stone-950 rounded-2xl overflow-hidden flex flex-col items-center justify-center text-center border border-stone-800 shadow-inner w-full min-h-[380px]" style="background-color: #0c0a09;">
-                    <div id="reader" style="width: 100%; min-height: 380px;"></div>
+                <div id="scanner-viewfinder-container" class="relative bg-stone-950 rounded-2xl overflow-hidden flex flex-col items-center justify-center text-center border border-stone-800 shadow-inner w-full min-h-[280px] sm:min-h-[380px]" style="background-color: #0c0a09;">
+                    <div id="reader" style="width: 100%; min-height: 280px;"></div>
 
                     <!-- Laser Target Box Overlay & Reticle Guides -->
                     <div id="scanner-laser-overlay" class="hidden absolute inset-0 pointer-events-none flex items-center justify-center">
-                        <div id="scanner-target-box" class="w-64 h-64 border-2 border-dashed border-emerald-400/80 rounded-2xl relative shadow-[0_0_25px_rgba(16,185,129,0.35)] transition-all duration-200">
+                        <div id="scanner-target-box" class="w-52 h-52 sm:w-64 sm:h-64 max-w-[75vw] max-h-[75vw] border-2 border-dashed border-emerald-400/80 rounded-2xl relative shadow-[0_0_25px_rgba(16,185,129,0.35)] transition-all duration-200">
                             <div class="absolute -top-1 -left-1 w-6 h-6 border-t-4 border-l-4 border-emerald-400 rounded-tl-lg"></div>
                             <div class="absolute -top-1 -right-1 w-6 h-6 border-t-4 border-r-4 border-emerald-400 rounded-tr-lg"></div>
                             <div class="absolute -bottom-1 -left-1 w-6 h-6 border-b-4 border-l-4 border-emerald-400 rounded-bl-lg"></div>
@@ -109,9 +109,9 @@
                     </div>
 
                     <!-- Idle Placeholder: Exact Center Positioned -->
-                    <div id="scanner-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-center p-6 space-y-3.5 text-stone-400 z-10">
-                        <div class="w-14 h-14 rounded-2xl bg-stone-900 border border-stone-800 text-stone-400 flex items-center justify-center mx-auto shadow-inner">
-                            <svg class="w-7 h-7 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div id="scanner-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-center p-4 sm:p-6 space-y-3 sm:space-y-3.5 text-stone-400 z-10">
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-stone-900 border border-stone-800 text-stone-400 flex items-center justify-center mx-auto shadow-inner">
+                            <svg class="w-6 h-6 sm:w-7 sm:h-7 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
                             </svg>
                         </div>
@@ -124,7 +124,7 @@
             </div>
 
             <!-- Catatan kecil di bawah kamera -->
-            <div class="p-3.5 bg-stone-50 border border-stone-200 rounded-2xl flex items-center gap-3">
+            <div class="p-3 sm:p-3.5 bg-stone-50 border border-stone-200 rounded-xl sm:rounded-2xl flex items-center gap-2.5 sm:gap-3">
                 <svg class="w-4 h-4 text-stone-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -133,11 +133,11 @@
         </div>
 
         <!-- Kartu Kanan: Input Manual Nomor Nota -->
-        <div class="bg-white border border-stone-200 rounded-3xl p-6 shadow-sm h-full flex flex-col justify-between space-y-5">
+        <div class="bg-white border border-stone-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-sm h-full flex flex-col justify-between space-y-4 sm:space-y-5">
             <!-- Header Kartu Kanan -->
-            <div class="flex items-center justify-between pb-4 border-b border-stone-200">
+            <div class="flex items-center justify-between pb-3 sm:pb-4 border-b border-stone-200">
                 <div class="flex items-center gap-2.5">
-                    <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-sm">
+                    <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-sm shrink-0">
                         <svg class="w-5 h-5 text-amber-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
                         </svg>
@@ -151,9 +151,9 @@
             </div>
 
             <!-- Form Input Manual yang mengisi ruang secara proporsional -->
-            <form onsubmit="handleManualSearch(event)" class="flex-1 flex flex-col justify-between py-2 space-y-6">
-                <div class="space-y-4 my-auto">
-                    <div class="space-y-1.5">
+            <form onsubmit="handleManualSearch(event)" class="flex-1 flex flex-col justify-between py-1 sm:py-2 space-y-5 sm:space-y-6">
+                <div class="space-y-3 sm:space-y-4 my-auto">
+                    <div class="space-y-1">
                         <label for="manual_code" class="block text-xs font-extrabold text-stone-700 uppercase tracking-wider">
                             Nomor Nota
                         </label>
@@ -162,9 +162,9 @@
                         </p>
                     </div>
 
-                    <div class="space-y-2">
+                    <div class="space-y-1.5 sm:space-y-2">
                         <input type="text" id="manual_code" name="manual_code" placeholder="Masukkan nomor nota..." required
-                               class="w-full bg-stone-50 border border-stone-300 text-[#1C1917] font-mono font-bold text-lg rounded-2xl px-5 py-4 focus:border-[#BD2000] focus:bg-white focus:outline-none uppercase tracking-wide transition-all shadow-inner placeholder:normal-case placeholder:font-normal placeholder:text-stone-400 placeholder:text-sm">
+                               class="w-full bg-stone-50 border border-stone-300 text-[#1C1917] font-mono font-bold text-base sm:text-lg rounded-xl sm:rounded-2xl px-4 sm:px-5 py-3.5 sm:py-4 focus:border-[#BD2000] focus:bg-white focus:outline-none uppercase tracking-wide transition-all shadow-inner placeholder:normal-case placeholder:font-normal placeholder:text-stone-400 placeholder:text-xs sm:placeholder:text-sm">
                         <p class="text-xs text-stone-500 font-medium">
                             Dapat memasukkan kode nota lengkap atau nomor pesanan.
                         </p>
@@ -174,7 +174,7 @@
                 <!-- Tombol Submit Utama: Cari Pesanan -->
                 <div>
                     <button type="submit" id="manual-btn"
-                            class="w-full py-4 px-6 bg-[#BD2000] hover:bg-[#8C0000] active:scale-[0.99] text-white font-extrabold text-sm rounded-2xl transition-all shadow-md flex items-center justify-center gap-2.5 cursor-pointer">
+                            class="w-full py-3.5 sm:py-4 px-6 bg-[#BD2000] hover:bg-[#8C0000] active:scale-[0.99] text-white font-extrabold text-sm sm:text-base rounded-xl sm:rounded-2xl transition-all shadow-md flex items-center justify-center gap-2.5 cursor-pointer min-h-[48px]">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
@@ -184,7 +184,7 @@
             </form>
 
             <!-- Catatan kecil di bawah kartu kanan sejajar dengan kartu kiri -->
-            <div class="p-3.5 bg-stone-50 border border-stone-200 rounded-2xl flex items-center gap-3">
+            <div class="p-3 sm:p-3.5 bg-stone-50 border border-stone-200 rounded-xl sm:rounded-2xl flex items-center gap-2.5 sm:gap-3">
                 <svg class="w-4 h-4 text-stone-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -195,18 +195,18 @@
 </div>
 
 <!-- Modal Verifikasi dan Pembayaran Pesanan -->
-<div id="verify-modal" class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="bg-white border border-stone-200 w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl transition-all my-8 animate-fade-in">
+<div id="verify-modal" class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white border border-stone-200 w-full max-w-2xl rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl transition-all my-auto sm:my-8 animate-fade-in">
         <!-- Modal Header -->
-        <div class="px-6 py-4 border-b border-stone-200 flex justify-between items-center bg-stone-50">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-[#BD2000]/10 text-[#BD2000] flex items-center justify-center font-bold text-lg">
+        <div class="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-stone-200 flex justify-between items-center bg-stone-50">
+            <div class="flex items-center gap-2.5 sm:gap-3">
+                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#BD2000]/10 text-[#BD2000] flex items-center justify-center font-bold text-base sm:text-lg shrink-0">
                     <svg class="w-5 h-5 text-[#BD2000]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
                 </div>
                 <div>
-                    <h3 class="text-base font-black text-[#8C0000] leading-tight">Konfirmasi Pembayaran Pesanan</h3>
+                    <h3 class="text-sm sm:text-base font-black text-[#8C0000] leading-tight">Konfirmasi Pembayaran Pesanan</h3>
                     <p class="text-xs text-stone-500 font-medium">Nomor Nota: <span class="font-mono font-black text-stone-900" id="modal-order-code">-</span></p>
                 </div>
             </div>
@@ -216,7 +216,7 @@
         </div>
 
         <!-- Modal Body -->
-        <div class="p-6 space-y-5 max-h-[calc(100vh-14rem)] overflow-y-auto scrollbar-thin">
+        <div class="p-4 sm:p-6 space-y-4 sm:space-y-5 max-h-[calc(100vh-8rem)] sm:max-h-[calc(100vh-14rem)] overflow-y-auto scrollbar-thin">
             <!-- Order Meta Pill -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div class="p-3 bg-stone-50 rounded-2xl border border-stone-200 text-center">
@@ -277,11 +277,11 @@
                     </div>
 
                     <!-- Quick buttons -->
-                    <div class="flex flex-wrap gap-2">
-                        <button type="button" onclick="setExactModalCash()" class="py-1.5 px-3 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold rounded-xl transition-colors cursor-pointer">Uang Pas</button>
-                        <button type="button" onclick="addModalCash(50000)" class="py-1.5 px-3 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold rounded-xl transition-colors cursor-pointer">+50.000</button>
-                        <button type="button" onclick="addModalCash(100000)" class="py-1.5 px-3 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold rounded-xl transition-colors cursor-pointer">+100.000</button>
-                        <button type="button" onclick="resetModalCash()" class="py-1.5 px-3 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-bold rounded-xl transition-colors cursor-pointer">Hitung Ulang</button>
+                    <div class="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
+                        <button type="button" onclick="setExactModalCash()" class="py-2 sm:py-1.5 px-3 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold rounded-xl transition-colors cursor-pointer">Uang Pas</button>
+                        <button type="button" onclick="addModalCash(50000)" class="py-2 sm:py-1.5 px-3 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold rounded-xl transition-colors cursor-pointer">+50.000</button>
+                        <button type="button" onclick="addModalCash(100000)" class="py-2 sm:py-1.5 px-3 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold rounded-xl transition-colors cursor-pointer">+100.000</button>
+                        <button type="button" onclick="resetModalCash()" class="py-2 sm:py-1.5 px-3 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-bold rounded-xl transition-colors cursor-pointer">Hitung Ulang</button>
                     </div>
 
                     <!-- Change Display -->
@@ -345,30 +345,52 @@
 <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 <style>
     #scanner-viewfinder-container {
-        min-height: 380px !important;
+        min-height: 280px !important;
         background-color: #0c0a09 !important;
         position: relative !important;
+    }
+    @media (min-width: 640px) {
+        #scanner-viewfinder-container {
+            min-height: 380px !important;
+        }
     }
     #reader {
         border: none !important;
         width: 100% !important;
-        min-height: 380px !important;
+        min-height: 280px !important;
         background: #0c0a09 !important;
         position: relative !important;
+    }
+    @media (min-width: 640px) {
+        #reader {
+            min-height: 380px !important;
+        }
     }
     #reader video {
         border-radius: 1rem !important;
         object-fit: cover !important;
         width: 100% !important;
         height: 100% !important;
-        min-height: 380px !important;
+        min-height: 280px !important;
         max-height: 480px !important;
         display: block !important;
+        transform: scaleX(1) !important;
+        -webkit-transform: scaleX(1) !important;
+    }
+    @media (min-width: 640px) {
+        #reader video {
+            min-height: 380px !important;
+        }
     }
     #reader__scan_region {
         border: none !important;
         width: 100% !important;
-        min-height: 380px !important;
+        min-height: 280px !important;
+    }
+    @media (min-width: 640px) {
+        #reader__scan_region {
+            min-height: 380px !important;
+        }
     }
     #reader__dashboard { border: none !important; }
     #reader__dashboard_section_csr, #reader__dashboard_section_swaplink, #reader__status_span, #reader canvas {
@@ -563,9 +585,11 @@
             if (videoEl) {
                 videoEl.style.width = '100%';
                 videoEl.style.height = '100%';
-                videoEl.style.minHeight = '380px';
+                videoEl.style.minHeight = window.innerWidth < 640 ? '280px' : '380px';
                 videoEl.style.objectFit = 'cover';
                 videoEl.style.display = 'block';
+                videoEl.style.transform = 'scaleX(1)';
+                videoEl.style.webkitTransform = 'scaleX(1)';
             }
 
             try {
@@ -599,9 +623,11 @@
                 if (videoEl) {
                     videoEl.style.width = '100%';
                     videoEl.style.height = '100%';
-                    videoEl.style.minHeight = '380px';
+                    videoEl.style.minHeight = window.innerWidth < 640 ? '280px' : '380px';
                     videoEl.style.objectFit = 'cover';
                     videoEl.style.display = 'block';
+                    videoEl.style.transform = 'scaleX(1)';
+                    videoEl.style.webkitTransform = 'scaleX(1)';
                 }
             }).catch(e2 => {
                 // Final fallback: unconstrained any camera device
@@ -617,9 +643,11 @@
                     if (videoEl) {
                         videoEl.style.width = '100%';
                         videoEl.style.height = '100%';
-                        videoEl.style.minHeight = '380px';
+                        videoEl.style.minHeight = window.innerWidth < 640 ? '280px' : '380px';
                         videoEl.style.objectFit = 'cover';
                         videoEl.style.display = 'block';
+                        videoEl.style.transform = 'scaleX(1)';
+                        videoEl.style.webkitTransform = 'scaleX(1)';
                     }
                 }).catch(e3 => {
                     alert('Akses kamera belum diizinkan pada peramban ini.');

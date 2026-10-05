@@ -8,8 +8,11 @@ use App\Models\Menu;
 use App\Models\Table;
 use App\Models\OrderItem;
 use App\Models\Transaction;
+use App\Models\Inventory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class OrderController extends Controller
 {
@@ -119,7 +122,7 @@ class OrderController extends Controller
         $validated = $request->validate([
             'payment_method' => 'nullable|in:cash,qris',
             'cash_paid'      => 'nullable|numeric|min:0',
-            'payment_proof'  => 'nullable|image|max:10240', // max 10MB
+            'payment_proof'  => 'nullable|file|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
 
         // Gunakan metode pembayaran yang telah dipilih customer saat memesan
@@ -139,7 +142,8 @@ class OrderController extends Controller
 
             if ($request->hasFile('payment_proof')) {
                 $file = $request->file('payment_proof');
-                $filename = 'proof_' . $order->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+                $extension = strtolower($file->extension() ?: 'jpg');
+                $filename = 'proof_' . $order->id . '_' . Str::random(24) . '.' . $extension;
                 $destinationPath = public_path('uploads/payment_proofs');
                 if (!file_exists($destinationPath)) {
                     mkdir($destinationPath, 0755, true);
@@ -199,51 +203,71 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'customer_name' => 'required|string|max:255',
-            'payment_method' => 'nullable|in:cash,qris',
-            'items' => 'required|array|min:1',
-            'items.*.menu_id' => 'required|exists:menus,id',
-            'items.*.quantity' => 'required|integer|min:1',
-            'items.*.notes' => 'nullable|string',
+            'customer_name'    => 'required|string|max:255',
+            'payment_method'   => 'nullable|in:cash,qris',
+            'items'            => 'required|array|min:1',
+            'items.*.menu_id'  => [
+                'required',
+                Rule::exists('menus', 'id')->where('branch_id', auth()->user()->branch_id)
+            ],
+            'items.*.quantity' => 'required|integer|min:1|max:100',
+            'items.*.notes'    => 'nullable|string|max:500',
         ]);
 
         $order = null;
 
         DB::transaction(function () use ($validated, &$order) {
+            $branchId = auth()->user()->branch_id;
+
             // Cashier POS orders are strictly Takeaway (no table)
             $order = Order::create([
-                'branch_id' => auth()->user()->branch_id,
-                'user_id' => auth()->user()->id,
-                'table_id' => null, // Strictly Takeaway in Cashier POS
-                'customer_name' => $validated['customer_name'],
-                'order_status' => 'pending',
+                'branch_id'      => $branchId,
+                'user_id'        => auth()->id(),
+                'table_id'       => null, // Strictly Takeaway in Cashier POS
+                'customer_name'  => $validated['customer_name'],
+                'order_status'   => 'pending',
                 'payment_status' => 'unpaid',
                 'payment_method' => $validated['payment_method'] ?? 'cash',
-                'total_price' => 0,
-                'confirmed_at' => now(), // Handled directly by cashier at POS counter
+                'total_price'    => 0,
+                'confirmed_at'   => now(), // Handled directly by cashier at POS counter
             ]);
 
             $totalPrice = 0;
             foreach ($validated['items'] as $item) {
-                $menu = Menu::with('ingredients.inventory')->find($item['menu_id']);
+                $menu = Menu::where('branch_id', $branchId)
+                    ->where('status', 'available')
+                    ->with('ingredients.inventory')
+                    ->find($item['menu_id']);
+
+                if (!$menu) {
+                    throw new \Exception('Salah satu menu tidak tersedia di cabang ini.');
+                }
+
                 OrderItem::create([
                     'order_id' => $order->id,
-                    'menu_id' => $menu->id,
+                    'menu_id'  => $menu->id,
                     'quantity' => $item['quantity'],
-                    'price' => $menu->price,
-                    'notes' => $item['notes'] ?? null,
+                    'price'    => $menu->price,
+                    'notes'    => $item['notes'] ?? null,
                 ]);
                 $totalPrice += $menu->price * $item['quantity'];
 
-                // Deduct inventory stock based on recipe (BOM)
-                if ($menu && $menu->ingredients) {
+                // Deduct inventory stock safely with row-level locking
+                if ($menu->ingredients) {
                     foreach ($menu->ingredients as $ingredient) {
-                        if ($ingredient->inventory) {
-                            $usedQty = (float) $ingredient->quantity * (int) $item['quantity'];
-                            $currentStock = (float) $ingredient->inventory->stock;
-                            $ingredient->inventory->update([
-                                'stock' => max(0, round($currentStock - $usedQty, 2))
-                            ]);
+                        if ($ingredient->inventory_id) {
+                            $inv = Inventory::where('id', $ingredient->inventory_id)
+                                ->where('branch_id', $branchId)
+                                ->lockForUpdate()
+                                ->first();
+
+                            if ($inv) {
+                                $usedQty = (float) $ingredient->quantity * (int) $item['quantity'];
+                                $currentStock = (float) $inv->stock;
+                                $inv->update([
+                                    'stock' => max(0, round($currentStock - $usedQty, 2))
+                                ]);
+                            }
                         }
                     }
                 }
@@ -355,10 +379,11 @@ class OrderController extends Controller
             'status'         => 'required|in:pending,completed,cancelled',
             'cash_paid'      => 'nullable|numeric|min:0',
             'merchant_id'    => 'nullable|string',
+            'payment_proof'  => 'nullable|file|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
 
         try {
-            DB::transaction(function () use ($validated, $order, &$transaction) {
+            DB::transaction(function () use ($validated, $order, $request, &$transaction) {
                 $amount = floatval($order->total_price);
                 $isTakeaway = ($order->table_id === null);
                 $newOrderStatus = $isTakeaway 
@@ -404,7 +429,8 @@ class OrderController extends Controller
                         $proofPath = null;
                         if ($request->hasFile('payment_proof')) {
                             $file = $request->file('payment_proof');
-                            $filename = 'proof_' . $order->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+                            $extension = strtolower($file->extension() ?: 'jpg');
+                            $filename = 'proof_' . $order->id . '_' . Str::random(24) . '.' . $extension;
                             $destinationPath = public_path('uploads/payment_proofs');
                             if (!file_exists($destinationPath)) {
                                 mkdir($destinationPath, 0755, true);

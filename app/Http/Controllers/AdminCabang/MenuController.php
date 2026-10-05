@@ -8,6 +8,8 @@ use App\Models\Category;
 use App\Models\Inventory;
 use App\Models\MenuIngredient;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class MenuController extends Controller
 {
@@ -43,16 +45,24 @@ class MenuController extends Controller
 
     public function store(Request $request)
     {
+        $branchId = auth()->user()->branch_id;
+
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'category_id' => 'required|exists:categories,id',
-            'price' => 'required|numeric|min:0',
-            'status' => 'required|in:available,sold_out',
-            'image' => 'nullable|file|image|max:2048',
-            'image_url' => 'nullable|string|max:1000',
-            'ingredients' => 'nullable|array',
-            'ingredients.*.inventory_id' => 'required_with:ingredients.*.quantity|exists:inventories,id',
-            'ingredients.*.quantity' => 'required_with:ingredients.*.inventory_id|numeric|min:0.001',
+            'name'                      => 'required|string|max:255',
+            'category_id'               => [
+                'required',
+                Rule::exists('categories', 'id')->where('branch_id', $branchId)
+            ],
+            'price'                     => 'required|numeric|min:0',
+            'status'                    => 'required|in:available,sold_out',
+            'image'                     => 'nullable|file|mimes:jpeg,png,jpg,webp|max:3072',
+            'image_url'                 => 'nullable|url|max:1000',
+            'ingredients'               => 'nullable|array',
+            'ingredients.*.inventory_id'=> [
+                'required_with:ingredients.*.quantity',
+                Rule::exists('inventories', 'id')->where('branch_id', $branchId)
+            ],
+            'ingredients.*.quantity'    => 'required_with:ingredients.*.inventory_id|numeric|min:0.001',
         ]);
 
         if ($request->hasFile('image')) {
@@ -62,16 +72,16 @@ class MenuController extends Controller
             $validated['image'] = $request->image_url;
         }
 
-        $validated['branch_id'] = auth()->user()->branch_id;
+        $validated['branch_id'] = $branchId;
         $menu = Menu::create($validated);
 
         if ($request->has('ingredients') && is_array($request->ingredients)) {
             foreach ($request->ingredients as $ing) {
                 if (!empty($ing['inventory_id']) && !empty($ing['quantity'])) {
                     MenuIngredient::create([
-                        'menu_id' => $menu->id,
+                        'menu_id'      => $menu->id,
                         'inventory_id' => $ing['inventory_id'],
-                        'quantity' => $ing['quantity'],
+                        'quantity'     => $ing['quantity'],
                     ]);
                 }
             }
@@ -108,21 +118,29 @@ class MenuController extends Controller
             abort(403);
         }
 
+        $branchId = auth()->user()->branch_id;
+
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'category_id' => 'required|exists:categories,id',
-            'price' => 'required|numeric|min:0',
-            'status' => 'required|in:available,sold_out',
-            'image' => 'nullable|file|image|max:2048',
-            'image_url' => 'nullable|string|max:1000',
-            'ingredients' => 'nullable|array',
-            'ingredients.*.inventory_id' => 'required_with:ingredients.*.quantity|exists:inventories,id',
-            'ingredients.*.quantity' => 'required_with:ingredients.*.inventory_id|numeric|min:0.001',
+            'name'                      => 'required|string|max:255',
+            'category_id'               => [
+                'required',
+                Rule::exists('categories', 'id')->where('branch_id', $branchId)
+            ],
+            'price'                     => 'required|numeric|min:0',
+            'status'                    => 'required|in:available,sold_out',
+            'image'                     => 'nullable|file|mimes:jpeg,png,jpg,webp|max:3072',
+            'image_url'                 => 'nullable|url|max:1000',
+            'ingredients'               => 'nullable|array',
+            'ingredients.*.inventory_id'=> [
+                'required_with:ingredients.*.quantity',
+                Rule::exists('inventories', 'id')->where('branch_id', $branchId)
+            ],
+            'ingredients.*.quantity'    => 'required_with:ingredients.*.inventory_id|numeric|min:0.001',
         ]);
 
         if ($request->hasFile('image')) {
             if ($menu->image && !str_starts_with($menu->image, 'http')) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($menu->image);
+                Storage::disk('public')->delete($menu->image);
             }
             $path = $request->file('image')->store('menus', 'public');
             $validated['image'] = $path;
@@ -140,9 +158,9 @@ class MenuController extends Controller
             foreach ($request->ingredients as $ing) {
                 if (!empty($ing['inventory_id']) && !empty($ing['quantity'])) {
                     MenuIngredient::create([
-                        'menu_id' => $menu->id,
+                        'menu_id'      => $menu->id,
                         'inventory_id' => $ing['inventory_id'],
-                        'quantity' => $ing['quantity'],
+                        'quantity'     => $ing['quantity'],
                     ]);
                 }
             }
@@ -156,7 +174,14 @@ class MenuController extends Controller
         if ($menu->branch_id !== auth()->user()->branch_id) {
             abort(403);
         }
+
+        if ($menu->image && !str_starts_with($menu->image, 'http')) {
+            Storage::disk('public')->delete($menu->image);
+        }
+
+        $menu->ingredients()->delete();
         $menu->delete();
+
         return redirect()->route('admin.menus.index')->with('success', 'Menu berhasil dihapus.');
     }
 }

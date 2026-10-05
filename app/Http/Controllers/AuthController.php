@@ -66,8 +66,9 @@ class AuthController extends Controller
             ])->onlyInput('email');
         }
 
+        $request->session()->forget('url.intended');
         $request->session()->regenerate();
-        return redirect()->intended($this->redirectBasedOnRole($user));
+        return redirect($this->redirectBasedOnRole($user));
     }
 
     public function showRegister()

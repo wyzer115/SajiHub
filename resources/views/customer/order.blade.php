@@ -44,6 +44,8 @@
             min-height: 260px !important;
             max-height: 380px !important;
             display: block !important;
+            transform: scaleX(1) !important;
+            -webkit-transform: scaleX(1) !important;
         }
         #qr-reader img[alt="Info icon"],
         #qr-reader__header_message,
@@ -88,8 +90,11 @@
     {{-- Header --}}
     <header class="border-b border-stone-200 bg-white sticky top-0 z-40 shadow-sm">
         <div class="max-w-7xl mx-auto px-6 lg:px-8 h-16 flex items-center justify-between">
-            <a href="{{ route('landing') }}" class="flex items-center group">
-                <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-10 w-auto object-contain drop-shadow-sm group-hover:scale-105 transition-transform">
+            <a href="{{ route('landing') }}" class="flex items-center gap-2.5 group">
+                <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-9 sm:h-10 w-auto object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-300">
+                <span class="font-black text-xl sm:text-2xl tracking-tight text-[#8C0000] leading-none group-hover:opacity-90 transition-opacity">
+                    Saji<span class="text-[#FFBE0F]">HUB</span>
+                </span>
             </a>
             
             <div class="flex items-center gap-3">
@@ -635,6 +640,8 @@
                     videoEl.style.minHeight = '260px';
                     videoEl.style.objectFit = 'cover';
                     videoEl.style.display = 'block';
+                    videoEl.style.transform = 'scaleX(1)';
+                    videoEl.style.webkitTransform = 'scaleX(1)';
                 }
             }).catch(err => {
                 console.warn("Primary camera start failed for", currentFacingMode, err);
@@ -654,6 +661,8 @@
                         videoEl.style.minHeight = '260px';
                         videoEl.style.objectFit = 'cover';
                         videoEl.style.display = 'block';
+                        videoEl.style.transform = 'scaleX(1)';
+                        videoEl.style.webkitTransform = 'scaleX(1)';
                     }
                 }).catch(e => {
                     // Final fallback: unconstrained any camera device

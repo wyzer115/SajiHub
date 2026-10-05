@@ -55,8 +55,8 @@ class StaffController extends Controller
 
     public function edit(User $user)
     {
-        if ($user->branch_id !== $this->branchId()) {
-            abort(403, 'Tidak dapat mengedit staf dari cabang lain.');
+        if ($user->branch_id !== $this->branchId() || !in_array($user->role, ['supervisor', 'kasir', 'dapur', 'koki', 'waiter'])) {
+            abort(403, 'Tidak dapat mengedit staf ini.');
         }
 
         return view('admin.staff.edit', compact('user'));
@@ -64,8 +64,8 @@ class StaffController extends Controller
 
     public function update(Request $request, User $user)
     {
-        if ($user->branch_id !== $this->branchId()) {
-            abort(403, 'Tidak dapat mengedit staf dari cabang lain.');
+        if ($user->branch_id !== $this->branchId() || !in_array($user->role, ['supervisor', 'kasir', 'dapur', 'koki', 'waiter'])) {
+            abort(403, 'Tidak dapat mengedit staf ini.');
         }
 
         $validated = $request->validate([
@@ -95,8 +95,12 @@ class StaffController extends Controller
 
     public function destroy(User $user)
     {
-        if ($user->branch_id !== $this->branchId()) {
-            abort(403, 'Tidak dapat menghapus staff dari cabang lain.');
+        if ($user->id === auth()->id()) {
+            return redirect()->back()->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
+        }
+
+        if ($user->branch_id !== $this->branchId() || !in_array($user->role, ['supervisor', 'kasir', 'dapur', 'koki', 'waiter'])) {
+            abort(403, 'Tidak dapat menghapus pengguna ini.');
         }
 
         $name = $user->name;

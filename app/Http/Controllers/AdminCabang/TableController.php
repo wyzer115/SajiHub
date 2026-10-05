@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Table;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class TableController extends Controller
 {
@@ -21,12 +22,21 @@ class TableController extends Controller
 
     public function store(Request $request)
     {
+        $branchId = auth()->user()->branch_id;
+
         $validated = $request->validate([
-            'table_number' => 'required|string|max:50',
+            'table_number' => [
+                'required',
+                'string',
+                'max:50',
+                Rule::unique('tables')->where('branch_id', $branchId),
+            ],
             'capacity' => 'nullable|integer|min:1|max:100',
+        ], [
+            'table_number.unique' => 'Nomor meja sudah terdaftar di cabang ini.',
         ]);
 
-        $validated['branch_id'] = auth()->user()->branch_id;
+        $validated['branch_id'] = $branchId;
         $validated['capacity'] = $validated['capacity'] ?? 4;
         $validated['qr_code_token'] = Str::random(32);
         
@@ -41,10 +51,20 @@ class TableController extends Controller
             abort(403);
         }
 
+        $branchId = auth()->user()->branch_id;
+
         $validated = $request->validate([
-            'table_number' => 'sometimes|required|string|max:50',
+            'table_number' => [
+                'sometimes',
+                'required',
+                'string',
+                'max:50',
+                Rule::unique('tables')->where('branch_id', $branchId)->ignore($table->id),
+            ],
             'capacity' => 'sometimes|required|integer|min:1|max:100',
             'status' => 'sometimes|required|in:empty,occupied',
+        ], [
+            'table_number.unique' => 'Nomor meja sudah terdaftar di cabang ini.',
         ]);
 
         $table->update($validated);
@@ -62,6 +82,11 @@ class TableController extends Controller
     {
         if ($table->branch_id !== auth()->user()->branch_id) {
             abort(403);
+        }
+
+        // Keamanan data: Cegah penghapusan meja jika sedang ada pesanan aktif
+        if ($table->orders()->whereIn('order_status', ['pending', 'cooking', 'served'])->exists()) {
+            return redirect()->back()->with('error', 'Meja ' . $table->table_number . ' tidak dapat dihapus karena masih memproses pesanan aktif.');
         }
 
         $table->delete();

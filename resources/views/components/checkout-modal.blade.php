@@ -1,6 +1,7 @@
 <div x-data="checkoutModalComponent()" 
      x-show="isOpen" 
      x-cloak
+     style="display: none;"
      @open-checkout.window="openCheckout($event.detail)"
      class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
     
@@ -229,6 +230,8 @@
 
                 <!-- OVERLAY SUKSES PEMBAYARAN -->
                 <div x-show="cashSuccess || qrisApproved" 
+                     x-cloak
+                     style="display: none;"
                      x-transition:enter="transition ease-out duration-300"
                      x-transition:enter-start="opacity-0 scale-90"
                      x-transition:enter-end="opacity-100 scale-100"

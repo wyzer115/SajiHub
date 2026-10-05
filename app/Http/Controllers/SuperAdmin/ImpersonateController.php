@@ -36,12 +36,18 @@ class ImpersonateController extends Controller
         }
 
         $superAdminId = session('impersonator_id');
-
-        // Log back in as Super Admin
-        auth()->loginUsingId($superAdminId);
+        $superAdmin = User::where('id', $superAdminId)->where('role', 'superadmin')->first();
 
         // Clear the session key
         session()->forget('impersonator_id');
+
+        if (!$superAdmin) {
+            auth()->logout();
+            return redirect()->route('login')->with('error', 'Sesi impersonasi tidak valid.');
+        }
+
+        // Log back in as Super Admin
+        auth()->login($superAdmin);
 
         return redirect()->route('superadmin.dashboard')->with('success', 'Kembali ke Dasbor Super Admin.');
     }

@@ -44,7 +44,7 @@ Route::get('/menu', [PublicMenuController::class, 'index'])->name('menu.catalog'
 
 // Auth Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+Route::post('/login', [AuthController::class, 'login'])->name('login.post')->middleware('throttle:6,1');
 Route::get('/register', fn() => redirect()->route('login'))->name('register');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
@@ -52,7 +52,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 // Customer Order / QR Scan Routes (Public - No Login Required)
 Route::get('/order', [CustomerOrderController::class, 'index'])->name('order.qr');
 Route::get('/pesan', [CustomerOrderController::class, 'index'])->name('pesan');
-Route::post('/pesan', [CustomerOrderController::class, 'store'])->name('pesan.store');
+Route::post('/pesan', [CustomerOrderController::class, 'store'])->name('pesan.store')->middleware('throttle:15,1');
 Route::get('/pesan/{order}/receipt', [CustomerOrderController::class, 'showReceipt'])->name('pesan.receipt');
 Route::get('/pesan/{order}/status', [CustomerOrderController::class, 'checkStatus'])->name('pesan.status');
 

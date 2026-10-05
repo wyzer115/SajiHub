@@ -87,6 +87,7 @@
             }
         </script>
         <style>
+            [x-cloak] { display: none !important; }
             .sidebar-transition { transition: width 0.3s ease, transform 0.3s ease; }
             .animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
             @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -94,3 +95,16 @@
         </style>
     @endif
 @endif
+
+<style>
+    [x-cloak] { display: none !important; }
+    /* Pastikan tampilan kamera pemindai QR tidak mirror / tidak terbalik */
+    #reader video,
+    #qr-reader video,
+    #qr-reader__scan_region video,
+    #kasir-qr-reader video,
+    div[id*="reader"] video {
+        transform: scaleX(1) !important;
+        -webkit-transform: scaleX(1) !important;
+    }
+</style>
