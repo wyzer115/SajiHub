@@ -23,9 +23,9 @@
                 <label for="role" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Peran / Tugas Staf <span class="text-red-500">*</span></label>
                 <select name="role" id="role" required
                     class="w-full bg-stone-50 border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-4 py-3 text-sm focus:border-[#BD2000] focus:outline-none transition-all">
-                    <option value="kasir" {{ old('role', $user->role) == 'kasir' ? 'selected' : '' }}>Kasir (Front Office POS)</option>
-                    <option value="koki" {{ old('role', $user->role) == 'koki' ? 'selected' : '' }}>Dapur / Kitchen (Koki)</option>
-                    <option value="waiter" {{ old('role', $user->role) == 'waiter' ? 'selected' : '' }}>Waiter / Pelayan</option>
+                    <option value="kasir" {{ old('role', $user->role) == 'kasir' ? 'selected' : '' }}>Kasir</option>
+                    <option value="koki" {{ old('role', $user->role) == 'koki' ? 'selected' : '' }}>Staf Dapur</option>
+                    <option value="waiter" {{ old('role', $user->role) == 'waiter' ? 'selected' : '' }}>Pelayan</option>
                 </select>
                 @error('role')
                     <p class="mt-1.5 text-xs font-bold text-red-600">{{ $message }}</p>

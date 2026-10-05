@@ -18,7 +18,7 @@ class StaffController extends Controller
     public function index()
     {
         $staff = User::where('branch_id', $this->branchId())
-            ->whereIn('role', ['owner', 'supervisor', 'kasir', 'dapur', 'koki'])
+            ->whereIn('role', ['supervisor', 'kasir', 'dapur', 'koki'])
             ->latest()
             ->get();
 
@@ -37,7 +37,7 @@ class StaffController extends Controller
             'email'    => 'required|email|unique:users,email',
             'username' => 'required|string|max:255|unique:users,username|alpha_dash',
             'password' => 'required|string|min:6|confirmed',
-            'role'     => 'required|in:owner,supervisor,kasir,dapur,koki',
+            'role'     => 'required|in:supervisor,kasir,dapur,koki',
         ]);
 
         User::create([
@@ -50,13 +50,13 @@ class StaffController extends Controller
         ]);
 
         return redirect()->route('admin.staff.index')
-            ->with('success', 'Akun staff "' . $validated['name'] . '" berhasil dibuat.');
+            ->with('success', 'Akun staf "' . $validated['name'] . '" berhasil dibuat.');
     }
 
     public function edit(User $user)
     {
         if ($user->branch_id !== $this->branchId()) {
-            abort(403, 'Tidak dapat mengedit staff dari cabang lain.');
+            abort(403, 'Tidak dapat mengedit staf dari cabang lain.');
         }
 
         return view('admin.staff.edit', compact('user'));
@@ -65,7 +65,7 @@ class StaffController extends Controller
     public function update(Request $request, User $user)
     {
         if ($user->branch_id !== $this->branchId()) {
-            abort(403, 'Tidak dapat mengedit staff dari cabang lain.');
+            abort(403, 'Tidak dapat mengedit staf dari cabang lain.');
         }
 
         $validated = $request->validate([
@@ -73,7 +73,7 @@ class StaffController extends Controller
             'email'    => ['required', 'email', Rule::unique('users')->ignore($user->id)],
             'username' => ['required', 'string', 'max:255', 'alpha_dash', Rule::unique('users')->ignore($user->id)],
             'password' => 'nullable|string|min:6|confirmed',
-            'role'     => 'required|in:owner,supervisor,kasir,dapur,koki',
+            'role'     => 'required|in:supervisor,kasir,dapur,koki',
         ]);
 
         $data = [

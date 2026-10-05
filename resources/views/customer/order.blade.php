@@ -24,9 +24,26 @@
     @include('partials.head-assets')
     <style>
         /* QR Code Scanner Custom Styles */
+        #qr-reader-container {
+            min-height: 270px !important;
+            background-color: #0c0a09 !important;
+            position: relative !important;
+        }
         #qr-reader {
             border: none !important;
-            background: transparent !important;
+            width: 100% !important;
+            min-height: 260px !important;
+            background: #0c0a09 !important;
+        }
+        #qr-reader video,
+        #qr-reader__scan_region video {
+            border-radius: 1rem !important;
+            object-fit: cover !important;
+            width: 100% !important;
+            height: 100% !important;
+            min-height: 260px !important;
+            max-height: 380px !important;
+            display: block !important;
         }
         #qr-reader img[alt="Info icon"],
         #qr-reader__header_message,
@@ -39,12 +56,8 @@
         #qr-reader__scan_region {
             border: none !important;
             background: transparent !important;
-        }
-        #qr-reader__scan_region video {
-            border-radius: 1rem !important;
-            object-fit: cover !important;
             width: 100% !important;
-            max-height: 320px !important;
+            min-height: 260px !important;
         }
         #qr-reader button {
             background-color: #BD2000 !important;
@@ -111,42 +124,17 @@
             </div>
         @endif
 
-        {{-- 1. IF NO BRANCH SELECTED --}}
-        @if(!$selectedBranch)
-            <div class="text-center max-w-2xl mx-auto py-16">
-                <h1 class="text-3xl font-black text-[#8C0000] mb-3">Mau Makan di Cabang Mana?</h1>
-                <p class="text-slate-600 mb-8 font-medium">Pilih lokasi cabang Restoran SajiHUB tempat Anda berada sekarang untuk mulai memesan makanan.</p>
-                
-                <div class="grid md:grid-cols-2 gap-6 text-left">
-                    @foreach($branches as $branch)
-                        <a href="?branch_id={{ $branch->id }}" class="p-6 bg-white border border-stone-200 rounded-3xl shadow-sm hover:shadow-xl hover:border-[#BD2000]/40 transition-all block group">
-                            <h3 class="text-xl font-extrabold text-[#1C1917] group-hover:text-[#BD2000] transition-colors mb-2">{{ $branch->name }}</h3>
-                            <p class="text-slate-600 text-sm mb-4 font-medium">{{ $branch->address }}</p>
-                            <span class="text-xs font-extrabold text-[#BD2000] flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                                Pilih Cabang Ini &rightarrow;
-                            </span>
-                        </a>
-                    @endforeach
-                </div>
-            </div>
-        @else
-            {{-- 2. BRANCH SELECTED — SHOW ORDER SYSTEM --}}
+            {{-- BRANCH & SCANNED TABLE HEADER --}}
             <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-stone-200">
                 <div>
                     <span class="text-xs font-bold text-[#BD2000] uppercase tracking-widest bg-[#BD2000]/10 px-3 py-1 rounded-full border border-[#BD2000]/20">Cabang Pilihan</span>
                     <h1 class="text-2xl lg:text-3xl font-black text-[#8C0000] uppercase mt-2">{{ $selectedBranch->name }}</h1>
                     <p class="text-slate-600 text-sm mt-1 font-medium">{{ $selectedBranch->address }}</p>
                 </div>
-                @if(!isset($selectedTable))
-                    <a href="{{ route('pesan') }}" class="text-xs font-bold text-stone-700 hover:text-[#BD2000] px-4 py-2 border border-stone-300 bg-white hover:bg-stone-50 rounded-xl transition-all shadow-sm">
-                        &larr; Ganti Cabang
-                    </a>
-                @else
-                    <span class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-[#BD2000]/10 text-[#BD2000] border border-[#BD2000]/20">
-                        <svg class="w-4 h-4 text-[#BD2000]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                        Cabang Terkunci (Hasil Scan QR)
-                    </span>
-                @endif
+                <span class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-[#BD2000]/10 text-[#BD2000] border border-[#BD2000]/20">
+                    <svg class="w-4 h-4 text-[#BD2000]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    Cabang Terkunci (Hasil Scan QR)
+                </span>
             </div>
 
             {{-- Ordering System Layout --}}
@@ -161,56 +149,28 @@
                         <input type="hidden" name="branch_id" value="{{ $selectedBranch->id }}">
                         <input type="hidden" name="payment_method" id="payment_method_input" value="cash">
 
-                        {{-- Table Selector (Locked if QR Scanned) --}}
-                        @if(isset($selectedTable))
-                            <div class="p-6 bg-white border-2 border-[#BD2000]/40 rounded-3xl shadow-md relative overflow-hidden">
-                                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                                    <div class="flex items-center gap-4">
-                                        <div class="w-12 h-12 rounded-2xl bg-[#BD2000]/10 border border-[#BD2000]/20 flex items-center justify-center text-[#BD2000] flex-shrink-0">
-                                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                        </div>
-                                        <div>
-                                            <span class="text-[10px] font-extrabold text-[#BD2000] uppercase tracking-widest block">Nomor Meja Terkunci (Hasil Scan QR)</span>
-                                            <h3 class="text-2xl font-black text-[#1C1917]">
-                                                {{ Str::startsWith($selectedTable->table_number, 'Meja') ? $selectedTable->table_number : 'Meja ' . $selectedTable->table_number }}
-                                                <span class="text-xs font-bold text-slate-500 ml-2">(Kapasitas: {{ $selectedTable->capacity ?? 4 }} Kursi)</span>
-                                            </h3>
-                                        </div>
+                        {{-- Table Indicator (Locked from Scan QR) --}}
+                        <div class="p-6 bg-white border-2 border-[#BD2000]/40 rounded-3xl shadow-md relative overflow-hidden">
+                            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 rounded-2xl bg-[#BD2000]/10 border border-[#BD2000]/20 flex items-center justify-center text-[#BD2000] flex-shrink-0">
+                                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                     </div>
-                                    <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                        <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                                        Meja Terkunci (Dine-In)
-                                    </span>
-                                </div>
-                                <input type="hidden" name="table_id" id="table_id" value="{{ $selectedTable->id }}">
-                            </div>
-                        @else
-                            <div class="p-6 bg-white border border-stone-200 rounded-3xl shadow-sm">
-                                <h3 class="text-lg font-black text-[#8C0000] mb-4 flex items-center gap-2">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-[#BD2000]"></span>
-                                    Pilih Nomor Meja Anda
-                                </h3>
-                                <div class="grid sm:grid-cols-2 gap-4">
                                     <div>
-                                        <label for="table_id" class="block text-xs font-bold text-stone-700 mb-1.5 uppercase">Nomor Meja *</label>
-                                        <select name="table_id" id="table_id" required class="block w-full bg-stone-50 border border-stone-300 rounded-xl px-4 py-3 text-[#1C1917] text-sm font-semibold focus:outline-none focus:border-[#BD2000]">
-                                            <option value="">-- Pilih Nomor Meja --</option>
-                                            @foreach($tables as $table)
-                                                <option value="{{ $table->id }}" 
-                                                    {{ old('table_id') == $table->id ? 'selected' : '' }}
-                                                    {{ $table->status == 'occupied' ? 'disabled class=text-stone-400' : '' }}>
-                                                    {{ Str::startsWith($table->table_number, 'Meja') ? $table->table_number : 'Meja ' . $table->table_number }} ({{ $table->status == 'occupied' ? 'Sedang Digunakan' : 'Tersedia' }})
-                                                </option>
-                                            @endforeach
-                                        </select>
+                                        <span class="text-[10px] font-extrabold text-[#BD2000] uppercase tracking-widest block">Nomor Meja Terkunci (Hasil Scan QR)</span>
+                                        <h3 class="text-2xl font-black text-[#1C1917]">
+                                            {{ Str::startsWith($selectedTable->table_number, 'Meja') ? $selectedTable->table_number : 'Meja ' . $selectedTable->table_number }}
+                                            <span class="text-xs font-bold text-slate-500 ml-2">(Kapasitas: {{ $selectedTable->capacity ?? 4 }} Kursi)</span>
+                                        </h3>
                                     </div>
-                                     <div class="flex items-center gap-2.5 text-xs text-slate-600 font-medium leading-relaxed bg-stone-50 p-4 border border-stone-200 rounded-xl">
-                                         <svg class="w-5 h-5 text-[#BD2000] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                         <span>Silakan periksa nomor yang tertera di meja fisik restoran tempat Anda duduk sekarang.</span>
-                                     </div>
                                 </div>
+                                <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                    Meja Terkunci (Dine-In)
+                                </span>
                             </div>
-                        @endif
+                            <input type="hidden" name="table_id" id="table_id" value="{{ $selectedTable->id }}">
+                        </div>
 
                         {{-- Menu Grid --}}
                         <div>
@@ -354,7 +314,6 @@
                     </div>
                 </div>
             </div>
-        @endif
     </main>
 
     <script>
@@ -524,12 +483,26 @@
             </div>
             
             <p class="text-xs text-slate-600 font-medium leading-relaxed">
-                Arahkan kamera ponsel Anda ke stiker kode QR yang menempel di meja makan.
+                Arahkan kamera ke stiker kode QR yang menempel di meja makan Anda.
             </p>
 
+            {{-- Camera Controls Bar (Flip Front / Back) --}}
+            <div class="flex items-center justify-between bg-stone-50 px-3.5 py-2 rounded-2xl border border-stone-200">
+                <span class="text-[11px] font-bold text-stone-600 flex items-center gap-1.5" id="customer-cam-label">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span id="customer-cam-mode-text">Kamera Depan</span>
+                </span>
+                <button type="button" onclick="toggleCustomerCameraFacing()" class="px-2.5 py-1 rounded-xl bg-white hover:bg-stone-100 text-stone-800 text-[11px] font-black transition-all border border-stone-300 flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
+                    <svg class="w-3.5 h-3.5 text-[#BD2000]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <span>Ganti Kamera</span>
+                </button>
+            </div>
+
             {{-- Camera Container with Viewfinder --}}
-            <div id="qr-reader-container" class="w-full bg-stone-950 rounded-2xl p-2 border border-stone-300/80 min-h-[260px] flex flex-col items-center justify-center relative overflow-hidden shadow-inner">
-                <div id="qr-reader" class="w-full rounded-xl overflow-hidden"></div>
+            <div id="qr-reader-container" class="w-full bg-stone-950 rounded-2xl p-2 border border-stone-300/80 flex flex-col items-center justify-center relative overflow-hidden shadow-inner" style="min-height: 270px; background-color: #0c0a09;">
+                <div id="qr-reader" class="w-full rounded-xl overflow-hidden" style="width: 100%; min-height: 260px;"></div>
                 
                 {{-- Glowing Viewfinder Target Box Overlay --}}
                 <div class="absolute inset-0 pointer-events-none flex items-center justify-center">
@@ -554,34 +527,215 @@
 
     <script>
         let html5QrCodeInstance = null;
+        let isScanLocked = false;
+
+        function playSuccessBeep() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.12);
+                gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.13);
+            } catch(e) {}
+        }
+
+        function playErrorBeep() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(250, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(180, audioCtx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.31);
+            } catch(e) {}
+        }
+
+        const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        // Default to 'user' on laptop/PC, 'environment' on smartphone
+        let currentFacingMode = isMobileDevice ? "environment" : "user";
+
+        function updateCustomerCamLabel() {
+            const el = document.getElementById('customer-cam-mode-text');
+            if (el) {
+                el.innerText = currentFacingMode === "user" ? "Kamera Depan" : "Kamera Belakang";
+            }
+        }
+
+        async function toggleCustomerCameraFacing() {
+            currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
+            updateCustomerCamLabel();
+
+            if (html5QrCodeInstance && html5QrCodeInstance.isScanning) {
+                try {
+                    await html5QrCodeInstance.stop();
+                    html5QrCodeInstance.clear();
+                } catch(e) {}
+                startCustomerCamera();
+            }
+        }
 
         function openQrScannerModal() {
             const modal = document.getElementById('qr-scanner-modal');
             modal.classList.remove('opacity-0', 'pointer-events-none');
             modal.classList.add('opacity-100');
+            isScanLocked = false;
+            updateCustomerCamLabel();
+
+            setTimeout(() => {
+                startCustomerCamera();
+            }, 150);
+        }
+
+        function startCustomerCamera() {
+            updateCustomerCamLabel();
 
             if (!html5QrCodeInstance) {
-                html5QrCodeInstance = new Html5Qrcode("qr-reader");
+                html5QrCodeInstance = new Html5Qrcode("qr-reader", {
+                    verbose: false
+                });
             }
 
-            const config = { fps: 15 };
+            const scanConfig = {
+                fps: 20,
+                qrbox: function(viewfinderWidth, viewfinderHeight) {
+                    const edge = Math.min(viewfinderWidth, viewfinderHeight);
+                    const boxSize = Math.max(Math.floor(edge * 0.85), 200);
+                    return { width: boxSize, height: boxSize };
+                },
+                aspectRatio: 1.0
+            };
+
+            const cameraConfig = {
+                facingMode: currentFacingMode
+            };
 
             html5QrCodeInstance.start(
-                { facingMode: "environment" },
-                config,
+                cameraConfig,
+                scanConfig,
                 onScanSuccess,
                 onScanError
-            ).catch(err => {
-                html5QrCodeInstance.start({ facingMode: "user" }, config, onScanSuccess, onScanError).catch(e => console.log(e));
+            ).then(() => {
+                const videoEl = document.querySelector('#qr-reader video');
+                if (videoEl) {
+                    videoEl.style.width = '100%';
+                    videoEl.style.height = '100%';
+                    videoEl.style.minHeight = '260px';
+                    videoEl.style.objectFit = 'cover';
+                    videoEl.style.display = 'block';
+                }
+            }).catch(err => {
+                console.warn("Primary camera start failed for", currentFacingMode, err);
+                const fallbackMode = currentFacingMode === "user" ? "environment" : "user";
+                html5QrCodeInstance.start(
+                    { facingMode: fallbackMode },
+                    scanConfig,
+                    onScanSuccess,
+                    onScanError
+                ).then(() => {
+                    currentFacingMode = fallbackMode;
+                    updateCustomerCamLabel();
+                    const videoEl = document.querySelector('#qr-reader video');
+                    if (videoEl) {
+                        videoEl.style.width = '100%';
+                        videoEl.style.height = '100%';
+                        videoEl.style.minHeight = '260px';
+                        videoEl.style.objectFit = 'cover';
+                        videoEl.style.display = 'block';
+                    }
+                }).catch(e => {
+                    // Final fallback: unconstrained any camera device
+                    html5QrCodeInstance.start(
+                        {},
+                        scanConfig,
+                        onScanSuccess,
+                        onScanError
+                    ).then(() => {
+                        const videoEl = document.querySelector('#qr-reader video');
+                        if (videoEl) {
+                            videoEl.style.width = '100%';
+                            videoEl.style.height = '100%';
+                            videoEl.style.minHeight = '260px';
+                            videoEl.style.objectFit = 'cover';
+                            videoEl.style.display = 'block';
+                        }
+                    }).catch(e2 => {
+                        console.error("Camera error:", e2);
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Kamera Tidak Dapat Dibuka',
+                            text: 'Pastikan Anda telah memberikan izin akses kamera pada browser.',
+                            confirmButtonColor: '#BD2000'
+                        });
+                        closeQrScannerModal();
+                    });
+                });
             });
         }
 
         function onScanSuccess(decodedText, decodedResult) {
-            console.log("QR Code Scanned:", decodedText);
-            if (decodedText) {
-                closeQrScannerModal();
-                window.location.href = decodedText;
+            if (isScanLocked) return;
+            isScanLocked = true;
+
+            if (html5QrCodeInstance && html5QrCodeInstance.isScanning) {
+                try { html5QrCodeInstance.pause(true); } catch(e) {}
             }
+
+            const text = (decodedText || '').trim();
+
+            // 1. Format resmi SajiHub: SAJIHUB-TABLE-{branch_id}-{tableIdentifier}
+            if (text.startsWith('SAJIHUB-TABLE-')) {
+                const parts = text.split('-');
+                if (parts.length >= 4) {
+                    const branchId = parts[2];
+                    const tableIdent = parts.slice(3).join('-');
+                    playSuccessBeep();
+                    closeQrScannerModal();
+                    window.location.href = `{{ url('/pesan') }}?branch_id=${encodeURIComponent(branchId)}&table=${encodeURIComponent(tableIdent)}`;
+                    return;
+                }
+            }
+
+            // 2. URL internal SajiHub (/pesan atau /order)
+            if (text.includes('/pesan') || text.includes('/order')) {
+                try {
+                    const urlObj = new URL(text, window.location.origin);
+                    if (urlObj.searchParams.has('branch_id') || urlObj.searchParams.has('table')) {
+                        playSuccessBeep();
+                        closeQrScannerModal();
+                        window.location.href = urlObj.href;
+                        return;
+                    }
+                } catch(e) {}
+            }
+
+            // 3. QR tidak dikenali / bukan QR SajiHub
+            playErrorBeep();
+            Swal.fire({
+                icon: 'error',
+                title: 'QR Code Tidak Dikenali',
+                text: 'Kode QR ini bukan QR Meja resmi SajiHUB. Silakan scan stiker QR yang terpasang di meja Anda.',
+                confirmButtonColor: '#BD2000',
+                confirmButtonText: 'Coba Lagi',
+                customClass: { popup: 'rounded-3xl shadow-2xl font-sans' }
+            }).then(() => {
+                isScanLocked = false;
+                if (html5QrCodeInstance && html5QrCodeInstance.isScanning) {
+                    try { html5QrCodeInstance.resume(); } catch(e) {}
+                }
+            });
         }
 
         function onScanError(errorMessage) {
@@ -589,17 +743,19 @@
         }
 
         function closeQrScannerModal() {
+            isScanLocked = false;
             const modal = document.getElementById('qr-scanner-modal');
             if (modal) {
                 modal.classList.remove('opacity-100');
                 modal.classList.add('opacity-0', 'pointer-events-none');
             }
 
-            if (html5QrCodeInstance) {
+            if (html5QrCodeInstance && html5QrCodeInstance.isScanning) {
                 html5QrCodeInstance.stop().then(() => {
-                    console.log("Camera stopped.");
+                    html5QrCodeInstance.clear();
+                    html5QrCodeInstance = null;
                 }).catch(err => {
-                    console.log("Stop error:", err);
+                    html5QrCodeInstance = null;
                 });
             }
         }
@@ -630,7 +786,7 @@
                 <div class="flex justify-between items-start border-b border-stone-100 pb-3">
                     <div class="flex items-center gap-2">
                         <div class="w-9 h-9 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-lg shadow-sm">
-                            🧾
+                            <svg class="w-5 h-5 text-emerald-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                         </div>
                         <div>
                             <h3 class="text-sm font-black text-[#8C0000] uppercase tracking-wider">Struk Digital Pesanan</h3>
@@ -649,23 +805,23 @@
                         @if ($receiptOrder->payment_status === 'paid' || $receiptOrder->payment_method === 'qris')
                             <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-[11px] font-black uppercase tracking-wider">
                                 <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                <span>LUNAS (QRIS)</span>
+                                <span>Lunas</span>
                             </span>
                         @else
                             <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-[11px] font-black uppercase tracking-wider">
                                 <svg class="w-3.5 h-3.5 text-amber-600 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                <span>BELUM DIBAYAR (TUNAI)</span>
+                                <span>Menunggu Pembayaran Kasir</span>
                             </span>
                         @endif
                     </div>
 
                     @if ($receiptOrder->payment_method === 'cash' && $receiptOrder->payment_status !== 'paid')
                         <p class="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-2.5 font-medium leading-relaxed">
-                            💡 Silakan tunjukkan nama <strong>{{ $receiptOrder->customer_name }}</strong> atau nota <strong>#ORD-{{ $receiptOrder->id }}</strong> ke Kasir untuk melunasi pembayaran pesanan Anda.
+                            Silakan tunjukkan nama <strong>{{ $receiptOrder->customer_name }}</strong> atau nota <strong>#ORD-{{ $receiptOrder->id }}</strong> ke Kasir untuk melunasi pembayaran pesanan Anda.
                         </p>
                     @else
                         <p class="text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl p-2.5 font-medium leading-relaxed">
-                            ✨ Pembayaran QRIS berhasil dikonfirmasi! Pesanan Anda telah terkirim otomatis dan sedang disiapkan di Dapur.
+                            Pembayaran QRIS berhasil dikonfirmasi. Pesanan Anda telah terkirim otomatis dan sedang disiapkan di Dapur.
                         </p>
                     @endif
                 </div>
@@ -678,15 +834,15 @@
                     </div>
                     <div class="flex justify-between text-stone-600">
                         <span>Nomor Meja:</span>
-                        <span class="font-bold text-[#BD2000]">{{ $receiptOrder->table ? $receiptOrder->table->table_number : 'Takeaway / Bebas' }}</span>
+                        <span class="font-bold text-[#BD2000]">{{ $receiptOrder->table ? $receiptOrder->table->table_number : 'Bawa Pulang' }}</span>
                     </div>
                     <div class="flex justify-between text-stone-600">
                         <span>Waktu Pesan:</span>
-                        <span class="font-bold text-stone-900">{{ $receiptOrder->created_at->format('d M Y, H:i') }} WIB</span>
+                        <span class="font-bold text-stone-900">{{ $receiptOrder->created_at->locale('id')->translatedFormat('d M Y, H:i') }} WIB</span>
                     </div>
                     <div class="flex justify-between text-stone-600">
                         <span>Metode Bayar:</span>
-                        <span class="font-bold uppercase text-stone-900">{{ strtoupper($receiptOrder->payment_method) }}</span>
+                        <span class="font-bold text-stone-900">{{ $receiptOrder->payment_method === 'cash' ? 'Tunai' : ($receiptOrder->payment_method === 'qris' ? 'QRIS' : 'Transfer') }}</span>
                     </div>
                 </div>
 
@@ -737,9 +893,48 @@
         {{-- Floating Action Button to Re-Open Receipt --}}
         <div class="fixed bottom-6 right-6 z-40">
             <button type="button" onclick="openReceiptModal()" class="px-4 py-3 bg-[#BD2000] hover:bg-[#8C0000] text-white font-extrabold text-xs rounded-2xl shadow-xl hover:shadow-2xl transition-all flex items-center gap-2 cursor-pointer border-2 border-white animate-bounce">
-                <span>🧾 Lihat Struk Digital (#ORD-{{ $receiptOrder->id }})</span>
+                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <span>Lihat Struk Digital (#ORD-{{ $receiptOrder->id }})</span>
             </button>
         </div>
+    @endif
+
+    @if(request('order_confirmed'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Pesanan Berhasil!',
+                    html: `
+                        <div class="space-y-3 text-center">
+                            <div class="p-3.5 bg-emerald-50 rounded-2xl border border-emerald-200">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-black uppercase tracking-wider">
+                                    Dikonfirmasi & Lunas
+                                </span>
+                                <p class="text-xs text-emerald-800 mt-2 font-bold leading-relaxed">
+                                    Pesanan <strong>#ORD-{{ request('order_confirmed') }}</strong> telah berhasil diverifikasi oleh kasir!
+                                </p>
+                            </div>
+                            <p class="text-xs text-stone-600 font-medium leading-relaxed">
+                                Koki kami di Dapur sedang menyiapkan hidangan Anda. Silakan santai di meja makan Anda. Selamat menikmati!
+                            </p>
+                        </div>
+                    `,
+                    confirmButtonColor: '#BD2000',
+                    confirmButtonText: 'Sip, Terima Kasih!',
+                    customClass: { popup: 'rounded-3xl shadow-2xl font-sans' }
+                });
+
+                // Bersihkan parameter query dari URL tanpa reload agar tidak muncul berulang saat refresh
+                try {
+                    const cleanUrl = new URL(window.location);
+                    cleanUrl.searchParams.delete('order_confirmed');
+                    window.history.replaceState({}, document.title, cleanUrl.toString());
+                } catch(e) {}
+            }
+        });
+    </script>
     @endif
 </body>
 </html>

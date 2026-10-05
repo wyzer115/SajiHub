@@ -1,6 +1,6 @@
 @extends('layouts.app')
-@section('title', 'Buat Pesanan - POS Kasir')
-@section('page-title', 'Mesin Kasir (POS)')
+@section('title', 'Buat Pesanan Baru')
+@section('page-title', 'Buat Pesanan Baru')
 
 @section('content')
 <div class="grid lg:grid-cols-3 gap-6 animate-fade-in-up">
@@ -32,7 +32,7 @@
                     @endif
                     @if($isSoldOut)
                         <div class="absolute inset-0 bg-white/80 backdrop-blur-xs flex items-center justify-center">
-                            <span class="bg-[#FA1E0E] text-white text-[11px] font-extrabold px-3 py-1 rounded-full shadow-md tracking-wider">🚫 HABIS (SOLD OUT)</span>
+                            <span class="bg-[#FA1E0E] text-white text-[11px] font-extrabold px-3 py-1 rounded-full shadow-md tracking-wider">Stok Habis</span>
                         </div>
                     @endif
                 </div>
@@ -42,7 +42,7 @@
                     
                     @if($isSoldOut)
                         <button type="button" disabled class="w-full bg-red-100 border border-red-200 text-red-600 font-bold py-2 rounded-xl text-xs flex items-center justify-center cursor-not-allowed">
-                            🚫 HABIS
+                            Stok Habis
                         </button>
                     @else
                         <button type="button" onclick="addToCart({{ $menu->id }}, '{{ addslashes($menu->name) }}', {{ $menu->price }})" class="w-full bg-stone-100 hover:bg-[#BD2000] text-stone-700 hover:text-white py-2 rounded-xl transition-all text-xs font-extrabold flex items-center justify-center cursor-pointer border border-stone-200">
@@ -77,7 +77,7 @@
                 <div>
                     <label for="customer_name" class="block text-stone-700 text-[11px] font-bold uppercase tracking-wider mb-1.5">Nama Pelanggan <span class="text-red-500">*</span></label>
                     <input type="text" name="customer_name" id="customer_name" required
-                        class="w-full bg-stone-50 border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-3.5 py-2 text-xs focus:border-[#BD2000] focus:outline-none transition-all" placeholder="Nama pemesan">
+                        class="w-full bg-stone-50 border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-3.5 py-2 text-xs focus:border-[#BD2000] focus:outline-none transition-all" placeholder="Masukkan nama pelanggan...">
                 </div>
 
                 <div>
@@ -109,7 +109,7 @@
                     </div>
                 </div>
 
-                <!-- Info Tipe Pesanan Kasir (Strictly Takeaway) -->
+                <!-- Info Tipe Pesanan Kasir (Bawa Pulang) -->
                 <div>
                     <label class="block text-stone-700 text-[11px] font-bold uppercase tracking-wider mb-1.5">Tipe Pesanan</label>
                     <input type="hidden" name="order_type" id="order_type_input" value="takeaway">
@@ -121,8 +121,8 @@
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
                             </div>
                             <div>
-                                <p class="font-extrabold text-amber-950">🛍️ Pesanan Bawa Pulang (Takeaway)</p>
-                                <p class="text-[10px] text-amber-800 font-medium">Khusus pesanan langsung di kasir (tanpa meja). Pelanggan makan di tempat wajib pesan via scan QR meja.</p>
+                                <p class="font-extrabold text-amber-950">Pesanan Bawa Pulang</p>
+                                <p class="text-[10px] text-amber-800 font-medium">Pesanan langsung di kasir untuk dibawa pulang. Pelanggan makan di tempat memesan via kode QR meja.</p>
                             </div>
                         </div>
                     </div>
@@ -131,7 +131,7 @@
                 <!-- Cart Items -->
                 <div id="cart-container" class="space-y-2 pt-2 border-t border-stone-200">
                     <div class="text-center text-stone-400 py-4 text-xs font-medium" id="empty-cart">
-                        Belum ada item di keranjang
+                        Belum ada menu di keranjang
                     </div>
                 </div>
             </div>
@@ -139,15 +139,15 @@
             <!-- Fixed Footer: Total & Submit Button ALWAYS VISIBLE -->
             <div class="pt-3 border-t border-stone-200 shrink-0 space-y-2.5 bg-white">
                 <div class="flex justify-between items-center text-sm font-bold">
-                    <span class="text-stone-700">Total Belanja:</span>
+                    <span class="text-stone-700">Total Pembayaran:</span>
                     <span class="text-[#BD2000] font-black text-lg font-mono" id="cart-total">Rp 0</span>
                 </div>
                 
                 <div id="hidden-inputs"></div>
 
                 <button type="submit" id="submit-btn" disabled 
-                        class="w-full bg-[#BD2000] hover:bg-[#8C0000] disabled:opacity-40 disabled:cursor-not-allowed text-white font-extrabold py-3 text-xs rounded-xl transition-all shadow-md cursor-pointer uppercase tracking-wider">
-                    Pesan Sekarang & Buka Pembayaran
+                        class="w-full bg-[#BD2000] hover:bg-[#8C0000] disabled:opacity-40 disabled:cursor-not-allowed text-white font-extrabold py-3 text-xs rounded-xl transition-all shadow-md cursor-pointer tracking-wide">
+                    Simpan dan Proses Pembayaran
                 </button>
             </div>
         </form>
@@ -198,7 +198,7 @@
         const totalEl = document.getElementById('cart-total');
 
         if (cart.length === 0) {
-            container.innerHTML = '<div class="text-center text-slate-400 py-6 text-xs font-medium" id="empty-cart">Belum ada item ditambahkan ke keranjang</div>';
+            container.innerHTML = '<div class="text-center text-slate-400 py-6 text-xs font-medium" id="empty-cart">Belum ada menu di keranjang belanja</div>';
             submitBtn.disabled = true;
             totalEl.innerText = 'Rp 0';
             hiddenInputs.innerHTML = '';
@@ -222,7 +222,7 @@
                         <span class="font-black text-[#BD2000]">Rp ${formatRupiah(subtotal)}</span>
                     </div>
                     <div class="flex justify-between items-center mt-1 gap-2">
-                        <input type="text" placeholder="Catatan (misal: pedas)" value="${item.notes}" onchange="updateNotes(${item.id}, this.value)"
+                        <input type="text" placeholder="Catatan menu, misal: pedas..." value="${item.notes}" onchange="updateNotes(${item.id}, this.value)"
                             class="bg-white border border-stone-300 text-[#1C1917] rounded-xl px-2.5 py-1 text-[11px] flex-1 focus:outline-none focus:border-[#BD2000] font-medium">
                         <div class="flex items-center gap-1.5 bg-white border border-stone-200 rounded-xl p-1 shadow-xs">
                             <button type="button" onclick="updateQty(${item.id}, -1)" class="w-6 h-6 flex items-center justify-center text-stone-600 hover:text-[#BD2000] hover:bg-stone-100 rounded-lg font-black transition-colors cursor-pointer">-</button>
@@ -270,15 +270,15 @@
         e.stopPropagation();
 
         if (cart.length === 0) {
-            if (window.showToast) window.showToast('Keranjang belanja masih kosong!', 'warning');
-            else alert('Keranjang belanja masih kosong!');
+            if (window.showToast) window.showToast('Keranjang belanja masih kosong.', 'warning');
+            else alert('Keranjang belanja masih kosong.');
             return;
         }
 
         const customerName = document.getElementById('customer_name').value.trim();
         if (!customerName) {
-            if (window.showToast) window.showToast('Silakan isi nama pelanggan terlebih dahulu!', 'warning');
-            else alert('Silakan isi nama pelanggan terlebih dahulu!');
+            if (window.showToast) window.showToast('Nama pelanggan wajib diisi.', 'warning');
+            else alert('Nama pelanggan wajib diisi.');
             return;
         }
 
@@ -286,7 +286,7 @@
         const paymentMethod = paymentMethodInput ? paymentMethodInput.value : 'cash';
         const submitBtn = document.getElementById('submit-btn');
         submitBtn.disabled = true;
-        submitBtn.innerText = '⏳ Menyimpan Pesanan...';
+        submitBtn.innerText = 'Menyimpan Pesanan...';
 
         try {
             const payload = {
@@ -319,22 +319,22 @@
                     detail: {
                         orderId: data.order.id,
                         customerName: data.order.customer_name,
-                        tableNumber: '🛍️ Bawa Pulang',
+                        tableNumber: 'Bawa Pulang',
                         totalAmount: data.order.total_price,
                         paymentMethod: paymentMethod,
                         items: data.order.items
                     }
                 }));
             } else {
-                if (window.showToast) window.showToast('Gagal menyimpan pesanan: ' + (data.message || 'Silakan cek kembali inputan.'), 'error');
-                else alert('Gagal menyimpan pesanan: ' + (data.message || 'Silakan cek kembali inputan.'));
+                if (window.showToast) window.showToast('Gagal menyimpan pesanan: ' + (data.message || 'Periksa kembali data pesanan.'), 'error');
+                else alert('Gagal menyimpan pesanan: ' + (data.message || 'Periksa kembali data pesanan.'));
             }
         } catch (err) {
-            if (window.showToast) window.showToast('Terjadi kesalahan jaringan saat mengirim pesanan.', 'error');
-            else alert('Terjadi kesalahan jaringan saat mengirim pesanan.');
+            if (window.showToast) window.showToast('Gangguan koneksi saat mengirim pesanan.', 'error');
+            else alert('Gangguan koneksi saat mengirim pesanan.');
         } finally {
             submitBtn.disabled = false;
-            submitBtn.innerText = 'Pesan Sekarang & Buka Pembayaran';
+            submitBtn.innerText = 'Simpan dan Proses Pembayaran';
         }
     });
 

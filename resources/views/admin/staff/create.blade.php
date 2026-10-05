@@ -16,11 +16,7 @@
     </div>
 
     {{-- Role Info Cards --}}
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div class="bg-blue-50 border border-blue-200 rounded-2xl p-3.5">
-            <div class="text-xs font-bold text-blue-700 mb-1">Owner</div>
-            <p class="text-[11px] text-slate-600 font-medium">Pantau omzet, laba bersih & stok barang</p>
-        </div>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div class="bg-amber-50 border border-amber-200 rounded-2xl p-3.5">
             <div class="text-xs font-bold text-amber-700 mb-1">Supervisor</div>
             <p class="text-[11px] text-slate-600 font-medium">Kelola & restok bahan makanan & alat</p>
@@ -31,7 +27,7 @@
         </div>
         <div class="bg-purple-50 border border-purple-200 rounded-2xl p-3.5">
             <div class="text-xs font-bold text-purple-700 mb-1">Dapur</div>
-            <p class="text-[11px] text-slate-600 font-medium">Monitor pesanan real-time dapur</p>
+            <p class="text-[11px] text-slate-600 font-medium">Monitor pesanan dapur real-time</p>
         </div>
     </div>
 
@@ -52,14 +48,7 @@
 
             <div>
                 <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Jabatan / Role <span class="text-red-500">*</span></label>
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <label class="cursor-pointer">
-                        <input type="radio" name="role" value="owner" class="sr-only peer" {{ old('role') === 'owner' ? 'checked' : '' }}>
-                        <div class="border border-stone-300 bg-stone-50 peer-checked:border-blue-600 peer-checked:bg-blue-50 rounded-2xl p-3.5 transition-all text-center">
-                            <div class="text-xs font-black text-stone-700 peer-checked:text-blue-700">Owner</div>
-                            <div class="text-[10px] text-slate-500 font-bold">Pemilik</div>
-                        </div>
-                    </label>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <label class="cursor-pointer">
                         <input type="radio" name="role" value="supervisor" class="sr-only peer" {{ old('role') === 'supervisor' ? 'checked' : '' }}>
                         <div class="border border-stone-300 bg-stone-50 peer-checked:border-amber-600 peer-checked:bg-amber-50 rounded-2xl p-3.5 transition-all text-center">

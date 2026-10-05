@@ -23,9 +23,9 @@
                 <select name="role" id="role" required
                     class="w-full bg-stone-50 border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-4 py-3 text-sm focus:border-[#BD2000] focus:outline-none transition-all">
                     <option value="">-- Pilih Peran / Posisi --</option>
-                    <option value="kasir" {{ old('role') == 'kasir' ? 'selected' : '' }}>Kasir (Front Office POS)</option>
-                    <option value="koki" {{ old('role') == 'koki' ? 'selected' : '' }}>Dapur / Kitchen (Koki)</option>
-                    <option value="waiter" {{ old('role') == 'waiter' ? 'selected' : '' }}>Waiter / Pelayan</option>
+                    <option value="kasir" {{ old('role') == 'kasir' ? 'selected' : '' }}>Kasir</option>
+                    <option value="koki" {{ old('role') == 'koki' ? 'selected' : '' }}>Staf Dapur</option>
+                    <option value="waiter" {{ old('role') == 'waiter' ? 'selected' : '' }}>Pelayan</option>
                 </select>
                 @error('role')
                     <p class="mt-1.5 text-xs font-bold text-red-600">{{ $message }}</p>

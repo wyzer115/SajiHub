@@ -30,9 +30,26 @@
             color: #1C1917;
         }
         /* QR Code Scanner Custom Styles */
+        #qr-reader-container {
+            min-height: 270px !important;
+            background-color: #0c0a09 !important;
+            position: relative !important;
+        }
         #qr-reader {
             border: none !important;
-            background: transparent !important;
+            width: 100% !important;
+            min-height: 260px !important;
+            background: #0c0a09 !important;
+        }
+        #qr-reader video,
+        #qr-reader__scan_region video {
+            border-radius: 1rem !important;
+            object-fit: cover !important;
+            width: 100% !important;
+            height: 100% !important;
+            min-height: 260px !important;
+            max-height: 380px !important;
+            display: block !important;
         }
         #qr-reader img[alt="Info icon"],
         #qr-reader__header_message,
@@ -45,12 +62,8 @@
         #qr-reader__scan_region {
             border: none !important;
             background: transparent !important;
-        }
-        #qr-reader__scan_region video {
-            border-radius: 1rem !important;
-            object-fit: cover !important;
             width: 100% !important;
-            max-height: 320px !important;
+            min-height: 260px !important;
         }
         #qr-reader button {
             background-color: #BD2000 !important;
@@ -101,18 +114,20 @@
 
     {{-- 1. NAVIGASI ATAS (HEADER) --}}
     <nav class="w-full bg-white border-b border-stone-200 sticky top-0 z-50 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             
             {{-- Logo Merk --}}
-            <a href="{{ route('landing') }}" class="flex items-center group">
-                <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-10 sm:h-11 w-auto object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-300">
+            <a href="{{ route('landing') }}" class="flex items-center gap-2.5 sm:gap-3 group">
+                <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-9 sm:h-10 w-auto object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-300">
+                <span class="font-black text-xl sm:text-2xl tracking-tight text-[#8C0000] leading-none group-hover:opacity-90 transition-opacity">
+                    Saji<span class="text-[#FFBE0F]">HUB</span>
+                </span>
             </a>
 
             {{-- Menu Navigasi Tengah --}}
             <div class="hidden lg:flex items-center gap-8 text-sm font-bold tracking-wide">
                 <a href="{{ route('landing') }}#beranda" class="nav-link text-stone-600 border-transparent py-1 border-b-2 hover:text-[#BD2000] transition-all">Beranda</a>
                 <a href="{{ route('landing') }}#menu-terlaris" class="nav-link text-stone-600 border-transparent py-1 border-b-2 hover:text-[#BD2000] transition-all">Menu Terlaris</a>
-                <a href="{{ route('landing') }}#testimoni" class="nav-link text-stone-600 border-transparent py-1 border-b-2 hover:text-[#BD2000] transition-all">Testimoni</a>
                 <a href="{{ route('menu.catalog') }}" class="nav-link text-[#BD2000] border-[#BD2000] py-1 border-b-2 font-black transition-all">Lihat Menu</a>
             </div>
 
@@ -250,7 +265,7 @@
             </h2>
             @if(request()->anyFilled(['search', 'branch_id', 'category_type', 'sort']))
                 <a href="{{ route('menu.catalog') }}" class="text-xs font-bold text-[#BD2000] hover:underline">
-                    Reset Filter
+                    Atur Ulang Saringan
                 </a>
             @endif
         </div>
@@ -328,7 +343,7 @@
                         </svg>
                     </div>
                     <h3 class="text-lg font-black text-[#1C1917]">Tidak Ada Menu Ditemukan</h3>
-                    <p class="text-slate-500 text-sm font-medium mt-1">Coba ubah kata kunci pencarian atau reset filter kategori & cabang.</p>
+                    <p class="text-slate-500 text-sm font-medium mt-1">Coba ubah kata kunci pencarian atau atur ulang saringan kategori & cabang.</p>
                     <a href="{{ route('menu.catalog') }}" class="inline-block mt-4 px-5 py-2.5 bg-[#BD2000] text-white font-extrabold text-xs rounded-xl hover:bg-[#8C0000] transition-colors">
                         Tampilkan Semua Menu
                     </a>
@@ -367,12 +382,26 @@
             </div>
 
             <p class="text-xs text-slate-600 font-medium leading-relaxed">
-                Arahkan kamera ponsel Anda ke stiker kode QR yang menempel di meja makan.
+                Arahkan kamera ke stiker kode QR yang menempel di meja makan Anda.
             </p>
 
+            {{-- Camera Controls Bar (Flip Front / Back) --}}
+            <div class="flex items-center justify-between bg-stone-50 px-3.5 py-2 rounded-2xl border border-stone-200">
+                <span class="text-[11px] font-bold text-stone-600 flex items-center gap-1.5" id="customer-cam-label">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span id="customer-cam-mode-text">Kamera Depan</span>
+                </span>
+                <button type="button" onclick="toggleCustomerCameraFacing()" class="px-2.5 py-1 rounded-xl bg-white hover:bg-stone-100 text-stone-800 text-[11px] font-black transition-all border border-stone-300 flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
+                    <svg class="w-3.5 h-3.5 text-[#BD2000]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <span>Ganti Kamera</span>
+                </button>
+            </div>
+
             {{-- Camera Container with Viewfinder --}}
-            <div id="qr-reader-container" class="w-full bg-stone-950 rounded-2xl p-2 border border-stone-300/80 min-h-[260px] flex flex-col items-center justify-center relative overflow-hidden shadow-inner">
-                <div id="qr-reader" class="w-full rounded-xl overflow-hidden"></div>
+            <div id="qr-reader-container" class="w-full bg-stone-950 rounded-2xl p-2 border border-stone-300/80 flex flex-col items-center justify-center relative overflow-hidden shadow-inner" style="min-height: 270px; background-color: #0c0a09;">
+                <div id="qr-reader" class="w-full rounded-xl overflow-hidden" style="width: 100%; min-height: 260px;"></div>
                 
                 {{-- Glowing Viewfinder Target Box Overlay --}}
                 <div class="absolute inset-0 pointer-events-none flex items-center justify-center">
@@ -397,43 +426,231 @@
 
     <script>
         let html5QrcodeScanner = null;
+        let isScanLocked = false;
+
+        function playSuccessBeep() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.12);
+                gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.13);
+            } catch(e) {}
+        }
+
+        function playErrorBeep() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(250, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(180, audioCtx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.31);
+            } catch(e) {}
+        }
+
+        const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        // Default to 'user' on laptop/PC, 'environment' on smartphone
+        let currentFacingMode = isMobileDevice ? "environment" : "user";
+
+        function updateCustomerCamLabel() {
+            const el = document.getElementById('customer-cam-mode-text');
+            if (el) {
+                el.innerText = currentFacingMode === "user" ? "Kamera Depan" : "Kamera Belakang";
+            }
+        }
+
+        async function toggleCustomerCameraFacing() {
+            currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
+            updateCustomerCamLabel();
+
+            if (html5QrcodeScanner && html5QrcodeScanner.isScanning) {
+                try {
+                    await html5QrcodeScanner.stop();
+                    html5QrcodeScanner.clear();
+                } catch(e) {}
+                startCustomerCamera();
+            }
+        }
 
         function openQrScannerModal() {
             const modal = document.getElementById('qr-scanner-modal');
             modal.classList.remove('opacity-0', 'pointer-events-none', 'hidden');
             modal.classList.add('opacity-100');
+            isScanLocked = false;
+            updateCustomerCamLabel();
+
+            setTimeout(() => {
+                startCustomerCamera();
+            }, 150);
+        }
+
+        function startCustomerCamera() {
+            updateCustomerCamLabel();
 
             if (!html5QrcodeScanner) {
-                html5QrcodeScanner = new Html5Qrcode("qr-reader");
+                html5QrcodeScanner = new Html5Qrcode("qr-reader", {
+                    verbose: false
+                });
             }
-            const config = { fps: 15 };
+
+            const scanConfig = {
+                fps: 20,
+                qrbox: function(viewfinderWidth, viewfinderHeight) {
+                    const edge = Math.min(viewfinderWidth, viewfinderHeight);
+                    const boxSize = Math.max(Math.floor(edge * 0.85), 200);
+                    return { width: boxSize, height: boxSize };
+                },
+                aspectRatio: 1.0
+            };
+
+            const cameraConfig = {
+                facingMode: currentFacingMode
+            };
 
             html5QrcodeScanner.start(
-                { facingMode: "environment" },
-                config,
-                (decodedText) => {
-                    closeQrScannerModal();
-                    window.location.href = decodedText;
-                },
+                cameraConfig,
+                scanConfig,
+                onScanSuccess,
                 (errorMessage) => {}
-            ).catch(err => {
-                html5QrcodeScanner.start({ facingMode: "user" }, config, (decodedText) => {
+            ).then(() => {
+                const videoEl = document.querySelector('#qr-reader video');
+                if (videoEl) {
+                    videoEl.style.width = '100%';
+                    videoEl.style.height = '100%';
+                    videoEl.style.minHeight = '260px';
+                    videoEl.style.objectFit = 'cover';
+                    videoEl.style.display = 'block';
+                }
+            }).catch(err => {
+                console.warn("Primary camera start failed for", currentFacingMode, err);
+                const fallbackMode = currentFacingMode === "user" ? "environment" : "user";
+                html5QrcodeScanner.start(
+                    { facingMode: fallbackMode },
+                    scanConfig,
+                    onScanSuccess,
+                    () => {}
+                ).then(() => {
+                    currentFacingMode = fallbackMode;
+                    updateCustomerCamLabel();
+                    const videoEl = document.querySelector('#qr-reader video');
+                    if (videoEl) {
+                        videoEl.style.width = '100%';
+                        videoEl.style.height = '100%';
+                        videoEl.style.minHeight = '260px';
+                        videoEl.style.objectFit = 'cover';
+                        videoEl.style.display = 'block';
+                    }
+                }).catch(e => {
+                    // Final fallback: unconstrained any camera device
+                    html5QrcodeScanner.start(
+                        {},
+                        scanConfig,
+                        onScanSuccess,
+                        () => {}
+                    ).then(() => {
+                        const videoEl = document.querySelector('#qr-reader video');
+                        if (videoEl) {
+                            videoEl.style.width = '100%';
+                            videoEl.style.height = '100%';
+                            videoEl.style.minHeight = '260px';
+                            videoEl.style.objectFit = 'cover';
+                            videoEl.style.display = 'block';
+                        }
+                    }).catch(e2 => {
+                        console.error("Camera error:", e2);
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Kamera Tidak Dapat Dibuka',
+                            text: 'Pastikan Anda telah memberikan izin akses kamera pada browser.',
+                            confirmButtonColor: '#BD2000'
+                        });
+                        closeQrScannerModal();
+                    });
+                });
+            });
+        }
+
+        function onScanSuccess(decodedText) {
+            if (isScanLocked) return;
+            isScanLocked = true;
+
+            if (html5QrcodeScanner && html5QrcodeScanner.isScanning) {
+                try { html5QrcodeScanner.pause(true); } catch(e) {}
+            }
+
+            const text = (decodedText || '').trim();
+
+            // 1. Format resmi SajiHub: SAJIHUB-TABLE-{branch_id}-{tableIdentifier}
+            if (text.startsWith('SAJIHUB-TABLE-')) {
+                const parts = text.split('-');
+                if (parts.length >= 4) {
+                    const branchId = parts[2];
+                    const tableIdent = parts.slice(3).join('-');
+                    playSuccessBeep();
                     closeQrScannerModal();
-                    window.location.href = decodedText;
-                }, () => {}).catch(e => console.log(e));
+                    window.location.href = `{{ url('/pesan') }}?branch_id=${encodeURIComponent(branchId)}&table=${encodeURIComponent(tableIdent)}`;
+                    return;
+                }
+            }
+
+            // 2. URL internal SajiHub (/pesan atau /order)
+            if (text.includes('/pesan') || text.includes('/order')) {
+                try {
+                    const urlObj = new URL(text, window.location.origin);
+                    if (urlObj.searchParams.has('branch_id') || urlObj.searchParams.has('table')) {
+                        playSuccessBeep();
+                        closeQrScannerModal();
+                        window.location.href = urlObj.href;
+                        return;
+                    }
+                } catch(e) {}
+            }
+
+            // 3. QR tidak dikenali / bukan QR SajiHub
+            playErrorBeep();
+            Swal.fire({
+                icon: 'error',
+                title: 'QR Code Tidak Dikenali',
+                text: 'Kode QR ini bukan QR Meja resmi SajiHUB. Silakan scan stiker QR yang terpasang di meja Anda.',
+                confirmButtonColor: '#BD2000',
+                confirmButtonText: 'Coba Lagi',
+                customClass: { popup: 'rounded-3xl shadow-2xl font-sans' }
+            }).then(() => {
+                isScanLocked = false;
+                if (html5QrcodeScanner && html5QrcodeScanner.isScanning) {
+                    try { html5QrcodeScanner.resume(); } catch(e) {}
+                }
             });
         }
 
         function closeQrScannerModal() {
+            isScanLocked = false;
             const modal = document.getElementById('qr-scanner-modal');
             if (modal) {
                 modal.classList.remove('opacity-100');
                 modal.classList.add('opacity-0', 'pointer-events-none');
             }
-            if (html5QrcodeScanner) {
+            if (html5QrcodeScanner && html5QrcodeScanner.isScanning) {
                 html5QrcodeScanner.stop().then(() => {
-                    console.log("Camera stopped.");
-                }).catch(() => {});
+                    html5QrcodeScanner.clear();
+                    html5QrcodeScanner = null;
+                }).catch(() => {
+                    html5QrcodeScanner = null;
+                });
             }
         }
 

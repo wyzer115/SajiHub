@@ -8,6 +8,7 @@
     <meta name="description" content="SajiHUB — Nikmati sajian kuliner khas Nusantara dengan bumbu meresap, bahan segar, dan pelayanan cepat di berbagai cabang restoran kami.">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     @include('partials.head-assets')
     <style>
@@ -49,9 +50,26 @@
         .delay-300 { transition-delay: 0.3s; }
 
         /* QR Code Scanner Custom Styles */
+        #qr-reader-container {
+            min-height: 270px !important;
+            background-color: #0c0a09 !important;
+            position: relative !important;
+        }
         #qr-reader {
             border: none !important;
-            background: transparent !important;
+            width: 100% !important;
+            min-height: 260px !important;
+            background: #0c0a09 !important;
+        }
+        #qr-reader video,
+        #qr-reader__scan_region video {
+            border-radius: 1rem !important;
+            object-fit: cover !important;
+            width: 100% !important;
+            height: 100% !important;
+            min-height: 260px !important;
+            max-height: 380px !important;
+            display: block !important;
         }
         #qr-reader img[alt="Info icon"],
         #qr-reader__header_message,
@@ -64,12 +82,8 @@
         #qr-reader__scan_region {
             border: none !important;
             background: transparent !important;
-        }
-        #qr-reader__scan_region video {
-            border-radius: 1rem !important;
-            object-fit: cover !important;
             width: 100% !important;
-            max-height: 320px !important;
+            min-height: 260px !important;
         }
         #qr-reader button {
             background-color: #BD2000 !important;
@@ -99,18 +113,20 @@
 
     {{-- 1. NAVIGASI ATAS (HEADER) --}}
     <nav class="w-full bg-white border-b border-stone-200 sticky top-0 z-50 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             
             {{-- Logo Merk --}}
-            <a href="#beranda" class="flex items-center group">
-                <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-10 sm:h-11 w-auto object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-300">
+            <a href="#beranda" class="flex items-center gap-2.5 sm:gap-3 group">
+                <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-9 sm:h-10 w-auto object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-300">
+                <span class="font-black text-xl sm:text-2xl tracking-tight text-[#8C0000] leading-none group-hover:opacity-90 transition-opacity">
+                    Saji<span class="text-[#FFBE0F]">HUB</span>
+                </span>
             </a>
 
             {{-- Menu Navigasi Tengah --}}
             <div class="hidden lg:flex items-center gap-8 text-sm font-bold tracking-wide">
                 <a href="#beranda" class="nav-link text-[#BD2000] border-[#BD2000] py-1 border-b-2 transition-all">Beranda</a>
                 <a href="#menu-terlaris" class="nav-link text-stone-600 border-transparent py-1 border-b-2 hover:text-[#BD2000] transition-all">Menu Terlaris</a>
-                <a href="#testimoni" class="nav-link text-stone-600 border-transparent py-1 border-b-2 hover:text-[#BD2000] transition-all">Testimoni</a>
                 <a href="{{ route('menu.catalog') }}" class="nav-link text-stone-600 border-transparent py-1 border-b-2 hover:text-[#BD2000] transition-all">Lihat Menu</a>
             </div>
 
@@ -145,9 +161,9 @@
     </nav>
 
     {{-- 2. BAGIAN UTAMA (HERO SECTION - 2 KOLOM SEIMBANG) --}}
-    <section id="beranda" class="w-full bg-[#FAF8F5]">
+    <section id="beranda" class="w-full bg-[#FAF8F5] scroll-mt-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center py-16 w-full">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center py-10 lg:py-12 w-full">
                 
                 {{-- Sisi Kiri (Teks) --}}
                 <div class="w-full text-left reveal-on-scroll reveal-left">
@@ -243,7 +259,7 @@
                 @endphp
 
                 <div class="w-full reveal-on-scroll reveal-right">
-                    <div id="hero-carousel-container" class="w-full rounded-3xl overflow-hidden shadow-2xl border border-stone-200 relative bg-stone-900 group" style="height: 450px; min-height: 420px;">
+                    <div id="hero-carousel-container" class="w-full rounded-3xl overflow-hidden shadow-2xl border border-stone-200 relative bg-stone-900 group" style="height: 380px; min-height: 340px;">
                         
                         {{-- Render Slides directly in HTML for Instant Server-side Load --}}
                         @foreach($slidesData as $index => $slide)
@@ -315,11 +331,11 @@
     </div>
 
     {{-- 3. BAGIAN MENU TERLARIS (DYNAMIC TOP 3 MENU) --}}
-    <section id="menu-terlaris" class="w-full py-16 sm:py-24 bg-white">
+    <section id="menu-terlaris" class="w-full py-10 sm:py-14 bg-white scroll-mt-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
             
             {{-- Header Judul Bagian --}}
-            <div class="text-center max-w-3xl mx-auto mb-16 space-y-3 reveal-on-scroll">
+            <div class="text-center max-w-3xl mx-auto mb-8 space-y-2 reveal-on-scroll">
                 <div class="inline-flex items-center gap-1.5 text-xs font-bold text-[#BD2000] uppercase tracking-wider bg-[#BD2000]/10 px-3.5 py-1.5 rounded-full border border-[#BD2000]/20">
                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/></svg>
                     Rekomendasi Utama
@@ -404,7 +420,7 @@
             </div>
 
             {{-- Tombol Lihat Seluruh Menu (Redirect to /menu Catalog) --}}
-            <div class="mt-12 text-center reveal-on-scroll reveal-scale">
+            <div class="mt-8 text-center reveal-on-scroll reveal-scale">
                 <a href="{{ route('menu.catalog') }}" class="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-stone-100 hover:bg-[#BD2000] text-[#1C1917] hover:text-white font-extrabold text-sm transition-all border border-stone-300 hover:border-[#BD2000] shadow-sm cursor-pointer">
                     Lihat Seluruh Daftar Menu SajiHUB
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
@@ -414,120 +430,22 @@
         </div>
     </section>
 
-    {{-- Pembatas Garis Gradasi Beranimasi --}}
-    <div class="w-full bg-white py-2 flex items-center justify-center overflow-hidden reveal-on-scroll">
-        <div class="w-3/4 max-w-4xl h-[1.5px] bg-gradient-to-r from-transparent via-[#BD2000]/35 to-transparent relative flex items-center justify-center">
-            <div class="w-2.5 h-2.5 rounded-full bg-[#BD2000]/40 animate-ping absolute"></div>
+    {{-- Pembatas Garis Gradasi Emas-Marun --}}
+    <div class="w-full bg-white py-1 flex items-center justify-center overflow-hidden reveal-on-scroll">
+        <div class="w-3/4 max-w-4xl h-[1.5px] bg-gradient-to-r from-transparent via-[#BD2000]/30 to-transparent relative flex items-center justify-center">
             <div class="w-2 h-2 rounded-full bg-[#BD2000] relative"></div>
         </div>
     </div>
 
-    {{-- 4. BAGIAN TESTIMONI / ULASAN PELANGGAN --}}
-    <section id="testimoni" class="w-full py-16 sm:py-24 bg-[#FAF8F5]">
+    {{-- 4. FOOTER (KAKI HALAMAN - WADAH MARUN GELAP #8C0000) --}}
+    <footer class="w-full bg-[#8C0000] text-stone-100 pt-10 pb-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-            
-            {{-- Header Judul --}}
-            <div class="text-center max-w-3xl mx-auto mb-16 space-y-3 reveal-on-scroll">
-                <div class="inline-flex items-center gap-1.5 text-xs font-bold text-[#BD2000] uppercase tracking-wider bg-[#BD2000]/10 px-3.5 py-1.5 rounded-full border border-[#BD2000]/20">
-                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-                    Ulasan Jujur Pelanggan
-                </div>
-                <h2 class="text-3xl sm:text-4xl font-black text-[#8C0000] tracking-tight">
-                    Apa Kata Pelanggan Setia Kami?
-                </h2>
-                <p class="text-slate-600 text-base font-medium">
-                    Ribuan pengalaman santap puas dari pecinta kuliner yang telah membuktikan cita rasa otentik SajiHUB.
-                </p>
-            </div>
-
-            {{-- Grid Kartu Ulasan --}}
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
-                
-                {{-- Kartu Ulasan 1 --}}
-                <div class="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between w-full reveal-on-scroll reveal-left delay-100">
-                    <div>
-                        <div class="text-[#FFBE0F] text-lg font-bold flex gap-1 mb-3">
-                            ★★★★★
-                        </div>
-                        <p class="text-[#1C1917] text-sm leading-relaxed font-medium italic mb-6">
-                            "Rasa bumbu rasanya pas banget di lidah, ayam bakarnya empuk dan bumbunya meresap sampai ke tulang. Pelayanannya cepat dan tempatnya sangat bersih!"
-                        </p>
-                    </div>
-                    <div class="flex items-center gap-3 pt-4 border-t border-stone-100">
-                        <div class="w-11 h-11 rounded-full bg-[#BD2000]/10 border border-[#BD2000]/20 flex items-center justify-center font-black text-[#BD2000] text-sm">
-                            B
-                        </div>
-                        <div>
-                            <div class="font-bold text-[#1C1917] text-sm">Bambang S.</div>
-                            <div class="text-xs text-slate-500 font-semibold">Pelanggan Setia — Cabang Pusat</div>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Kartu Ulasan 2 --}}
-                <div class="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between w-full reveal-on-scroll reveal-scale delay-200">
-                    <div>
-                        <div class="text-[#FFBE0F] text-lg font-bold flex gap-1 mb-3">
-                            ★★★★★
-                        </div>
-                        <p class="text-[#1C1917] text-sm leading-relaxed font-medium italic mb-6">
-                            "Sistem scan QR meja nya praktis banget! Nggak perlu antre lama di kasir, tinggal pesan dari meja langsung diantar panas-panas. Sangat direkomendasikan."
-                        </p>
-                    </div>
-                    <div class="flex items-center gap-3 pt-4 border-t border-stone-100">
-                        <div class="w-11 h-11 rounded-full bg-[#BD2000]/10 border border-[#BD2000]/20 flex items-center justify-center font-black text-[#BD2000] text-sm">
-                            R
-                        </div>
-                        <div>
-                            <div class="font-bold text-[#1C1917] text-sm">Rina Rahmawati</div>
-                            <div class="text-xs text-slate-500 font-semibold">Pengunjung Keluarga</div>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Kartu Ulasan 3 --}}
-                <div class="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between w-full reveal-on-scroll reveal-right delay-300">
-                    <div>
-                        <div class="text-[#FFBE0F] text-lg font-bold flex gap-1 mb-3">
-                            ★★★★★
-                        </div>
-                        <p class="text-[#1C1917] text-sm leading-relaxed font-medium italic mb-6">
-                            "Harga porsinya sangat bersahabat dibanding kualitas rasanya yang bintang lima. Nasi goreng rempahnya bikin nagih!"
-                        </p>
-                    </div>
-                    <div class="flex items-center gap-3 pt-4 border-t border-stone-100">
-                        <div class="w-11 h-11 rounded-full bg-[#BD2000]/10 border border-[#BD2000]/20 flex items-center justify-center font-black text-[#BD2000] text-sm">
-                            A
-                        </div>
-                        <div>
-                            <div class="font-bold text-[#1C1917] text-sm">Agung Pratama</div>
-                            <div class="text-xs text-slate-500 font-semibold">Pecinta Kuliner Nusantara</div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
-    </section>
-
-    {{-- Pembatas Garis Gradasi Emas-Marun --}}
-    <div class="w-full bg-[#FAF8F5] py-2 flex items-center justify-center overflow-hidden reveal-on-scroll">
-        <div class="w-3/4 max-w-4xl h-[1.5px] bg-gradient-to-r from-transparent via-[#FFBE0F]/50 to-transparent relative flex items-center justify-center">
-            <div class="w-2.5 h-2.5 rounded-full bg-[#FFBE0F]/40 animate-ping absolute"></div>
-            <div class="w-2 h-2 rounded-full bg-[#FFBE0F] relative"></div>
-        </div>
-    </div>
-
-    {{-- 5. FOOTER (KAKI HALAMAN - WADAH MARUN GELAP #8C0000) --}}
-    <footer class="w-full bg-[#8C0000] text-stone-100 pt-16 pb-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-12 pb-12 border-b border-white/10 w-full reveal-on-scroll">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 pb-8 border-b border-white/10 w-full reveal-on-scroll">
                 
                 {{-- Kolom 1: Tentang SajiHUB & Langganan Promo --}}
-                <div class="lg:col-span-4 space-y-4">
+                <div class="lg:col-span-4 space-y-3">
                     <div class="flex items-center gap-3">
-                        <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-10 w-10 object-contain">
+                        <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-9 w-9 object-contain">
                         <span class="font-black text-2xl tracking-tight text-white">Saji<span class="text-[#FFBE0F]">HUB</span></span>
                     </div>
                     
@@ -537,23 +455,22 @@
                 </div>
 
                 {{-- Kolom 2: Navigasi Cepat --}}
-                <div class="lg:col-span-2 space-y-4">
-                    <h4 class="font-extrabold text-white text-base uppercase tracking-wider">Navigasi Cepat</h4>
-                    <ul class="space-y-2.5 text-sm font-medium text-stone-200">
+                <div class="lg:col-span-2 space-y-3">
+                    <h4 class="font-extrabold text-white text-sm uppercase tracking-wider">Navigasi Cepat</h4>
+                    <ul class="space-y-2 text-sm font-medium text-stone-200">
                         <li><a href="#beranda" class="hover:text-[#FFBE0F] transition-colors">Beranda</a></li>
                         <li><a href="#menu-terlaris" class="hover:text-[#FFBE0F] transition-colors">Menu Terlaris</a></li>
-                        <li><a href="#testimoni" class="hover:text-[#FFBE0F] transition-colors">Testimoni</a></li>
-                        <li><a href="{{ route('pesan') }}" class="hover:text-[#FFBE0F] transition-colors">Pesan Online</a></li>
+                        <li><a href="javascript:void(0)" onclick="openQrScannerModal()" class="hover:text-[#FFBE0F] transition-colors">Pesan dari Meja (Scan QR)</a></li>
                     </ul>
                 </div>
 
                 {{-- Kolom 3: Layanan Kontak --}}
-                <div class="lg:col-span-3 space-y-4">
-                    <h4 class="font-extrabold text-white text-base uppercase tracking-wider">Layanan Pelanggan</h4>
-                    <ul class="space-y-2.5 text-sm font-medium text-stone-200">
+                <div class="lg:col-span-3 space-y-3">
+                    <h4 class="font-extrabold text-white text-sm uppercase tracking-wider">Layanan Pelanggan</h4>
+                    <ul class="space-y-2 text-sm font-medium text-stone-200">
                         <li class="flex items-center gap-2">
                             <svg class="w-4 h-4 text-[#FFBE0F]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-                            <span>0813-9889-7488 (WhatsApp)</span>
+                            <span>0895-3685-22726 (WhatsApp)</span>
                         </li>
                         <li class="flex items-center gap-2">
                             <svg class="w-4 h-4 text-[#FFBE0F]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
@@ -567,8 +484,8 @@
                 </div>
 
                 {{-- Kolom 4: Alamat Resto --}}
-                <div class="lg:col-span-3 space-y-4">
-                    <h4 class="font-extrabold text-white text-base uppercase tracking-wider">Alamat Kantor Restoran</h4>
+                <div class="lg:col-span-3 space-y-3">
+                    <h4 class="font-extrabold text-white text-sm uppercase tracking-wider">Alamat Kantor Restoran</h4>
                     <p class="text-sm text-stone-200 leading-relaxed font-medium">
                         Jl. Raya Kuliner Nusantara No. 88, Jakarta Selatan, Indonesia.
                     </p>
@@ -577,7 +494,7 @@
             </div>
 
             {{-- Copyright Text --}}
-            <div class="pt-8 text-center text-xs text-stone-300 font-medium">
+            <div class="pt-5 text-center text-xs text-stone-300 font-medium">
                 © 2026 SajiHUB Resto. Seluruh Hak Cipta Dilindungi.
             </div>
         </div>
@@ -678,12 +595,26 @@
             </div>
             
             <p class="text-xs text-slate-600 font-medium leading-relaxed">
-                Arahkan kamera ponsel Anda ke stiker kode QR yang menempel di meja makan.
+                Arahkan kamera ke stiker kode QR yang menempel di meja makan Anda.
             </p>
 
+            {{-- Camera Controls Bar (Flip Front / Back) --}}
+            <div class="flex items-center justify-between bg-stone-50 px-3.5 py-2 rounded-2xl border border-stone-200">
+                <span class="text-[11px] font-bold text-stone-600 flex items-center gap-1.5" id="customer-cam-label">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span id="customer-cam-mode-text">Kamera Depan</span>
+                </span>
+                <button type="button" onclick="toggleCustomerCameraFacing()" class="px-2.5 py-1 rounded-xl bg-white hover:bg-stone-100 text-stone-800 text-[11px] font-black transition-all border border-stone-300 flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
+                    <svg class="w-3.5 h-3.5 text-[#BD2000]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <span>Ganti Kamera</span>
+                </button>
+            </div>
+
             {{-- Camera Container with Viewfinder --}}
-            <div id="qr-reader-container" class="w-full bg-stone-950 rounded-2xl p-2 border border-stone-300/80 min-h-[260px] flex flex-col items-center justify-center relative overflow-hidden shadow-inner">
-                <div id="qr-reader" class="w-full rounded-xl overflow-hidden"></div>
+            <div id="qr-reader-container" class="w-full bg-stone-950 rounded-2xl p-2 border border-stone-300/80 flex flex-col items-center justify-center relative overflow-hidden shadow-inner" style="min-height: 270px; background-color: #0c0a09;">
+                <div id="qr-reader" class="w-full rounded-xl overflow-hidden" style="width: 100%; min-height: 260px;"></div>
                 
                 {{-- Glowing Viewfinder Target Box Overlay --}}
                 <div class="absolute inset-0 pointer-events-none flex items-center justify-center">
@@ -708,6 +639,41 @@
 
     <script>
         let html5QrCodeInstance = null;
+        let isScanLocked = false;
+
+        function playSuccessBeep() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.12);
+                gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.13);
+            } catch(e) {}
+        }
+
+        function playErrorBeep() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(250, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(180, audioCtx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.31);
+            } catch(e) {}
+        }
 
         function openOrderTypeModal() {
             const modal = document.getElementById('order-type-modal');
@@ -732,33 +698,179 @@
             }, 200);
         }
 
+        const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        // Default to 'user' on laptop/PC, 'environment' on smartphone
+        let currentFacingMode = isMobileDevice ? "environment" : "user";
+
+        function updateCustomerCamLabel() {
+            const el = document.getElementById('customer-cam-mode-text');
+            if (el) {
+                el.innerText = currentFacingMode === "user" ? "Kamera Depan" : "Kamera Belakang";
+            }
+        }
+
+        async function toggleCustomerCameraFacing() {
+            currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
+            updateCustomerCamLabel();
+
+            if (html5QrCodeInstance && html5QrCodeInstance.isScanning) {
+                try {
+                    await html5QrCodeInstance.stop();
+                    html5QrCodeInstance.clear();
+                } catch(e) {}
+                startCustomerCamera();
+            }
+        }
+
         function openQrScannerModal() {
             const modal = document.getElementById('qr-scanner-modal');
             modal.classList.remove('opacity-0', 'pointer-events-none');
             modal.classList.add('opacity-100');
+            isScanLocked = false;
+            updateCustomerCamLabel();
+
+            setTimeout(() => {
+                startCustomerCamera();
+            }, 150);
+        }
+
+        function startCustomerCamera() {
+            updateCustomerCamLabel();
 
             if (!html5QrCodeInstance) {
-                html5QrCodeInstance = new Html5Qrcode("qr-reader");
+                html5QrCodeInstance = new Html5Qrcode("qr-reader", {
+                    verbose: false
+                });
             }
 
-            const config = { fps: 15 };
+            const scanConfig = {
+                fps: 20,
+                qrbox: function(viewfinderWidth, viewfinderHeight) {
+                    const edge = Math.min(viewfinderWidth, viewfinderHeight);
+                    const boxSize = Math.max(Math.floor(edge * 0.85), 200);
+                    return { width: boxSize, height: boxSize };
+                },
+                aspectRatio: 1.0
+            };
+
+            const cameraConfig = {
+                facingMode: currentFacingMode
+            };
 
             html5QrCodeInstance.start(
-                { facingMode: "environment" },
-                config,
+                cameraConfig,
+                scanConfig,
                 onScanSuccess,
                 onScanError
-            ).catch(err => {
-                html5QrCodeInstance.start({ facingMode: "user" }, config, onScanSuccess, onScanError).catch(e => console.log(e));
+            ).then(() => {
+                const videoEl = document.querySelector('#qr-reader video');
+                if (videoEl) {
+                    videoEl.style.width = '100%';
+                    videoEl.style.height = '100%';
+                    videoEl.style.minHeight = '260px';
+                    videoEl.style.objectFit = 'cover';
+                    videoEl.style.display = 'block';
+                }
+            }).catch(err => {
+                console.warn("Primary camera start failed for", currentFacingMode, err);
+                const fallbackMode = currentFacingMode === "user" ? "environment" : "user";
+                html5QrCodeInstance.start(
+                    { facingMode: fallbackMode },
+                    scanConfig,
+                    onScanSuccess,
+                    onScanError
+                ).then(() => {
+                    currentFacingMode = fallbackMode;
+                    updateCustomerCamLabel();
+                    const videoEl = document.querySelector('#qr-reader video');
+                    if (videoEl) {
+                        videoEl.style.width = '100%';
+                        videoEl.style.height = '100%';
+                        videoEl.style.minHeight = '260px';
+                        videoEl.style.objectFit = 'cover';
+                        videoEl.style.display = 'block';
+                    }
+                }).catch(e => {
+                    // Final fallback: unconstrained any camera device
+                    html5QrCodeInstance.start(
+                        {},
+                        scanConfig,
+                        onScanSuccess,
+                        onScanError
+                    ).then(() => {
+                        const videoEl = document.querySelector('#qr-reader video');
+                        if (videoEl) {
+                            videoEl.style.width = '100%';
+                            videoEl.style.height = '100%';
+                            videoEl.style.minHeight = '260px';
+                            videoEl.style.objectFit = 'cover';
+                            videoEl.style.display = 'block';
+                        }
+                    }).catch(e2 => {
+                        console.error("Camera error:", e2);
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Kamera Tidak Dapat Dibuka',
+                            text: 'Pastikan Anda telah memberikan izin akses kamera pada browser.',
+                            confirmButtonColor: '#BD2000'
+                        });
+                        closeQrScannerModal();
+                    });
+                });
             });
         }
 
         function onScanSuccess(decodedText, decodedResult) {
-            console.log("QR Code Scanned:", decodedText);
-            if (decodedText) {
-                closeQrScannerModal();
-                window.location.href = decodedText;
+            if (isScanLocked) return;
+            isScanLocked = true;
+
+            if (html5QrCodeInstance && html5QrCodeInstance.isScanning) {
+                try { html5QrCodeInstance.pause(true); } catch(e) {}
             }
+
+            const text = (decodedText || '').trim();
+
+            // 1. Format resmi SajiHub: SAJIHUB-TABLE-{branch_id}-{tableIdentifier}
+            if (text.startsWith('SAJIHUB-TABLE-')) {
+                const parts = text.split('-');
+                if (parts.length >= 4) {
+                    const branchId = parts[2];
+                    const tableIdent = parts.slice(3).join('-');
+                    playSuccessBeep();
+                    closeQrScannerModal();
+                    window.location.href = `{{ url('/pesan') }}?branch_id=${encodeURIComponent(branchId)}&table=${encodeURIComponent(tableIdent)}`;
+                    return;
+                }
+            }
+
+            // 2. URL internal SajiHub (/pesan atau /order)
+            if (text.includes('/pesan') || text.includes('/order')) {
+                try {
+                    const urlObj = new URL(text, window.location.origin);
+                    if (urlObj.searchParams.has('branch_id') || urlObj.searchParams.has('table')) {
+                        playSuccessBeep();
+                        closeQrScannerModal();
+                        window.location.href = urlObj.href;
+                        return;
+                    }
+                } catch(e) {}
+            }
+
+            // 3. QR tidak dikenali / bukan QR SajiHub
+            playErrorBeep();
+            Swal.fire({
+                icon: 'error',
+                title: 'QR Code Tidak Dikenali',
+                text: 'Kode QR ini bukan QR Meja resmi SajiHUB. Silakan scan stiker QR yang terpasang di meja Anda.',
+                confirmButtonColor: '#BD2000',
+                confirmButtonText: 'Coba Lagi',
+                customClass: { popup: 'rounded-3xl shadow-2xl font-sans' }
+            }).then(() => {
+                isScanLocked = false;
+                if (html5QrCodeInstance && html5QrCodeInstance.isScanning) {
+                    try { html5QrCodeInstance.resume(); } catch(e) {}
+                }
+            });
         }
 
         function onScanError(errorMessage) {
@@ -766,9 +878,12 @@
         }
 
         function closeQrScannerModal() {
+            isScanLocked = false;
             const modal = document.getElementById('qr-scanner-modal');
-            modal.classList.remove('opacity-100');
-            modal.classList.add('opacity-0', 'pointer-events-none');
+            if (modal) {
+                modal.classList.remove('opacity-100');
+                modal.classList.add('opacity-0', 'pointer-events-none');
+            }
 
             if (html5QrCodeInstance && html5QrCodeInstance.isScanning) {
                 html5QrCodeInstance.stop().then(() => {

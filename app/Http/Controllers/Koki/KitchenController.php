@@ -13,6 +13,7 @@ class KitchenController extends Controller
         $branch = auth()->user()->branch;
 
         $orders = Order::where('branch_id', $branch->id)
+            ->whereNotNull('confirmed_at')
             ->whereIn('order_status', ['pending', 'cooking'])
             ->with(['items.menu', 'table'])
             ->orderBy('created_at', 'asc')

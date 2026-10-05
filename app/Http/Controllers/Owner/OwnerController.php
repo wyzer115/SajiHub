@@ -272,7 +272,7 @@ class OwnerController extends Controller
         } elseif ($preset === 'month') {
             $startDate = now()->startOfMonth()->toDateString();
             $endDate = now()->toDateString();
-            $periodLabel = 'Bulan Ini (' . now()->format('F Y') . ')';
+            $periodLabel = 'Bulan Ini (' . now()->locale('id')->translatedFormat('F Y') . ')';
         } elseif ($request->filled('start_date') && $request->filled('end_date')) {
             $preset = 'custom';
             $startDate = $request->start_date;
@@ -282,7 +282,7 @@ class OwnerController extends Controller
             $preset = 'month';
             $startDate = now()->startOfMonth()->toDateString();
             $endDate = now()->toDateString();
-            $periodLabel = 'Bulan Ini (' . now()->format('F Y') . ')';
+            $periodLabel = 'Bulan Ini (' . now()->locale('id')->translatedFormat('F Y') . ')';
         }
 
         $startDateTime = \Carbon\Carbon::parse($startDate)->startOfDay();

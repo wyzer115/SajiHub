@@ -70,19 +70,12 @@
             </div>
             <div class="flex items-center gap-2 text-xs text-slate-500 font-medium">
                 <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                <span>Bergabung {{ $person->created_at->format('d M Y') }}</span>
+                <span>Bergabung {{ $person->created_at->locale('id')->translatedFormat('d M Y') }}</span>
             </div>
         </div>
 
         <div class="mt-4 pt-3 border-t border-stone-200">
-            @if($person->role === 'owner')
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-blue-50/80 border border-blue-200/80 text-xs font-bold text-blue-900">
-                    <span class="w-2 h-2 rounded-full bg-blue-600 shrink-0"></span>
-                    <span>Owner</span>
-                    <span class="text-blue-300 font-normal">•</span>
-                    <span class="text-blue-600/90 font-medium">Pemilik Cabang</span>
-                </div>
-            @elseif($person->role === 'supervisor')
+            @if($person->role === 'supervisor')
                 <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-50/80 border border-amber-200/80 text-xs font-bold text-amber-900">
                     <span class="w-2 h-2 rounded-full bg-amber-600 shrink-0"></span>
                     <span>Supervisor</span>
@@ -94,14 +87,14 @@
                     <span class="w-2 h-2 rounded-full bg-emerald-600 shrink-0"></span>
                     <span>Kasir</span>
                     <span class="text-emerald-300 font-normal">•</span>
-                    <span class="text-emerald-600/90 font-medium">POS Front Office</span>
+                    <span class="text-emerald-600/90 font-medium">Layanan Kasir</span>
                 </div>
             @else
                 <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-stone-100 border border-stone-200 text-xs font-bold text-stone-800">
                     <span class="w-2 h-2 rounded-full bg-stone-600 shrink-0"></span>
-                    <span>Koki Dapur</span>
+                    <span>Staf Dapur</span>
                     <span class="text-stone-300 font-normal">•</span>
-                    <span class="text-stone-600 font-medium">Produksi</span>
+                    <span class="text-stone-600 font-medium">Produksi Makanan</span>
                 </div>
             @endif
         </div>

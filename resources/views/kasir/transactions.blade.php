@@ -1,6 +1,6 @@
 @extends('layouts.app')
-@section('title', 'Riwayat Semua Transaksi')
-@section('page-title', 'Riwayat Semua Transaksi')
+@section('title', 'Riwayat Transaksi')
+@section('page-title', 'Riwayat Transaksi')
 
 @section('content')
 <div class="space-y-6 animate-fade-in-up">
@@ -19,7 +19,7 @@
 
         <div class="bg-white border border-stone-200 rounded-3xl p-6 shadow-sm flex items-center justify-between">
             <div>
-                <p class="text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Total Keseluruhan Transaksi</p>
+                <p class="text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Total Transaksi</p>
                 <h3 class="text-3xl font-black text-[#1C1917]">{{ $orders->total() }} <span class="text-sm font-bold text-slate-500">transaksi</span></h3>
             </div>
             <div class="p-3.5 bg-[#BD2000]/10 text-[#BD2000] rounded-2xl border border-[#BD2000]/20 shrink-0">
@@ -34,7 +34,7 @@
         <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-stone-200/60">
             <div class="flex items-center gap-2">
                 <svg class="w-4 h-4 text-[#BD2000]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                <span class="text-xs font-black text-stone-600 uppercase tracking-wider">Filter Cepat:</span>
+                <span class="text-xs font-black text-stone-600 uppercase tracking-wider">Periode:</span>
             </div>
             <div class="flex flex-wrap items-center gap-2">
                 <a href="{{ route('kasir.transactions', ['preset' => 'today']) }}"
@@ -72,10 +72,10 @@
             </div>
             <div class="flex items-center gap-2">
                 <button type="submit" class="w-full bg-[#BD2000] hover:bg-[#8C0000] text-white font-extrabold py-2.5 rounded-xl text-sm transition-all shadow-md cursor-pointer">
-                    Filter Tanggal
+                    Terapkan Saringan
                 </button>
                 <a href="{{ route('kasir.transactions') }}" class="bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold px-4 py-2.5 rounded-xl text-sm border border-stone-300 transition-all text-center">
-                    Reset
+                    Atur Ulang
                 </a>
             </div>
         </form>
@@ -85,13 +85,13 @@
     <div class="bg-white border border-stone-200 rounded-3xl overflow-hidden shadow-sm">
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
-                <thead class="bg-stone-100 text-stone-700 text-xs font-extrabold uppercase tracking-wider border-b border-stone-200">
+                <thead class="bg-stone-100 text-stone-700 text-xs font-extrabold border-b border-stone-200">
                     <tr>
                         <th class="px-6 py-4">No</th>
                         <th class="px-6 py-4">Pelanggan</th>
                         <th class="px-6 py-4">Meja</th>
                         <th class="px-6 py-4">Status Bayar</th>
-                        <th class="px-6 py-4">Metode</th>
+                        <th class="px-6 py-4">Metode Bayar</th>
                         <th class="px-6 py-4">Total Tagihan</th>
                         <th class="px-6 py-4">Waktu Transaksi</th>
                         <th class="px-6 py-4 text-right">Aksi</th>
@@ -105,19 +105,25 @@
                         <td class="px-6 py-4 text-sm text-slate-700 font-bold">{{ $order->table ? $order->table->table_number : 'Bawa Pulang' }}</td>
                         <td class="px-6 py-4">
                             @if($order->payment_status == 'paid')
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold uppercase bg-emerald-50 text-emerald-800 border border-emerald-200">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
                                     <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
-                                    LUNAS
+                                    Lunas
                                 </span>
                             @else
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold uppercase bg-amber-50 text-amber-800 border border-amber-200">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
                                     <span class="w-2 h-2 rounded-full bg-amber-500 shrink-0"></span>
-                                    BELUM BAYAR
+                                    Belum Bayar
                                 </span>
                             @endif
                         </td>
-                        <td class="px-6 py-4 text-xs font-extrabold uppercase text-stone-700">
-                            {{ $order->payment_method ?? 'cash' }}
+                        <td class="px-6 py-4 text-xs font-extrabold text-stone-700">
+                            @if(($order->payment_method ?? 'cash') === 'cash')
+                                Tunai
+                            @elseif($order->payment_method === 'qris')
+                                QRIS
+                            @else
+                                Transfer
+                            @endif
                         </td>
                         <td class="px-6 py-4 text-sm font-black text-emerald-700">Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>
                         <td class="px-6 py-4 text-xs text-slate-600 font-semibold">{{ $order->created_at->format('d/m/Y H:i') }} WIB</td>
@@ -130,17 +136,17 @@
                             @else
                                 <a href="{{ route('kasir.orders.show', $order) }}" class="inline-flex items-center gap-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1.5 rounded-xl border border-amber-200 transition-all">
                                     <svg class="w-3.5 h-3.5 text-amber-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                                    Proses Bayar
+                                    Bayar Kasir
                                 </a>
                             @endif
                             <a href="{{ route('kasir.orders.show', $order) }}" class="inline-flex items-center gap-1 bg-[#BD2000]/10 hover:bg-[#BD2000]/20 text-[#BD2000] text-xs font-extrabold px-3 py-1.5 rounded-xl border border-[#BD2000]/20 transition-all">
-                                Detail
+                                Rincian
                             </a>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="8" class="px-6 py-12 text-center text-slate-500 text-sm font-medium">Tidak ada riwayat transaksi ditemukan.</td>
+                        <td colspan="8" class="px-6 py-12 text-center text-slate-500 text-sm font-medium">Belum ada riwayat transaksi pada periode ini.</td>
                     </tr>
                     @endforelse
                 </tbody>

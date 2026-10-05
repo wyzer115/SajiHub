@@ -1,6 +1,6 @@
 @extends('layouts.app')
-@section('title', 'Laporan Keuangan & Rekap Kasir')
-@section('page-title', 'Laporan Keuangan & Rekap Kasir')
+@section('title', 'Laporan Keuangan Kasir')
+@section('page-title', 'Laporan Keuangan Kasir')
 
 @section('content')
 <div class="space-y-6 animate-fade-in-up">
@@ -10,9 +10,9 @@
         <div>
             <h2 class="text-xl font-black text-[#8C0000] flex items-center gap-2 mb-1">
                 <svg class="w-6 h-6 text-[#BD2000]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                <span>Rekap Keuangan Transaksi Kasir ({{ $branch->name ?? 'Cabang' }})</span>
+                <span>Rekap Transaksi Kasir • {{ $branch->name ?? 'Cabang' }}</span>
             </h2>
-            <p class="text-stone-600 text-xs font-medium">Rekapitulasi penjualan terbayar, serah terima shift kasir, & rincian pembayaran (Cash vs QRIS).</p>
+            <p class="text-stone-600 text-xs font-medium">Rekapitulasi penjualan terbayar, serah terima shift kasir, dan rincian metode pembayaran.</p>
         </div>
 
         <!-- Filter Period & Custom Dates -->
@@ -20,7 +20,7 @@
             <div class="flex items-center bg-stone-100 p-1 rounded-xl">
                 <a href="{{ route('kasir.reports', ['preset' => 'today']) }}"
                    class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all {{ $preset === 'today' && !request('start_date') ? 'bg-white text-[#BD2000] shadow-xs' : 'text-stone-600 hover:text-stone-900' }}">
-                    Hari Ini (Shift)
+                    Shift Hari Ini
                 </a>
                 <a href="{{ route('kasir.reports', ['preset' => 'weekly']) }}"
                    class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all {{ $preset === 'weekly' && !request('start_date') ? 'bg-white text-[#BD2000] shadow-xs' : 'text-stone-600 hover:text-stone-900' }}">
@@ -35,57 +35,65 @@
             <input type="date" name="start_date" value="{{ $startDate }}" class="bg-stone-50 border border-stone-300 text-stone-800 text-xs font-semibold rounded-xl px-3 py-1.5 focus:border-[#BD2000] focus:outline-none">
             <span class="text-xs font-bold text-stone-400">-</span>
             <input type="date" name="end_date" value="{{ $endDate }}" class="bg-stone-50 border border-stone-300 text-stone-800 text-xs font-semibold rounded-xl px-3 py-1.5 focus:border-[#BD2000] focus:outline-none">
-            <button type="submit" class="bg-[#BD2000] hover:bg-[#8C0000] text-white text-xs font-extrabold px-4 py-2 rounded-xl transition-all shadow-xs cursor-pointer">Filter</button>
+            <button type="submit" class="bg-[#BD2000] hover:bg-[#8C0000] text-white text-xs font-extrabold px-4 py-2 rounded-xl transition-all shadow-xs cursor-pointer">Terapkan</button>
         </form>
     </div>
 
     <!-- Financial KPI Summary Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <!-- Total Omset Lunas -->
+        <!-- Total Pendapatan Lunas -->
         <div class="bg-white border border-stone-200 rounded-3xl p-6 shadow-sm flex items-center justify-between">
             <div>
-                <span class="text-stone-500 font-bold text-xs block mb-1">TOTAL OMSET LUNAS</span>
+                <span class="text-stone-500 font-bold text-xs block mb-1">Total Pendapatan Lunas</span>
                 <h3 class="text-2xl font-black text-[#8C0000]">Rp {{ number_format($totalPaidRevenue, 0, ',', '.') }}</h3>
                 <span class="text-[11px] font-semibold text-emerald-600 mt-1 block">Dari {{ $totalPaidOrdersCount }} transaksi terbayar</span>
             </div>
             <div class="w-12 h-12 rounded-2xl bg-red-50 text-[#BD2000] flex items-center justify-center font-bold text-xl shrink-0">
-                💰
+                <svg class="w-6 h-6 text-[#BD2000]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
             </div>
         </div>
 
-        <!-- Pembayaran Tunai (Cash) -->
+        <!-- Pembayaran Tunai -->
         <div class="bg-white border border-stone-200 rounded-3xl p-6 shadow-sm flex items-center justify-between">
             <div>
-                <span class="text-stone-500 font-bold text-xs block mb-1">PEMBAYARAN TUNAI (CASH)</span>
+                <span class="text-stone-500 font-bold text-xs block mb-1">Pembayaran Tunai</span>
                 <h3 class="text-2xl font-black text-emerald-700">Rp {{ number_format($cashRevenue, 0, ',', '.') }}</h3>
-                <span class="text-[11px] font-semibold text-stone-400 mt-1 block">Fisik kas di laci kasir</span>
+                <span class="text-[11px] font-semibold text-stone-500 mt-1 block">Kas fisik di laci kasir</span>
             </div>
             <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xl shrink-0">
-                💵
+                <svg class="w-6 h-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
             </div>
         </div>
 
-        <!-- Pembayaran QRIS / Non-Tunai -->
+        <!-- Pembayaran QRIS -->
         <div class="bg-white border border-stone-200 rounded-3xl p-6 shadow-sm flex items-center justify-between">
             <div>
-                <span class="text-stone-500 font-bold text-xs block mb-1">PEMBAYARAN QRIS / DIGITAL</span>
+                <span class="text-stone-500 font-bold text-xs block mb-1">Pembayaran QRIS</span>
                 <h3 class="text-2xl font-black text-blue-700">Rp {{ number_format($qrisRevenue, 0, ',', '.') }}</h3>
-                <span class="text-[11px] font-semibold text-stone-400 mt-1 block">Masuk ke rekening digital</span>
+                <span class="text-[11px] font-semibold text-stone-500 mt-1 block">Pemasukan rekening digital</span>
             </div>
             <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xl shrink-0">
-                📱
+                <svg class="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
             </div>
         </div>
 
-        <!-- Rata-rata Keranjang Transaksi (AOV) -->
+        <!-- Rata-rata Nilai Transaksi -->
         <div class="bg-white border border-stone-200 rounded-3xl p-6 shadow-sm flex items-center justify-between">
             <div>
-                <span class="text-stone-500 font-bold text-xs block mb-1">RATA-RATA NILAI TRANSAKSI</span>
+                <span class="text-stone-500 font-bold text-xs block mb-1">Rata-rata Nilai Transaksi</span>
                 <h3 class="text-2xl font-black text-stone-800">Rp {{ number_format($avgTransactionValue, 0, ',', '.') }}</h3>
-                <span class="text-[11px] font-semibold text-stone-400 mt-1 block">Per transaksi pelanggan</span>
+                <span class="text-[11px] font-semibold text-stone-500 mt-1 block">Rata-rata per transaksi</span>
             </div>
             <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xl shrink-0">
-                📊
+                <svg class="w-6 h-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
             </div>
         </div>
     </div>
@@ -95,7 +103,10 @@
         <!-- Rincian Penjualan per Kategori -->
         <div class="bg-white border border-stone-200 rounded-3xl p-6 shadow-sm space-y-4">
             <h3 class="text-sm font-extrabold text-stone-800 uppercase tracking-wider flex items-center gap-2">
-                <span>📂 Omset Penjualan per Kategori Menu</span>
+                <svg class="w-4 h-4 text-stone-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                </svg>
+                <span>Pendapatan Penjualan per Kategori Menu</span>
             </h3>
 
             <div class="space-y-3">
@@ -106,12 +117,12 @@
                     <div class="p-3.5 bg-stone-50 border border-stone-200 rounded-2xl space-y-2">
                         <div class="flex items-center justify-between text-xs">
                             <span class="font-extrabold text-stone-900">{{ $cat['name'] }}</span>
-                            <span class="font-black text-[#BD2000]">Rp {{ number_format($cat['total'], 0, ',', '.') }} ({{ $cat['qty'] }} porsi)</span>
+                            <span class="font-black text-[#BD2000]">Rp {{ number_format($cat['total'], 0, ',', '.') }} • {{ $cat['qty'] }} Porsi</span>
                         </div>
                         <div class="w-full bg-stone-200 h-2 rounded-full overflow-hidden">
                             <div class="bg-[#BD2000] h-full rounded-full" style="width: {{ $percentage }}%"></div>
                         </div>
-                        <div class="text-[10px] text-stone-500 font-medium text-right">{{ $percentage }}% dari total omset terbayar</div>
+                        <div class="text-[10px] text-stone-500 font-medium text-right">{{ $percentage }}% dari total pendapatan terbayar</div>
                     </div>
                 @empty
                     <div class="p-6 text-center text-xs font-semibold text-stone-400">Belum ada transaksi terbayar pada periode ini.</div>
@@ -119,11 +130,19 @@
             </div>
         </div>
 
-        <!-- Top 5 Menu Terlaris -->
+        <!-- 5 Menu Terlaris -->
         <div class="bg-white border border-stone-200 rounded-3xl p-6 shadow-sm space-y-4">
-            <h3 class="text-sm font-extrabold text-stone-800 uppercase tracking-wider flex items-center gap-2">
-                <span>🔥 Top 5 Menu Terlaris (Best Seller Kasir)</span>
-            </h3>
+            <div class="flex items-center justify-between">
+                <h3 class="text-sm font-extrabold text-stone-800 uppercase tracking-wider flex items-center gap-2">
+                    <svg class="w-4 h-4 text-[#BD2000]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
+                    </svg>
+                    <span>5 Menu Terlaris</span>
+                </h3>
+                <span class="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200">
+                    Terlaris
+                </span>
+            </div>
 
             <div class="divide-y divide-stone-100">
                 @forelse($topMenus as $index => $menu)
@@ -160,8 +179,8 @@
             <table class="w-full text-left text-xs text-stone-700">
                 <thead class="bg-stone-100 text-stone-700 uppercase font-black tracking-wider text-[11px] border-b border-stone-200">
                     <tr>
-                        <th class="px-4 py-3">Tanggal & Jam</th>
-                        <th class="px-4 py-3">Kode Order</th>
+                        <th class="px-4 py-3">Tanggal dan Jam</th>
+                        <th class="px-4 py-3">Nomor Nota</th>
                         <th class="px-4 py-3">Pelanggan</th>
                         <th class="px-4 py-3">Meja</th>
                         <th class="px-4 py-3">Metode Bayar</th>
@@ -175,12 +194,12 @@
                             <td class="px-4 py-3 font-semibold whitespace-nowrap">{{ $order->created_at->format('d/m/Y H:i') }}</td>
                             <td class="px-4 py-3 font-extrabold text-stone-900">#{{ $order->id }}</td>
                             <td class="px-4 py-3 font-semibold text-stone-800">{{ $order->customer_name }}</td>
-                            <td class="px-4 py-3 font-medium">{{ $order->table ? 'Meja ' . $order->table->table_number : 'Takeaway' }}</td>
+                            <td class="px-4 py-3 font-medium">{{ $order->table ? 'Meja ' . $order->table->table_number : 'Bawa Pulang' }}</td>
                             <td class="px-4 py-3 font-bold">
                                 @if($order->payment_method === 'cash')
-                                    <span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-0.5 rounded-lg text-[11px]">💵 Cash</span>
+                                    <span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-0.5 rounded-lg text-[11px] font-bold">Tunai</span>
                                 @else
-                                    <span class="inline-flex items-center gap-1 bg-blue-50 text-blue-800 border border-blue-200 px-2.5 py-0.5 rounded-lg text-[11px]">📱 QRIS</span>
+                                    <span class="inline-flex items-center gap-1 bg-blue-50 text-blue-800 border border-blue-200 px-2.5 py-0.5 rounded-lg text-[11px] font-bold">QRIS</span>
                                 @endif
                             </td>
                             <td class="px-4 py-3 text-stone-600 font-medium">{{ $order->user->name ?? 'Kasir' }}</td>

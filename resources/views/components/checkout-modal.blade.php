@@ -10,15 +10,15 @@
         <!-- Header -->
         <div class="px-6 py-4 border-b border-stone-200 flex justify-between items-center bg-stone-50">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-[#BD2000]/10 border border-[#BD2000]/20 flex items-center justify-center text-[#BD2000] font-black">
-                    💳
+                <div class="w-10 h-10 rounded-xl bg-[#BD2000]/10 border border-[#BD2000]/20 flex items-center justify-center text-[#BD2000]">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 </div>
                 <div>
-                    <h3 class="text-lg font-black text-[#8C0000] leading-tight">Modul Pembayaran SajiHUB</h3>
+                    <h3 class="text-lg font-black text-[#8C0000] leading-tight">Konfirmasi Pembayaran</h3>
                     <p class="text-xs text-slate-500 font-medium">Pelanggan: <span class="text-[#BD2000] font-extrabold" x-text="customerName || '-'"></span></p>
                 </div>
             </div>
-            <button @click="closeModal()" class="p-2 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-xl transition-colors cursor-pointer">
+            <button @click="closeModal()" class="p-2 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-xl transition-colors cursor-pointer" title="Tutup">
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
@@ -36,7 +36,7 @@
                             <div class="flex justify-between items-center text-sm py-1.5 border-b border-stone-200">
                                 <div>
                                     <span class="font-extrabold text-[#1C1917]" x-text="item.name"></span>
-                                    <span class="text-xs text-slate-500 ml-1 font-bold" x-text="'x' + item.qty"></span>
+                                    <span class="text-xs text-slate-500 ml-1 font-bold" x-text="'• ' + item.qty + ' porsi'"></span>
                                 </div>
                                 <span class="font-mono text-stone-700 font-bold" x-text="formatRupiah(item.price * item.qty)"></span>
                             </div>
@@ -60,32 +60,36 @@
                     </div>
                 </div>
 
-                <!-- Status Metode Pembayaran (Terdeteksi & Terkunci) -->
+                <!-- Status Metode Pembayaran (Terpilih & Terkunci) -->
                 <div>
-                    <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-2">Metode Pembayaran (Terdeteksi)</label>
+                    <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-2">Metode Pembayaran Terpilih</label>
                     <div class="p-3.5 rounded-2xl bg-white border border-stone-200 flex items-center justify-between shadow-xs">
                         <div class="flex items-center gap-2.5">
                             <template x-if="paymentMethod === 'cash'">
                                 <div class="flex items-center gap-2.5 text-stone-800 font-extrabold text-sm">
-                                    <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-base">💵</div>
+                                    <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+                                        <svg class="w-4 h-4 text-emerald-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                    </div>
                                     <div>
-                                        <span>Pembayaran Tunai (Cash)</span>
-                                        <span class="block text-[10px] text-slate-500 font-bold">Diterima oleh Kasir</span>
+                                        <span>Pembayaran Tunai</span>
+                                        <span class="block text-[10px] text-slate-500 font-bold">Uang tunai diterima kasir</span>
                                     </div>
                                 </div>
                             </template>
                             <template x-if="paymentMethod === 'qris'">
                                 <div class="flex items-center gap-2.5 text-[#BD2000] font-extrabold text-sm">
-                                    <div class="w-8 h-8 rounded-xl bg-[#BD2000]/10 text-[#BD2000] flex items-center justify-center font-bold text-base">📲</div>
+                                    <div class="w-8 h-8 rounded-xl bg-[#BD2000]/10 text-[#BD2000] flex items-center justify-center font-bold">
+                                        <svg class="w-4 h-4 text-[#BD2000]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                                    </div>
                                     <div>
-                                        <span>Pembayaran QRIS Statis</span>
-                                        <span class="block text-[10px] text-slate-500 font-bold">Scan Kode QR Merchant</span>
+                                        <span>Pembayaran QRIS</span>
+                                        <span class="block text-[10px] text-slate-500 font-bold">Pindai kode QR pelanggan</span>
                                     </div>
                                 </div>
                             </template>
                         </div>
                         <span class="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-stone-100 text-stone-600 border border-stone-200">
-                            🔒 Terkunci
+                            Terkunci
                         </span>
                     </div>
                 </div>
@@ -106,7 +110,7 @@
                         <!-- Input Cash -->
                         <div class="space-y-3">
                             <div>
-                                <label class="block text-xs text-stone-700 font-bold mb-1 uppercase">Nominal Diterima (Rp)</label>
+                                <label class="block text-xs text-stone-700 font-bold mb-1 uppercase">Nominal Uang Diterima</label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 font-black">Rp</span>
                                     <input type="number" x-model.number="cashPaid" @input="calculateChange()" min="0" placeholder="0"
@@ -116,11 +120,11 @@
 
                             <!-- Quick Nominal Buttons (Akumulatif / Nambah) -->
                             <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                                <button type="button" @click="setExactCash()" class="py-2 px-2 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold rounded-xl transition-colors cursor-pointer" title="Set sesuai total tagihan">Uang Pas</button>
+                                <button type="button" @click="setExactCash()" class="py-2 px-2 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold rounded-xl transition-colors cursor-pointer" title="Sesuai total tagihan">Uang Pas</button>
                                 <button type="button" @click="addCashAmount(50000)" class="py-2 px-2 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold rounded-xl transition-colors cursor-pointer" title="Tambah Rp 50.000">+50.000</button>
                                 <button type="button" @click="addCashAmount(100000)" class="py-2 px-2 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold rounded-xl transition-colors cursor-pointer" title="Tambah Rp 100.000">+100.000</button>
                                 <button type="button" @click="addCashAmount(200000)" class="py-2 px-2 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold rounded-xl transition-colors cursor-pointer" title="Tambah Rp 200.000">+200.000</button>
-                                <button type="button" @click="resetCash()" class="py-2 px-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-bold rounded-xl transition-colors cursor-pointer" title="Reset nominal ke Rp 0">Reset</button>
+                                <button type="button" @click="resetCash()" class="py-2 px-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-bold rounded-xl transition-colors cursor-pointer" title="Atur ulang nominal">Hitung Ulang</button>
                             </div>
 
                             <!-- Kembalian Display -->
@@ -129,7 +133,7 @@
                                 <div class="text-xs text-stone-600 font-bold mb-1 uppercase">Uang Kembalian</div>
                                 <div class="text-2xl font-black font-mono"
                                      :class="cashPaid >= totalAmount ? 'text-emerald-600' : 'text-red-600'"
-                                     x-text="cashPaid >= totalAmount ? formatRupiah(cashChange) : 'Nominal kurang Rp ' + formatRupiah(totalAmount - cashPaid)"></div>
+                                     x-text="cashPaid >= totalAmount ? formatRupiah(cashChange) : 'Kurang Rp ' + formatRupiah(totalAmount - cashPaid)"></div>
                             </div>
                         </div>
                     </div>
@@ -143,7 +147,10 @@
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                 Konfirmasi Pembayaran Tunai
                             </span>
-                            <span x-show="isProcessing" class="animate-spin">⏳ Memproses...</span>
+                            <span x-show="isProcessing" class="inline-flex items-center gap-2">
+                                <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                                Memproses Pembayaran...
+                            </span>
                         </button>
                     </div>
                 </div>
@@ -165,7 +172,7 @@
                         <div>
                             <h4 class="text-lg font-black text-[#1C1917] tracking-wide">warung akid</h4>
                             <p class="text-xs text-slate-600 font-mono font-bold">NMID : ID1026528881513</p>
-                            <p class="text-[11px] text-slate-500 font-mono">Kode Terminal : A01</p>
+                            <p class="text-[11px] text-slate-500 font-mono">Terminal: A01</p>
                         </div>
 
                         <!-- Display Real Official QR Code Image -->
@@ -177,14 +184,14 @@
                         <!-- Status Informasional -->
                         <div class="flex items-center justify-center gap-2 bg-white px-3 py-2 rounded-xl border border-stone-200 shadow-sm text-xs font-bold text-[#BD2000]">
                             <span class="w-2.5 h-2.5 rounded-full bg-[#BD2000]"></span>
-                            <span>Scan Kode QRIS & Verifikasi Pembayaran Pelanggan</span>
+                            <span>Pindai kode QR dan verifikasi pembayaran</span>
                         </div>
                     </div>
 
                     <!-- Foto / Upload Bukti Transfer Manual -->
                     <div class="space-y-2">
                         <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider">
-                            Foto Bukti Transfer Customer <span class="text-red-500">*</span>
+                            Foto Bukti Transfer Pelanggan <span class="text-red-500">*</span>
                         </label>
                         <input type="file" id="checkout_qris_proof" accept="image/*" capture="environment" @change="handleProofUpload($event)" class="hidden">
                         
@@ -192,9 +199,9 @@
                             <button type="button" @click="document.getElementById('checkout_qris_proof').click()"
                                     class="py-2 px-3 bg-stone-100 hover:bg-stone-200 border border-stone-300 text-stone-800 font-bold text-xs rounded-xl transition-all flex items-center gap-1.5 cursor-pointer">
                                 <svg class="w-4 h-4 text-stone-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                <span>Ambil Foto / Upload Bukti</span>
+                                <span>Ambil Foto atau Unggah Bukti</span>
                             </button>
-                            <span class="text-xs text-stone-500 font-medium truncate max-w-[180px]" x-text="proofFileName || 'Belum ada foto'"></span>
+                            <span class="text-xs text-stone-500 font-medium truncate max-w-[180px]" x-text="proofFileName || 'Belum ada berkas foto'"></span>
                         </div>
 
                         <!-- Image Preview -->
@@ -212,7 +219,10 @@
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                                 Konfirmasi Pembayaran QRIS Lunas
                             </span>
-                            <span x-show="isProcessing" class="animate-spin">⏳ Memproses...</span>
+                            <span x-show="isProcessing" class="inline-flex items-center gap-2">
+                                <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                                Memproses Verifikasi...
+                            </span>
                         </button>
                     </div>
                 </div>
@@ -229,9 +239,9 @@
                     <div>
                         <h3 class="text-xl font-black text-[#1C1917]" x-text="cashSuccess ? 'Pembayaran Tunai Berhasil!' : 'Pembayaran QRIS Berhasil!'"></h3>
                         <p class="text-xs text-slate-600 mt-1 font-medium">Pelanggan: <span class="font-extrabold text-[#BD2000]" x-text="customerName"></span></p>
-                        <p class="text-xs text-emerald-600 font-mono mt-1 font-black uppercase">Status: LUNAS & SELESAI</p>
+                        <p class="text-xs text-emerald-600 font-mono mt-1 font-black">Status: Lunas</p>
                     </div>
-                    <p class="text-[11px] text-slate-500 animate-pulse font-medium">Menyiapkan Struk Transaksi...</p>
+                    <p class="text-[11px] text-slate-500 animate-pulse font-medium">Mencetak struk transaksi...</p>
                 </div>
 
             </div>
@@ -348,8 +358,8 @@
 
             async submitCashPayment() {
                 if (this.cashPaid < this.totalAmount) {
-                    if (window.showToast) window.showToast('Nominal uang tunai kurang!', 'error');
-                    else alert('Nominal uang kurang!');
+                    if (window.showToast) window.showToast('Nominal pembayaran tunai masih kurang.', 'error');
+                    else alert('Nominal pembayaran tunai masih kurang.');
                     return;
                 }
 
@@ -380,12 +390,12 @@
                             window.location.reload();
                         }, 1200);
                     } else {
-                        if (window.showToast) window.showToast('Gagal memproses pembayaran: ' + (data.message || 'Error'), 'error');
-                        else alert('Gagal memproses pembayaran: ' + (data.message || 'Error'));
+                        if (window.showToast) window.showToast('Gagal memproses pembayaran: ' + (data.message || 'Terjadi kesalahan sistem.'), 'error');
+                        else alert('Gagal memproses pembayaran: ' + (data.message || 'Terjadi kesalahan sistem.'));
                     }
                 } catch (e) {
-                    if (window.showToast) window.showToast('Terjadi kesalahan jaringan.', 'error');
-                    else alert('Terjadi kesalahan jaringan.');
+                    if (window.showToast) window.showToast('Gangguan koneksi internet.', 'error');
+                    else alert('Gangguan koneksi internet.');
                 } finally {
                     this.isProcessing = false;
                 }
@@ -393,8 +403,8 @@
 
             async triggerQrisApprove() {
                 if (!this.proofFile) {
-                    if (window.showToast) window.showToast('Silakan ambil foto atau upload bukti transfer QRIS terlebih dahulu!', 'warning');
-                    else alert('Silakan ambil foto atau upload bukti transfer QRIS terlebih dahulu!');
+                    if (window.showToast) window.showToast('Unggah atau ambil foto bukti transfer QRIS terlebih dahulu.', 'warning');
+                    else alert('Unggah atau ambil foto bukti transfer QRIS terlebih dahulu.');
                     return;
                 }
 
@@ -428,10 +438,12 @@
                             window.location.reload();
                         }, 1500);
                     } else {
-                        alert(data.message || 'Gagal memproses verifikasi QRIS.');
+                        if (window.showToast) window.showToast(data.message || 'Gagal memproses verifikasi QRIS.', 'error');
+                        else alert(data.message || 'Gagal memproses verifikasi QRIS.');
                     }
                 } catch (e) {
-                    alert('Gagal memproses verifikasi QRIS.');
+                    if (window.showToast) window.showToast('Gagal memproses verifikasi QRIS.', 'error');
+                    else alert('Gagal memproses verifikasi QRIS.');
                 } finally {
                     this.isProcessing = false;
                 }

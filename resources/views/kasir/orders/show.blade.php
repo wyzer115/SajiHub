@@ -1,6 +1,6 @@
 @extends('layouts.app')
-@section('title', 'Detail Pesanan ' . $order->customer_name)
-@section('page-title', 'Detail Pesanan ' . $order->customer_name)
+@section('title', 'Rincian Pesanan ' . $order->customer_name)
+@section('page-title', 'Rincian Pesanan ' . $order->customer_name)
 
 @section('content')
 <div class="max-w-4xl mx-auto space-y-6 animate-fade-in-up">
@@ -18,12 +18,12 @@
 
             @if($order->payment_status == 'unpaid')
                 @if(($order->payment_method ?? 'cash') === 'qris')
-                    <form action="{{ route('kasir.orders.pay', $order) }}" method="POST" class="inline" onsubmit="return showConfirm(event, 'Konfirmasi pembayaran QRIS pesanan {{ $order->customer_name }} sebagai LUNAS?', 'Konfirmasi QRIS', 'Ya, Tandai Lunas')">
+                    <form action="{{ route('kasir.orders.pay', $order) }}" method="POST" class="inline" onsubmit="return showConfirm(event, 'Konfirmasi pembayaran QRIS pesanan {{ $order->customer_name }} sebagai lunas?', 'Konfirmasi QRIS', 'Ya, Tandai Lunas')">
                         @csrf
                         @method('PATCH')
                         <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold px-5 py-2 rounded-xl transition-all shadow-md flex items-center gap-2 cursor-pointer text-sm">
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                            <span>Tandai Lunas (QRIS)</span>
+                            <span>Tandai Lunas QRIS</span>
                         </button>
                     </form>
                 @else
@@ -31,7 +31,7 @@
                             onclick='openCheckoutModal({!! json_encode([
                                 "orderId" => $order->id,
                                 "customerName" => $order->customer_name,
-                                "tableNumber" => $order->table ? $order->table->table_number : "Takeaway",
+                                "tableNumber" => $order->table ? $order->table->table_number : "Bawa Pulang",
                                 "totalAmount" => (float)$order->total_price,
                                 "paymentMethod" => "cash",
                                 "items" => $order->items->map(function($item) {
@@ -44,7 +44,7 @@
                             ], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!})'
                             class="bg-[#BD2000] hover:bg-[#8C0000] text-white font-extrabold px-5 py-2 rounded-xl transition-all shadow-md flex items-center gap-2 cursor-pointer text-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                        <span>Bayar (Tunai)</span>
+                        <span>Pembayaran Tunai</span>
                     </button>
                 @endif
             @endif
@@ -82,9 +82,9 @@
                 @endif
 
                 @if($order->payment_status == 'paid')
-                    <span class="px-3 py-1 rounded-full text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-300">LUNAS</span>
+                    <span class="px-3 py-1 rounded-full text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-300">Lunas</span>
                 @else
-                    <span class="px-3 py-1 rounded-full text-xs font-black bg-red-100 text-red-600 border border-red-200">BELUM DIBAYAR</span>
+                    <span class="px-3 py-1 rounded-full text-xs font-black bg-red-100 text-red-600 border border-red-200">Belum Bayar</span>
                 @endif
             </div>
         </div>
@@ -122,7 +122,7 @@
 
         @if($order->transaction)
         <div class="p-6 bg-stone-50 border-b border-stone-200">
-            <h4 class="text-xs font-bold text-stone-700 uppercase tracking-wider mb-3">Detail Transaksi Terdaftar</h4>
+            <h4 class="text-xs font-bold text-stone-700 uppercase tracking-wider mb-3">Rincian Transaksi</h4>
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
                 <div>
                     <span class="text-slate-500 font-bold">Metode</span>
@@ -153,15 +153,15 @@
         @endif
 
         <div class="p-6">
-            <h4 class="text-[#8C0000] font-black text-sm uppercase tracking-wider mb-4">Daftar Item Pesanan</h4>
+            <h4 class="text-[#8C0000] font-black text-sm uppercase tracking-wider mb-4">Daftar Menu Pesanan</h4>
             <div class="overflow-x-auto rounded-2xl border border-stone-200">
                 <table class="w-full text-left">
-                    <thead class="bg-stone-100 text-stone-700 text-xs font-extrabold uppercase tracking-wider border-b border-stone-200">
+                    <thead class="bg-stone-100 text-stone-700 text-xs font-extrabold border-b border-stone-200">
                         <tr>
                             <th class="px-4 py-3.5">Menu</th>
-                            <th class="px-4 py-3.5 text-center">Jml</th>
+                            <th class="px-4 py-3.5 text-center">Jumlah</th>
                             <th class="px-4 py-3.5 text-right">Harga Satuan</th>
-                            <th class="px-4 py-3.5 text-right">Subtotal</th>
+                            <th class="px-4 py-3.5 text-right">Total Harga</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-stone-200">

@@ -21,7 +21,7 @@
 <div class="bg-white border border-stone-200 rounded-3xl p-5 mb-6 animate-fade-in-up shadow-sm">
     <form method="GET" action="{{ route('superadmin.users.index') }}" class="flex flex-wrap gap-3 items-end">
         <div class="flex-1 min-w-[200px] max-w-xs">
-            <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">Filter Cabang</label>
+            <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">Saring Cabang</label>
             <select name="branch_id" class="w-full bg-stone-50 border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#BD2000]">
                 <option value="">Semua Cabang</option>
                 @foreach($branches as $branch)
@@ -33,7 +33,7 @@
         </div>
         <div class="flex gap-2">
             <button type="submit" class="px-4 py-2 bg-[#BD2000] hover:bg-[#8C0000] text-white rounded-xl text-sm font-extrabold transition-colors shadow-md cursor-pointer">Terapkan</button>
-            <a href="{{ route('superadmin.users.index') }}" class="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl text-sm font-bold border border-stone-300 transition-colors">Reset</a>
+            <a href="{{ route('superadmin.users.index') }}" class="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl text-sm font-bold border border-stone-300 transition-colors">Atur Ulang</a>
         </div>
     </form>
 </div>
@@ -73,7 +73,7 @@
                             {{ $user->branch->name ?? 'Belum Ditugaskan' }}
                         </span>
                     </td>
-                    <td class="px-6 py-4 text-xs text-slate-500 font-semibold">{{ $user->created_at->format('d M Y') }}</td>
+                    <td class="px-6 py-4 text-xs text-slate-500 font-semibold">{{ $user->created_at->locale('id')->translatedFormat('d M Y') }}</td>
                     <td class="px-6 py-4 text-right">
                         <div class="flex items-center justify-end gap-2">
                             <a href="{{ route('superadmin.users.edit', $user->id) }}"

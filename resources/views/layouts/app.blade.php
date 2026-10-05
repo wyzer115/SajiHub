@@ -110,7 +110,7 @@
                 <div class="text-[10px] font-bold text-stone-500 uppercase tracking-wider">Lokasi Cabang</div>
                 <div class="text-xs font-extrabold text-[#BD2000] truncate mt-0.5">
                     @if($user->isOwner())
-                        Multi-Cabang (Pusat)
+                        Kantor Pusat
                     @else
                         {{ $user->branch->name ?? 'Pusat' }}
                     @endif
@@ -136,7 +136,7 @@
 
                     <a href="{{ route('superadmin.reports') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all {{ request()->routeIs('superadmin.reports') ? 'bg-[#BD2000]/10 text-[#BD2000] border-l-4 border-[#BD2000] font-extrabold shadow-sm' : 'text-stone-600 hover:bg-stone-100 hover:text-[#BD2000] font-semibold' }}">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                        <span>Laporan Omzet Global</span>
+                        <span>Laporan Pendapatan Seluruh Cabang</span>
                     </a>
 
                     <a href="{{ route('superadmin.users.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all {{ request()->routeIs('superadmin.users.*') ? 'bg-[#BD2000]/10 text-[#BD2000] border-l-4 border-[#BD2000] font-extrabold shadow-sm' : 'text-stone-600 hover:bg-stone-100 hover:text-[#BD2000] font-semibold' }}">
@@ -155,12 +155,12 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                             </svg>
-                            <span>Mode Maintenance</span>
+                            <span>Mode Pemeliharaan</span>
                         </div>
                         @if($isSysMaint)
                             <span class="px-2 py-0.5 text-[10px] font-black rounded-full bg-red-100 text-red-700 border border-red-200">AKTIF</span>
                         @else
-                            <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200">Online</span>
+                            <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200">Aktif</span>
                         @endif
                     </a>
                 @endif
@@ -168,7 +168,7 @@
                 @if($user && $user->isAdminCabang())
                     <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all {{ request()->routeIs('admin.dashboard') ? 'bg-[#BD2000]/10 text-[#BD2000] border-l-4 border-[#BD2000] font-extrabold shadow-sm' : 'text-stone-600 hover:bg-stone-100 hover:text-[#BD2000] font-semibold' }}">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"></path></svg>
-                        <span>Dashboard</span>
+                        <span>Beranda</span>
                     </a>
                     <a href="{{ route('admin.menus.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all {{ request()->routeIs('admin.menus.*') ? 'bg-[#BD2000]/10 text-[#BD2000] border-l-4 border-[#BD2000] font-extrabold shadow-sm' : 'text-stone-600 hover:bg-stone-100 hover:text-[#BD2000] font-semibold' }}">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
@@ -195,7 +195,7 @@
                 @if($user && $user->isOwner())
                     <a href="{{ route('owner.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all {{ request()->routeIs('owner.dashboard') ? 'bg-[#BD2000]/10 text-[#BD2000] border-l-4 border-[#BD2000] font-extrabold shadow-sm' : 'text-stone-600 hover:bg-stone-100 hover:text-[#BD2000] font-semibold' }}">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                        <span>Dasbor Utama</span>
+                        <span>Beranda</span>
                     </a>
                     <a href="{{ route('owner.reports') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all {{ request()->routeIs('owner.reports') ? 'bg-[#BD2000]/10 text-[#BD2000] border-l-4 border-[#BD2000] font-extrabold shadow-sm' : 'text-stone-600 hover:bg-stone-100 hover:text-[#BD2000] font-semibold' }}">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
@@ -221,19 +221,24 @@
                 @if($user && $user->isKasir())
                     <a href="{{ route('kasir.orders.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all {{ request()->routeIs('kasir.orders.index') ? 'bg-[#BD2000]/10 text-[#BD2000] border-l-4 border-[#BD2000] font-extrabold shadow-sm' : 'text-stone-600 hover:bg-stone-100 hover:text-[#BD2000] font-semibold' }}">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-                        <span>Pesanan</span>
+                        <span>Daftar Pesanan</span>
                     </a>
                     <a href="{{ route('kasir.orders.create') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all {{ request()->routeIs('kasir.orders.create') ? 'bg-[#BD2000]/10 text-[#BD2000] border-l-4 border-[#BD2000] font-extrabold shadow-sm' : 'text-stone-600 hover:bg-stone-100 hover:text-[#BD2000] font-semibold' }}">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                        <span>Buat Pesanan Kasir</span>
+                        <span>Buat Pesanan Baru</span>
                     </a>
-                    <a href="{{ route('kasir.orders.scan') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all {{ request()->routeIs('kasir.orders.scan') ? 'bg-[#BD2000]/10 text-[#BD2000] border-l-4 border-[#BD2000] font-extrabold shadow-sm' : 'text-stone-600 hover:bg-stone-100 hover:text-[#BD2000] font-semibold' }}">
-                        <svg class="w-5 h-5 text-[#BD2000]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
-                        <span>Scan QR Konfirmasi</span>
+                    <a href="{{ route('kasir.orders.scan') }}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm transition-all {{ request()->routeIs('kasir.orders.scan') ? 'bg-[#BD2000]/10 text-[#BD2000] border-l-4 border-[#BD2000] font-extrabold shadow-sm' : 'text-stone-600 hover:bg-stone-100 hover:text-[#BD2000] font-semibold' }}">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 {{ request()->routeIs('kasir.orders.scan') ? 'text-[#BD2000]' : 'text-stone-500' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+                            <span>Pindai QR Konfirmasi</span>
+                        </div>
+                        @if(request()->routeIs('kasir.orders.scan'))
+                            <span class="w-2 h-2 rounded-full bg-[#BD2000]"></span>
+                        @endif
                     </a>
                     <a href="{{ route('kasir.tables.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all {{ request()->routeIs('kasir.tables.*') ? 'bg-[#BD2000]/10 text-[#BD2000] border-l-4 border-[#BD2000] font-extrabold shadow-sm' : 'text-stone-600 hover:bg-stone-100 hover:text-[#BD2000] font-semibold' }}">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path></svg>
-                        <span>Status & QR Meja</span>
+                        <span>Status dan Meja</span>
                     </a>
                     <a href="{{ route('kasir.transactions') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all {{ request()->routeIs('kasir.transactions') ? 'bg-[#BD2000]/10 text-[#BD2000] border-l-4 border-[#BD2000] font-extrabold shadow-sm' : 'text-stone-600 hover:bg-stone-100 hover:text-[#BD2000] font-semibold' }}">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
@@ -281,19 +286,53 @@
                     <button id="sidebar-toggle" class="p-2 text-stone-500 hover:text-[#BD2000] lg:hidden rounded-xl hover:bg-stone-100 transition-colors">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                     </button>
-                    <h1 class="text-lg font-black text-[#8C0000] tracking-tight">@yield('page-title', 'Dashboard')</h1>
+                    <div>
+                        <!-- Breadcrumb -->
+                        <nav class="hidden sm:flex items-center gap-1.5 text-[11px] font-semibold text-stone-400 mb-0.5" aria-label="Breadcrumb">
+                            @hasSection('breadcrumb')
+                                @yield('breadcrumb')
+                            @else
+                                @php
+                                    $breadcrumbRole = 'SajiHUB';
+                                    if ($user) {
+                                        if ($user->isSuperAdmin()) $breadcrumbRole = 'Super Admin';
+                                        elseif ($user->isAdminCabang()) $breadcrumbRole = 'Admin Cabang';
+                                        elseif ($user->isOwner()) $breadcrumbRole = 'Pemilik';
+                                        elseif ($user->isSupervisor()) $breadcrumbRole = 'Supervisor';
+                                        elseif ($user->isKasir()) $breadcrumbRole = 'Kasir';
+                                        elseif ($user->isDapur()) $breadcrumbRole = 'Staf Dapur';
+                                    }
+                                @endphp
+                                <span>{{ $breadcrumbRole }}</span>
+                                <svg class="w-3 h-3 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                <span class="text-stone-600 font-bold">@yield('page-title', 'Beranda')</span>
+                            @endif
+                        </nav>
+                        <h1 class="text-base sm:text-lg font-black text-[#8C0000] tracking-tight leading-tight">@yield('page-title', 'Beranda')</h1>
+                    </div>
                 </div>
 
                 <!-- User Dropdown & Status -->
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <!-- Status Kasir Online Badge -->
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold shadow-xs">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        <span class="hidden sm:inline">{{ $user && $user->branch ? $user->branch->name : ($user && ($user->isSuperAdmin() || $user->isOwner()) ? 'Kantor Pusat' : 'Pusat') }}</span>
+                        <span class="text-emerald-400 font-medium hidden sm:inline">•</span>
+                        <span class="text-emerald-700 font-extrabold">Aktif</span>
+                    </div>
+
                     @if($user)
-                    <div class="flex items-center gap-3 border-l border-stone-200 pl-4">
+                    <div class="flex items-center gap-3 border-l border-stone-200 pl-3 sm:pl-4">
                         <div class="text-right hidden sm:block">
                             <div class="text-sm font-extrabold text-[#1C1917] leading-tight">{{ $user->name }}</div>
                             <div class="text-xs text-[#BD2000] font-bold capitalize">
                                 @if($user->isSuperAdmin()) Super Admin
                                 @elseif($user->isAdminCabang()) Admin Cabang
-                                @elseif($user->isOwner()) Pemilik (Owner)
+                                @elseif($user->isOwner()) Pemilik
                                 @elseif($user->isSupervisor()) Supervisor
                                 @elseif($user->isKasir()) Kasir
                                 @elseif($user->isDapur()) Staf Dapur

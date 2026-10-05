@@ -34,11 +34,11 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // Owner Utama (Pemilik Bisnis Multi-Cabang)
-        User::firstOrCreate(
+        // Owner Utama (Pemilik Bisnis Multi-Cabang - Universal Tunggal)
+        User::updateOrCreate(
             ['username' => 'owner'],
             [
-                'name'      => 'Owner SajiHUB',
+                'name'      => 'Owner',
                 'email'     => 'owner@sajihub.com',
                 'password'  => Hash::make('password'),
                 'role'      => 'owner',
@@ -52,33 +52,30 @@ class DatabaseSeeder extends Seeder
                 'name'       => 'SajiHUB Jakarta Selatan',
                 'address'    => 'Jl. Kemang Raya No. 12, Jakarta Selatan',
                 'phone'      => '021-7891234',
-                'admin'      => ['name' => 'Admin Jakarta', 'username' => 'admin_jakarta', 'email' => 'admin@sajihub.com'],
-                'owner'      => ['name' => 'Owner Jakarta', 'username' => 'owner_jkt', 'email' => 'owner.jakarta@sajihub.com'],
-                'supervisor' => ['name' => 'Supervisor Jakarta', 'username' => 'spv_jkt', 'email' => 'spv.jakarta@sajihub.com'],
-                'kasir'      => ['name' => 'Kasir Jakarta', 'username' => 'kasir_jkt', 'email' => 'kasir@sajihub.com'],
-                'dapur'      => ['name' => 'Dapur Jakarta', 'username' => 'koki_jkt', 'email' => 'koki@sajihub.com'],
+                'admin'      => ['name' => 'Admin Jakarta', 'username' => 'admin_jakarta', 'email' => 'admin_jakarta@sajihub.com'],
+                'supervisor' => ['name' => 'Supervisor Jakarta', 'username' => 'spv_jkt', 'email' => 'spv_jkt@sajihub.com'],
+                'kasir'      => ['name' => 'Kasir Jakarta', 'username' => 'kasir_jkt', 'email' => 'kasir_jkt@sajihub.com'],
+                'dapur'      => ['name' => 'Dapur Jakarta', 'username' => 'koki_jkt', 'email' => 'koki_jkt@sajihub.com'],
             ],
             [
                 'key'        => 'bandung',
-                'name'       => 'SajiHUB Bandung',
+                'name'       => 'SajiHUPB Bandung',
                 'address'    => 'Jl. Braga No. 45, Bandung',
                 'phone'      => '022-4201234',
-                'admin'      => ['name' => 'Admin Bandung', 'username' => 'admin_bandung', 'email' => 'bandung@sajihub.com'],
-                'owner'      => ['name' => 'Owner Bandung', 'username' => 'owner_bdg', 'email' => 'owner.bandung@sajihub.com'],
-                'supervisor' => ['name' => 'Supervisor Bandung', 'username' => 'spv_bdg', 'email' => 'spv.bandung@sajihub.com'],
-                'kasir'      => ['name' => 'Kasir Bandung', 'username' => 'kasir_bdg', 'email' => 'kasir.bandung@sajihub.com'],
-                'dapur'      => ['name' => 'Dapur Bandung', 'username' => 'koki_bdg', 'email' => 'koki.bandung@sajihub.com'],
+                'admin'      => ['name' => 'Admin Bandung', 'username' => 'admin_bandung', 'email' => 'admin_bandung@sajihub.com'],
+                'supervisor' => ['name' => 'Supervisor Bandung', 'username' => 'spv_bdg', 'email' => 'spv_bdg@sajihub.com'],
+                'kasir'      => ['name' => 'Kasir Bandung', 'username' => 'kasir_bdg', 'email' => 'kasir_bdg@sajihub.com'],
+                'dapur'      => ['name' => 'Dapur Bandung', 'username' => 'koki_bdg', 'email' => 'koki_bdg@sajihub.com'],
             ],
             [
                 'key'        => 'surabaya',
                 'name'       => 'SajiHUB Surabaya',
                 'address'    => 'Jl. Tunjungan No. 78, Surabaya',
                 'phone'      => '031-5311234',
-                'admin'      => ['name' => 'Admin Surabaya', 'username' => 'admin_surabaya', 'email' => 'surabaya@sajihub.com'],
-                'owner'      => ['name' => 'Owner Surabaya', 'username' => 'owner_sby', 'email' => 'owner.surabaya@sajihub.com'],
-                'supervisor' => ['name' => 'Supervisor Surabaya', 'username' => 'spv_sby', 'email' => 'spv.surabaya@sajihub.com'],
-                'kasir'      => ['name' => 'Kasir Surabaya', 'username' => 'kasir_sby', 'email' => 'kasir.surabaya@sajihub.com'],
-                'dapur'      => ['name' => 'Dapur Surabaya', 'username' => 'koki_sby', 'email' => 'koki.surabaya@sajihub.com'],
+                'admin'      => ['name' => 'Admin Surabaya', 'username' => 'admin_surabaya', 'email' => 'admin_surabaya@sajihub.com'],
+                'supervisor' => ['name' => 'Supervisor Surabaya', 'username' => 'spv_sby', 'email' => 'spv_sby@sajihub.com'],
+                'kasir'      => ['name' => 'Kasir Surabaya', 'username' => 'kasir_sby', 'email' => 'kasir_sby@sajihub.com'],
+                'dapur'      => ['name' => 'Dapur Surabaya', 'username' => 'koki_sby', 'email' => 'koki_sby@sajihub.com'],
             ],
         ];
 
@@ -92,7 +89,7 @@ class DatabaseSeeder extends Seeder
             );
 
             // Admin Cabang
-            User::firstOrCreate(
+            User::updateOrCreate(
                 ['username' => $data['admin']['username']],
                 [
                     'branch_id' => $branch->id,
@@ -103,20 +100,8 @@ class DatabaseSeeder extends Seeder
                 ]
             );
 
-            // Owner
-            User::firstOrCreate(
-                ['username' => $data['owner']['username']],
-                [
-                    'branch_id' => $branch->id,
-                    'name'      => $data['owner']['name'],
-                    'email'     => $data['owner']['email'],
-                    'password'  => Hash::make('password'),
-                    'role'      => 'owner',
-                ]
-            );
-
             // Supervisor
-            User::firstOrCreate(
+            User::updateOrCreate(
                 ['username' => $data['supervisor']['username']],
                 [
                     'branch_id' => $branch->id,
@@ -128,7 +113,7 @@ class DatabaseSeeder extends Seeder
             );
 
             // Kasir
-            User::firstOrCreate(
+            User::updateOrCreate(
                 ['username' => $data['kasir']['username']],
                 [
                     'branch_id' => $branch->id,
@@ -140,7 +125,7 @@ class DatabaseSeeder extends Seeder
             );
 
             // Dapur
-            User::firstOrCreate(
+            User::updateOrCreate(
                 ['username' => $data['dapur']['username']],
                 [
                     'branch_id' => $branch->id,

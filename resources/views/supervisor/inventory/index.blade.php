@@ -29,7 +29,7 @@
             </div>
 
             <div class="w-full sm:w-56">
-                <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">Filter Kategori</label>
+                <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">Saring Kategori</label>
                 <select name="category" class="w-full bg-stone-50 border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#BD2000]">
                     <option value="">Semua Kategori</option>
                     <option value="bahan_makanan" {{ request('category') == 'bahan_makanan' ? 'selected' : '' }}>Bahan Makanan</option>
@@ -39,8 +39,8 @@
             </div>
 
             <div class="flex gap-2">
-                <button type="submit" class="px-5 py-2.5 bg-[#BD2000] hover:bg-[#8C0000] text-white rounded-xl text-sm font-extrabold transition-colors shadow-xs cursor-pointer">Filter</button>
-                <a href="{{ route('supervisor.inventory.index') }}" class="px-5 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 border border-stone-300 rounded-xl text-sm font-bold transition-colors cursor-pointer">Reset</a>
+                <button type="submit" class="px-5 py-2.5 bg-[#BD2000] hover:bg-[#8C0000] text-white rounded-xl text-sm font-extrabold transition-colors shadow-xs cursor-pointer">Saring</button>
+                <a href="{{ route('supervisor.inventory.index') }}" class="px-5 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 border border-stone-300 rounded-xl text-sm font-bold transition-colors cursor-pointer">Atur Ulang</a>
             </div>
         </form>
     </div>
@@ -55,8 +55,8 @@
                         <th class="px-6 py-4">Nama Barang</th>
                         <th class="px-6 py-4">Kategori</th>
                         <th class="px-6 py-4">Jumlah Stok</th>
-                        <th class="px-6 py-4">Min. Stok Warning</th>
-                        <th class="px-6 py-4">Harga Est. / Unit</th>
+                        <th class="px-6 py-4">Batas Minimal Stok</th>
+                        <th class="px-6 py-4">Perkiraan Harga Satuan</th>
                         <th class="px-6 py-4">Status</th>
                         <th class="px-6 py-4 text-right">Aksi</th>
                     </tr>
@@ -101,9 +101,9 @@
                         <td class="px-6 py-4 text-right">
                             <div class="flex items-center justify-end gap-2">
                                 <a href="{{ route('supervisor.inventory.edit', $item->id) }}"
-                                   class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-stone-100 hover:bg-[#BD2000] text-stone-700 hover:text-white rounded-xl text-xs font-bold transition-all border border-stone-200 hover:border-transparent shadow-2xs" title="Edit / Update Stok">
+                                   class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-stone-100 hover:bg-[#BD2000] text-stone-700 hover:text-white rounded-xl text-xs font-bold transition-all border border-stone-200 hover:border-transparent shadow-2xs" title="Edit / Perbarui Stok">
                                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                                    <span>Update Stok</span>
+                                    <span>Perbarui Stok</span>
                                 </a>
                                 <form action="{{ route('supervisor.inventory.destroy', $item->id) }}" method="POST" onsubmit="return showConfirm(event, 'Apakah Anda yakin ingin menghapus data inventaris ini?', 'Hapus Inventaris', 'Ya, Hapus');">
                                     @csrf @method('DELETE')

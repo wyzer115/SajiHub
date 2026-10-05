@@ -32,14 +32,7 @@
 
             <div>
                 <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Jabatan / Role <span class="text-red-500">*</span></label>
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <label class="cursor-pointer">
-                        <input type="radio" name="role" value="owner" class="sr-only peer" {{ old('role', $user->role) === 'owner' ? 'checked' : '' }}>
-                        <div class="border border-stone-300 bg-stone-50 peer-checked:border-blue-600 peer-checked:bg-blue-50 rounded-2xl p-3.5 transition-all text-center">
-                            <div class="text-xs font-black text-stone-700 peer-checked:text-blue-700">Owner</div>
-                            <div class="text-[10px] text-slate-500 font-bold">Pemilik</div>
-                        </div>
-                    </label>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <label class="cursor-pointer">
                         <input type="radio" name="role" value="supervisor" class="sr-only peer" {{ old('role', $user->role) === 'supervisor' ? 'checked' : '' }}>
                         <div class="border border-stone-300 bg-stone-50 peer-checked:border-amber-600 peer-checked:bg-amber-50 rounded-2xl p-3.5 transition-all text-center">
@@ -51,14 +44,14 @@
                         <input type="radio" name="role" value="kasir" class="sr-only peer" {{ old('role', $user->role) === 'kasir' ? 'checked' : '' }}>
                         <div class="border border-stone-300 bg-stone-50 peer-checked:border-emerald-600 peer-checked:bg-emerald-50 rounded-2xl p-3.5 transition-all text-center">
                             <div class="text-xs font-black text-stone-700 peer-checked:text-emerald-700">Kasir</div>
-                            <div class="text-[10px] text-slate-500 font-bold">POS Kasir</div>
+                            <div class="text-[10px] text-slate-500 font-bold">Layanan Kasir</div>
                         </div>
                     </label>
                     <label class="cursor-pointer">
                         <input type="radio" name="role" value="dapur" class="sr-only peer" {{ old('role', $user->role) === 'dapur' || old('role', $user->role) === 'koki' ? 'checked' : '' }}>
                         <div class="border border-stone-300 bg-stone-50 peer-checked:border-purple-600 peer-checked:bg-purple-50 rounded-2xl p-3.5 transition-all text-center">
                             <div class="text-xs font-black text-stone-700 peer-checked:text-purple-700">Dapur</div>
-                            <div class="text-[10px] text-slate-500 font-bold">Kitchen</div>
+                            <div class="text-[10px] text-slate-500 font-bold">Produksi Makanan</div>
                         </div>
                     </label>
                 </div>

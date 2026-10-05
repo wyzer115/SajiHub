@@ -78,7 +78,7 @@
     <!-- Header Dokumen -->
     <table>
         <tr>
-            <td colspan="7" class="title">LAPORAN LABA RUGI EKSEKUTIF (PROFIT & LOSS)</td>
+            <td colspan="7" class="title">LAPORAN LABA RUGI EKSEKUTIF</td>
         </tr>
         <tr>
             <td colspan="7" class="subtitle">SajiHub - Multi-Branch Culinary Enterprise</td>
@@ -100,7 +100,7 @@
             <th colspan="7">1. RINGKASAN EKSEKUTIF LABA RUGI</th>
         </tr>
         <tr>
-            <td colspan="2" class="font-bold">Total Pendapatan Kotor (Omset)</td>
+            <td colspan="2" class="font-bold">Total Pendapatan Kotor</td>
             <td colspan="2" class="text-right font-bold highlight-green">Rp {{ number_format($revenue, 0, ',', '.') }}</td>
             <td colspan="2">Total Transaksi Lunas</td>
             <td class="text-right font-bold">{{ number_format($totalOrders, 0, ',', '.') }} pesanan</td>
@@ -108,15 +108,15 @@
         <tr>
             <td colspan="2" class="font-bold">Total Beban & Biaya Operasional</td>
             <td colspan="2" class="text-right font-bold highlight-red">Rp {{ number_format($totalExpenses, 0, ',', '.') }}</td>
-            <td colspan="2">Rata-rata Nilai Transaksi (AOV)</td>
+            <td colspan="2">Rata-rata Nilai Transaksi</td>
             <td class="text-right font-bold">Rp {{ number_format($avgOrderValue, 0, ',', '.') }}</td>
         </tr>
         <tr>
-            <td colspan="2" class="font-bold">Laba Bersih Operasional (Net Profit)</td>
+            <td colspan="2" class="font-bold">Laba Bersih Operasional</td>
             <td colspan="2" class="text-right font-bold {{ $netProfit >= 0 ? 'highlight-green' : 'highlight-red' }}">
                 Rp {{ number_format($netProfit, 0, ',', '.') }}
             </td>
-            <td colspan="2">Net Profit Margin (%)</td>
+            <td colspan="2">Margin Laba Bersih (%)</td>
             <td class="text-right font-bold {{ $profitMargin >= 0 ? 'highlight-green' : 'highlight-red' }}">{{ $profitMargin }}%</td>
         </tr>
         <tr>
@@ -139,7 +139,7 @@
         </tr>
         @forelse($paymentMethods as $pmKey => $pmData)
         <tr>
-            <td colspan="3" class="font-bold uppercase">{{ $pmKey === 'cash' ? 'Tunai (Cash Kasir)' : strtoupper($pmKey) }}</td>
+            <td colspan="3" class="font-bold uppercase">{{ $pmKey === 'cash' ? 'Tunai' : strtoupper($pmKey) }}</td>
             <td colspan="2" class="text-center">{{ $pmData['count'] }} transaksi ({{ $pmData['percentage'] }}%)</td>
             <td colspan="2" class="text-right font-bold">Rp {{ number_format($pmData['total'], 0, ',', '.') }}</td>
         </tr>

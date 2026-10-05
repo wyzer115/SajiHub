@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Manajemen Mode Maintenance - Super Admin')
+@section('title', 'Manajemen Mode Pemeliharaan - Super Admin')
 @section('page-title', 'Mode Pemeliharaan Website')
 
 @section('content')
@@ -36,7 +36,7 @@
                     {{ $maintenance['active'] ? 'bg-red-500/20 text-red-700 border border-red-500/30' : 'bg-emerald-500/20 text-emerald-700 border border-emerald-500/30' }}">
                     <span class="w-2.5 h-2.5 rounded-full {{ $maintenance['active'] ? 'bg-red-500 animate-ping' : 'bg-emerald-500' }}"></span>
                     <span class="w-2.5 h-2.5 rounded-full {{ $maintenance['active'] ? 'bg-red-500 -ml-4.5' : 'bg-emerald-500 -ml-4.5' }}"></span>
-                    <span>{{ $maintenance['active'] ? 'MODE MAINTENANCE AKTIF (WEBSITE NON-AKTIF)' : 'WEBSITE AKTIF & ONLINE NORMAL' }}</span>
+                    <span>{{ $maintenance['active'] ? 'MODE PEMELIHARAAN AKTIF (WEBSITE NON-AKTIF)' : 'WEBSITE AKTIF NORMAL' }}</span>
                 </div>
 
                 <h2 class="text-2xl sm:text-3xl font-black text-stone-900 tracking-tight">
@@ -45,7 +45,7 @@
 
                 <p class="text-stone-600 text-sm sm:text-base max-w-xl leading-relaxed">
                     {{ $maintenance['active'] 
-                        ? 'Pengunjung publik dan akun staf cabang diarahkan ke halaman 503 Maintenance. Hanya Super Admin yang memiliki akses ke dashboard dan sistem.' 
+                        ? 'Pengunjung publik dan akun staf cabang diarahkan ke halaman 503 Pemeliharaan. Hanya Super Admin yang memiliki akses ke dashboard dan sistem.' 
                         : 'Semua pengunjung dapat mengakses katalog menu, meja QR scan, dan seluruh staf cabang dapat memproses pesanan seperti biasa.' }}
                 </p>
 
@@ -67,12 +67,12 @@
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
-                            <span>Kembalikan Website Online</span>
+                            <span>Buka Akses Publik</span>
                         @else
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                             </svg>
-                            <span>Aktifkan Mode Maintenance</span>
+                            <span>Aktifkan Mode Pemeliharaan</span>
                         @endif
                     </button>
                 </form>
@@ -160,7 +160,7 @@
             <!-- End Time (Optional Countdown) -->
             <div>
                 <label class="block text-xs font-black uppercase text-stone-600 mb-2">
-                    Estimasi Selesai (Opsional untuk Countdown Timer)
+                    Perkiraan Waktu Selesai (Opsional)
                 </label>
                 <input type="datetime-local" name="maintenance_end_time" 
                     value="{{ old('maintenance_end_time', $maintenance['end_time'] ? \Carbon\Carbon::parse($maintenance['end_time'])->format('Y-m-d\TH:i') : '') }}" 
@@ -191,8 +191,8 @@
                 </svg>
             </div>
             <div>
-                <h3 class="text-base font-black text-stone-800">Tautan Akses Rahasia (Secret Bypass URL)</h3>
-                <p class="text-xs text-stone-500">Gunakan tautan ini jika Anda ingin login dari perangkat atau browser baru saat mode maintenance aktif.</p>
+                <h3 class="text-base font-black text-stone-800">Tautan Akses Rahasia</h3>
+                <p class="text-xs text-stone-500">Gunakan tautan ini jika Anda ingin login dari perangkat atau browser baru saat mode pemeliharaan aktif.</p>
             </div>
         </div>
 
@@ -211,7 +211,7 @@
                     @csrf
                     <button type="submit" onclick="return confirm('Apakah Anda yakin ingin memperbarui token bypass? Token lama tidak akan berlaku lagi.')" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-stone-200 hover:bg-stone-300 text-stone-700 text-xs font-bold transition-all cursor-pointer">
                         <svg class="w-4 h-4 text-stone-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                        <span>Regenerasi</span>
+                        <span>Perbarui Kunci</span>
                     </button>
                 </form>
             </div>
@@ -223,12 +223,12 @@
 <script>
     function confirmQuickToggle(willActivate) {
         const title = willActivate 
-            ? 'Aktifkan Mode Maintenance?' 
-            : 'Nonaktifkan Mode Maintenance?';
+            ? 'Aktifkan Mode Pemeliharaan?' 
+            : 'Nonaktifkan Mode Pemeliharaan?';
         const text = willActivate 
             ? 'Pengunjung publik dan staf cabang tidak akan bisa mengakses website sampai Anda mematikannya kembali.' 
-            : 'Website akan kembali ONLINE dan dapat diakses publik seketika.';
-        const confirmText = willActivate ? 'Ya, Aktifkan!' : 'Ya, Kembalikan Online!';
+            : 'Website akan kembali aktif normal dan dapat diakses publik seketika.';
+        const confirmText = willActivate ? 'Ya, Aktifkan!' : 'Ya, Buka Akses Publik!';
         const confirmColor = willActivate ? '#BD2000' : '#059669';
 
         Swal.fire({

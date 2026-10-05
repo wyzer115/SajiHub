@@ -15,13 +15,10 @@ class CustomerOrderController extends Controller
 {
     public function index(Request $request)
     {
-        $branches        = Branch::all();
-        $selectedBranch  = null;
-        $selectedTable   = null;
-        $menus           = collect();
-        $tables          = collect();
+        $selectedBranch = null;
+        $selectedTable  = null;
 
-        // Support Table & Branch detection via URL parameters
+        // Support Table & Branch detection via URL parameters (Scan QR Meja)
         if ($request->filled('branch_id')) {
             $selectedBranch = Branch::find($request->branch_id);
         }
@@ -33,13 +30,23 @@ class CustomerOrderController extends Controller
             }
             
             $tableParam = $request->table;
-            $selectedTable = $tableQuery->where(function($q) use ($tableParam) {
+            $cleanParam = trim(str_replace(['Meja', 'meja', 'Table', 'table', '-', ' '], '', $tableParam));
+            $selectedTable = $tableQuery->where(function($q) use ($tableParam, $cleanParam) {
                 $q->where('qr_code_token', $tableParam)
                   ->orWhere('table_number', $tableParam)
+                  ->orWhere('table_number', str_replace('-', ' ', $tableParam))
+                  ->orWhere('table_number', str_replace(' ', '-', $tableParam))
                   ->orWhere('table_number', 'Table ' . $tableParam)
                   ->orWhere('table_number', 'Meja ' . $tableParam)
                   ->orWhere('table_number', ltrim($tableParam, '0'))
                   ->orWhere('id', $tableParam);
+
+                if (!empty($cleanParam)) {
+                    $q->orWhere('table_number', $cleanParam)
+                      ->orWhere('table_number', 'Meja ' . $cleanParam)
+                      ->orWhere('table_number', 'Meja ' . str_pad($cleanParam, 2, '0', STR_PAD_LEFT))
+                      ->orWhere('table_number', ltrim($cleanParam, '0'));
+                }
             })->first();
 
             if ($selectedTable && !$selectedBranch) {
@@ -47,25 +54,21 @@ class CustomerOrderController extends Controller
             }
         }
 
+        // Pesanan harus melalui scan QR meja restoran
+        if (!$selectedTable) {
+            return redirect()->route('landing')->with('warning', 'Silakan pindai (scan) QR Code di meja Anda terlebih dahulu untuk memesan menu.');
+        }
+
         if (!$selectedBranch) {
-            $selectedBranch = $branches->first();
+            $selectedBranch = $selectedTable->branch;
         }
 
-        if ($selectedBranch) {
-            $menus  = Menu::where('branch_id', $selectedBranch->id)
-                ->with(['category', 'ingredients.inventory'])
-                ->get();
-            $tables = Table::where('branch_id', $selectedBranch->id)->get();
-        }
-
-        $receiptOrder = null;
-        $receiptOrderId = session('receipt_order_id') ?? $request->get('receipt_id');
-        if ($receiptOrderId) {
-            $receiptOrder = Order::with(['items.menu', 'branch', 'table', 'transaction'])->find($receiptOrderId);
-        }
+        $menus = Menu::where('branch_id', $selectedBranch->id)
+            ->with(['category', 'ingredients.inventory'])
+            ->get();
 
         return view('customer.order', compact(
-            'branches', 'selectedBranch', 'selectedTable', 'menus', 'tables', 'receiptOrder'
+            'selectedBranch', 'selectedTable', 'menus'
         ));
     }
 
@@ -99,6 +102,7 @@ class CustomerOrderController extends Controller
                 'payment_status' => 'unpaid', // Dine-in customer must confirm & pay at cashier
                 'payment_method' => $validated['payment_method'],
                 'total_price'    => 0,
+                'confirmed_at'   => null, // Must be confirmed via QR scan by cashier
             ]);
 
             $totalPrice = 0;
@@ -165,6 +169,7 @@ class CustomerOrderController extends Controller
         return response()->json([
             'payment_status' => $order->payment_status,
             'order_status'   => $order->order_status,
+            'is_confirmed'   => !is_null($order->confirmed_at),
         ]);
     }
 }

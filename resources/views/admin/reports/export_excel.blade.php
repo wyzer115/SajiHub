@@ -102,10 +102,10 @@
             <tr>
                 <td class="font-bold">Total Pendapatan</td>
                 <td class="font-bold text-right">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</td>
-                <td>Tunai (Cash)</td>
+                <td>Tunai</td>
                 <td class="text-right">Rp {{ number_format($paymentMethods->get('cash')['total'] ?? 0, 0, ',', '.') }} ({{ $paymentMethods->get('cash')['count'] ?? 0 }} pesanan)</td>
                 <td colspan="4" rowspan="2" style="vertical-align: middle; text-align: center; font-size: 14pt; background-color: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0;" class="font-bold">
-                    Omset Terkumpul:<br>
+                    Pendapatan Terkumpul:<br>
                     Rp {{ number_format($totalRevenue, 0, ',', '.') }}
                 </td>
             </tr>
@@ -142,7 +142,7 @@
                 <td class="text-center font-bold">#{{ $order->id }}</td>
                 <td>{{ $order->created_at->format('d M Y, H:i') }} WIB</td>
                 <td>{{ $order->customer_name }}</td>
-                <td class="text-center">{{ $order->table ? 'Meja ' . $order->table->table_number : 'Takeaway' }}</td>
+                <td class="text-center">{{ $order->table ? 'Meja ' . $order->table->table_number : 'Bawa Pulang' }}</td>
                 <td>
                     @if($order->payment_method == 'cash')
                         Tunai
@@ -162,7 +162,7 @@
             @endforelse
             @if($ordersList->isNotEmpty())
             <tr style="background-color: #f3f4f6; font-weight: bold;">
-                <td colspan="7" class="text-right" style="padding: 10px;">TOTAL OMSET KESELURUHAN</td>
+                <td colspan="7" class="text-right" style="padding: 10px;">TOTAL PENDAPATAN KESELURUHAN</td>
                 <td class="text-right text-brand-500" style="color: #e85824; padding: 10px;">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</td>
             </tr>
             @endif

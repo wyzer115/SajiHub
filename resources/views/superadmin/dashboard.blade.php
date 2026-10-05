@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('title', 'Dashboard Super Admin')
-@section('page-title', 'Ringkasan Global')
+@section('page-title', 'Ringkasan Utama')
 
 @section('content')
 
@@ -26,7 +26,7 @@
         <div>
             <div class="flex items-center gap-2">
                 <span class="text-xs font-black uppercase tracking-wider {{ $sysMaintenance['active'] ? 'text-red-600' : 'text-emerald-600' }}">
-                    Status Website: {{ $sysMaintenance['active'] ? 'MODE MAINTENANCE (NON-AKTIF)' : 'ONLINE NORMAL' }}
+                    Status Website: {{ $sysMaintenance['active'] ? 'MODE PEMELIHARAAN (NON-AKTIF)' : 'AKTIF NORMAL' }}
                 </span>
                 <span class="w-2 h-2 rounded-full {{ $sysMaintenance['active'] ? 'bg-red-500 animate-ping' : 'bg-emerald-500' }}"></span>
             </div>
@@ -38,13 +38,13 @@
         </div>
     </div>
     <div class="flex items-center gap-2 shrink-0">
-        <form action="{{ route('superadmin.maintenance.toggle') }}" method="POST" onsubmit="return confirm('{{ $sysMaintenance['active'] ? 'Kembalikan website online untuk publik?' : 'Aktifkan mode maintenance sekarang? Website akan non-aktif untuk umum.' }}')">
+        <form action="{{ route('superadmin.maintenance.toggle') }}" method="POST" onsubmit="return confirm('{{ $sysMaintenance['active'] ? 'Buka kembali akses website untuk publik?' : 'Aktifkan mode pemeliharaan sekarang? Website akan dinonaktifkan untuk umum.' }}')">
             @csrf
             <button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer
                 {{ $sysMaintenance['active'] 
                     ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
                     : 'bg-stone-100 hover:bg-red-50 text-stone-700 hover:text-red-600 border border-stone-200 hover:border-red-200' }}">
-                {{ $sysMaintenance['active'] ? 'Matikan Maintenance (Go Online)' : 'Aktifkan Maintenance' }}
+                {{ $sysMaintenance['active'] ? 'Buka Akses Publik' : 'Aktifkan Mode Pemeliharaan' }}
             </button>
         </form>
         <a href="{{ route('superadmin.maintenance.index') }}" class="px-4 py-2 rounded-xl text-xs font-bold bg-[#BD2000] hover:bg-[#8C0000] text-white shadow-sm transition-all">
@@ -109,7 +109,7 @@
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in-up">
     <!-- Monthly Global Revenue Trend -->
     <div class="bg-white border border-stone-200 rounded-3xl p-6 shadow-sm flex flex-col">
-        <h3 class="text-base font-black text-[#8C0000] mb-4">Tren Pendapatan Bulanan Global</h3>
+        <h3 class="text-base font-black text-[#8C0000] mb-4">Tren Pendapatan Bulanan Seluruh Cabang</h3>
         <div class="relative w-full h-[260px]">
             <canvas id="globalRevenueChart"></canvas>
         </div>
@@ -168,7 +168,7 @@
                         @else
                             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
                                 <span class="w-2 h-2 rounded-full bg-amber-500 shrink-0"></span>
-                                Maintenance
+                                Pemeliharaan
                             </span>
                         @endif
                     </td>
@@ -326,7 +326,7 @@
                     <div id="modal-branch-orders-count" class="text-lg font-black text-[#1C1917]">0</div>
                 </div>
                 <div class="bg-stone-50 border border-stone-200 rounded-2xl p-3 text-center">
-                    <div class="text-xs text-stone-500 font-bold mb-1">Total Omset</div>
+                    <div class="text-xs text-stone-500 font-bold mb-1">Total Pendapatan</div>
                     <div id="modal-branch-revenue" class="text-lg font-black text-[#BD2000]">Rp 0</div>
                 </div>
             </div>
@@ -346,7 +346,7 @@
         data: {
             labels: {!! json_encode($monthlyLabels ?? []) !!},
             datasets: [{
-                label: 'Omzet Bulanan (Rp)',
+                label: 'Pendapatan Bulanan (Rp)',
                 data: {!! json_encode($monthlyValues ?? []) !!},
                 borderColor: '#059669',
                 backgroundColor: 'rgba(5, 150, 105, 0.1)',

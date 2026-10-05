@@ -13,11 +13,11 @@
             <p class="text-slate-600 text-sm mt-1 font-medium">Laporan arus kas (pemasukan & pengeluaran) serta pengawasan stok barang: <span class="text-[#BD2000] font-extrabold">{{ $selectedBranch ? $selectedBranch->name : 'Semua Cabang (Gabungan)' }}</span></p>
         </div>
         <form method="GET" action="{{ route('owner.dashboard') }}" class="flex items-center gap-2">
-            <label for="branch_id" class="text-xs font-bold text-stone-600 whitespace-nowrap">Filter Cabang:</label>
+            <label for="branch_id" class="text-xs font-bold text-stone-600 whitespace-nowrap">Saring Cabang:</label>
             <select name="branch_id" id="branch_id" onchange="this.form.submit()" class="bg-stone-50 border border-stone-300 text-stone-800 text-xs font-bold rounded-xl px-4 py-2.5 focus:border-[#BD2000] focus:outline-none shadow-sm cursor-pointer">
-                <option value="all" {{ ($selectedBranchId == 'all' || !$selectedBranchId) ? 'selected' : '' }}>🌐 Semua Cabang (Gabungan)</option>
+                <option value="all" {{ ($selectedBranchId == 'all' || !$selectedBranchId) ? 'selected' : '' }}>Semua Cabang (Gabungan)</option>
                 @foreach($branches as $b)
-                    <option value="{{ $b->id }}" {{ $selectedBranchId == $b->id ? 'selected' : '' }}>🏢 {{ $b->name }}</option>
+                    <option value="{{ $b->id }}" {{ $selectedBranchId == $b->id ? 'selected' : '' }}>{{ $b->name }}</option>
                 @endforeach
             </select>
             @if(request('period'))
@@ -36,7 +36,7 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="bg-white border border-stone-200 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all flex items-center justify-between">
             <div>
-                <p class="text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5">Total Pemasukan (Omzet)</p>
+                <p class="text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5">Total Pendapatan</p>
                 <h3 class="text-3xl font-black text-emerald-600">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</h3>
                 <p class="text-xs text-slate-500 font-semibold mt-2">Bulan Ini: <span class="text-[#1C1917] font-black">Rp {{ number_format($monthRevenue, 0, ',', '.') }}</span></p>
             </div>
@@ -58,7 +58,7 @@
 
         <div class="bg-white border border-stone-200 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all flex items-center justify-between">
             <div>
-                <p class="text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5">Laba Bersih Estimasi</p>
+                <p class="text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5">Perkiraan Laba Bersih</p>
                 <h3 class="text-3xl font-black {{ $netProfit >= 0 ? 'text-[#BD2000]' : 'text-red-600' }}">Rp {{ number_format($netProfit, 0, ',', '.') }}</h3>
                 <p class="text-xs text-slate-500 font-semibold mt-2">Pemasukan - Pengeluaran</p>
             </div>
@@ -107,7 +107,7 @@
                         <span class="text-xs text-stone-400 font-bold">-</span>
                         <input type="date" name="end_date" value="{{ $endDate }}" class="text-[11px] bg-white border border-stone-300 rounded-xl px-2.5 py-1 text-stone-700 font-semibold focus:outline-none focus:border-[#BD2000]">
                         <button type="submit" class="px-3 py-1 bg-stone-800 hover:bg-[#8C0000] text-white rounded-xl text-xs font-extrabold transition-all shadow-xs cursor-pointer" title="Terapkan Rentang Tanggal">
-                            Filter
+                            Saring
                         </button>
                     </form>
                 </div>
@@ -125,15 +125,15 @@
                 <div class="space-y-3">
                     <div class="p-3.5 bg-stone-50 rounded-2xl border border-stone-200 flex items-center justify-between">
                         <span class="text-xs font-bold text-stone-600">Bahan Makanan</span>
-                        <span class="text-sm font-black text-stone-900">{{ $bahanMakananCount }} item</span>
+                        <span class="text-sm font-black text-stone-900">{{ $bahanMakananCount }} jenis</span>
                     </div>
                     <div class="p-3.5 bg-stone-50 rounded-2xl border border-stone-200 flex items-center justify-between">
                         <span class="text-xs font-bold text-stone-600">Bahan Minuman</span>
-                        <span class="text-sm font-black text-stone-900">{{ $bahanMinumanCount }} item</span>
+                        <span class="text-sm font-black text-stone-900">{{ $bahanMinumanCount }} jenis</span>
                     </div>
                     <div class="p-3.5 bg-stone-50 rounded-2xl border border-stone-200 flex items-center justify-between">
                         <span class="text-xs font-bold text-stone-600">Peralatan</span>
-                        <span class="text-sm font-black text-stone-900">{{ $peralatanCount }} item</span>
+                        <span class="text-sm font-black text-stone-900">{{ $peralatanCount }} jenis</span>
                     </div>
                 </div>
             </div>
@@ -141,7 +141,7 @@
             <div class="mt-4 pt-4 border-t border-stone-200 flex items-center justify-between">
                 <div>
                     <span class="text-xs font-bold text-stone-500 uppercase block">Stok Menipis</span>
-                    <span class="text-xl font-black {{ $lowStockCount > 0 ? 'text-amber-600' : 'text-emerald-600' }}">{{ $lowStockCount }} Item</span>
+                    <span class="text-xl font-black {{ $lowStockCount > 0 ? 'text-amber-600' : 'text-emerald-600' }}">{{ $lowStockCount }} Barang</span>
                 </div>
                 <a href="{{ route('owner.inventory') }}" class="px-4 py-2 bg-[#BD2000] hover:bg-[#8C0000] text-white rounded-xl text-xs font-bold transition-all shadow-sm">
                     Lihat Aset Gudang &rarr;
@@ -163,10 +163,10 @@
             <table class="w-full text-left text-sm text-[#1C1917]">
                 <thead class="bg-stone-100 text-stone-700 text-xs font-extrabold uppercase border-b border-stone-200">
                     <tr>
-                        <th class="p-3">Item</th>
+                        <th class="p-3">Nama Barang</th>
                         <th class="p-3">Kategori</th>
                         <th class="p-3">Stok Saat Ini</th>
-                        <th class="p-3">Batas Min.</th>
+                        <th class="p-3">Batas Minimal</th>
                         <th class="p-3">Status</th>
                     </tr>
                 </thead>

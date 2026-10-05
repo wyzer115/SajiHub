@@ -54,20 +54,20 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">Satuan (Unit) <span class="text-red-500">*</span></label>
+                    <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">Satuan Barang <span class="text-red-500">*</span></label>
                     <input type="text" name="unit" value="{{ old('unit', $inventory->unit) }}" required
                            class="w-full bg-stone-50 border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#BD2000]">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">Batas Min. Stok Warning <span class="text-red-500">*</span></label>
+                    <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">Batas Minimal Stok <span class="text-red-500">*</span></label>
                     <input type="number" step="any" name="min_stock" value="{{ old('min_stock', (float)$inventory->min_stock) }}" required min="0"
                            class="w-full bg-stone-50 border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#BD2000]">
                 </div>
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">Harga Beli Per Unit (Rp)</label>
+                <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">Harga Beli Satuan (Rp)</label>
                 <input type="number" name="unit_price" value="{{ old('unit_price', $inventory->unit_price) }}" min="0" step="100"
                        class="w-full bg-stone-50 border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#BD2000]">
             </div>

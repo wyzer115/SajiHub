@@ -24,6 +24,10 @@ class AppServiceProvider extends ServiceProvider
     {
         Paginator::useTailwind();
 
+        // Timezone and locale setup
+        date_default_timezone_set(config('app.timezone', 'Asia/Jakarta'));
+        \Carbon\Carbon::setLocale(config('app.locale', 'id'));
+
         // 1. Force HTTPS on production or when accessed via secure connection / proxy
         if ($this->shouldForceHttps()) {
             URL::forceScheme('https');

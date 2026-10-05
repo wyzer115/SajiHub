@@ -69,8 +69,8 @@
 
                 {{-- Role Description Box --}}
                 <div id="role-desc" class="p-4 rounded-2xl bg-[#BD2000]/5 border border-[#BD2000]/20 text-xs text-stone-600 leading-relaxed font-medium transition-all duration-300">
-                    <span class="text-[#BD2000] font-extrabold block mb-1">Benefit Akun Biasa:</span>
-                    Akses pemesanan menu online standar, simpan riwayat transaksi kuliner, dan lacak status pesanan langsung dari meja Anda.
+                    <span class="text-[#BD2000] font-extrabold block mb-1">Keuntungan Akun Pelanggan:</span>
+                    Akses pemesanan menu digital standar, simpan riwayat transaksi kuliner, dan lacak status pesanan langsung dari meja Anda.
                 </div>
 
                 {{-- Name --}}
@@ -177,15 +177,15 @@
                 tabMember.className = "py-2.5 px-4 rounded-lg text-xs font-bold text-center transition-all duration-300 text-stone-600 hover:text-[#BD2000] cursor-pointer";
                 
                 roleDesc.innerHTML = `
-                    <span class="text-[#BD2000] font-extrabold block mb-1">Benefit Akun Biasa:</span>
-                    Akses pemesanan menu online standar, simpan riwayat transaksi kuliner, dan lacak status pesanan langsung dari meja Anda.
+                    <span class="text-[#BD2000] font-extrabold block mb-1">Keuntungan Akun Pelanggan:</span>
+                    Akses pemesanan menu digital standar, simpan riwayat transaksi kuliner, dan lacak status pesanan langsung dari meja Anda.
                 `;
             } else {
                 tabMember.className = "py-2.5 px-4 rounded-lg text-xs font-extrabold text-center transition-all duration-300 bg-[#BD2000] text-white shadow-md cursor-pointer";
                 tabPelanggan.className = "py-2.5 px-4 rounded-lg text-xs font-bold text-center transition-all duration-300 text-stone-600 hover:text-[#BD2000] cursor-pointer";
                 
                 roleDesc.innerHTML = `
-                    <span class="text-[#BD2000] font-extrabold block mb-1">👑 Benefit Akun Member (VIP):</span>
+                    <span class="text-[#BD2000] font-extrabold block mb-1">Keuntungan Akun Member Eksklusif:</span>
                     Kumpulkan poin loyalitas setiap pembelian untuk ditukar hidangan gratis, dapatkan diskon eksklusif member 10%, akses promo hari spesial, dan prioritas antrean pesanan!
                 `;
             }

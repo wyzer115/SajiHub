@@ -5,14 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(['branch_id', 'table_id', 'user_id', 'customer_name', 'total_price', 'payment_status', 'order_status', 'payment_method'])]
+#[Fillable(['branch_id', 'table_id', 'user_id', 'customer_name', 'total_price', 'payment_status', 'order_status', 'payment_method', 'confirmed_at'])]
 class Order extends Model
 {
     protected function casts(): array
     {
         return [
-            'total_price' => 'decimal:2',
+            'total_price'  => 'decimal:2',
+            'confirmed_at' => 'datetime',
         ];
+    }
+
+    public function isConfirmed(): bool
+    {
+        return !is_null($this->confirmed_at);
     }
 
     public function branch()

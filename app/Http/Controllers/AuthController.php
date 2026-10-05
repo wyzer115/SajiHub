@@ -24,65 +24,50 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+        // Mendukung input email (khusus email, tanpa username / 'atau')
+        $email = trim($request->input('email', $request->input('login', '')));
+        $password = $request->input('password', '');
+        $request->merge(['email' => $email]);
+
         $request->validate([
-            'login' => 'required|string',
+            'email'    => 'required|email',
             'password' => 'required|string',
+        ], [
+            'email.required'    => 'Alamat email wajib diisi.',
+            'email.email'       => 'Format email tidak valid. Masukkan alamat email yang benar.',
+            'password.required' => 'Kata sandi wajib diisi.',
         ]);
 
-        $loginInput = trim($request->input('login'));
-        $loginType = filter_var($loginInput, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        // 1. Cek apakah email terdaftar di database
+        $user = User::where('email', $email)->first();
 
-        if ($loginType === 'username') {
-            $aliases = [
-                'admin_jkt'      => 'admin_jakarta',
-                'admin_bdg'      => 'admin_bandung',
-                'admin_sby'      => 'admin_surabaya',
-                'owner_jakarta'  => 'owner',
-                'owner_bandung'  => 'owner',
-                'owner_surabaya' => 'owner',
-                'owner_jkt'      => 'owner',
-                'owner_bdg'      => 'owner',
-                'owner_sby'      => 'owner',
-                'spv_jakarta'    => 'spv_jkt',
-                'spv_bandung'    => 'spv_bdg',
-                'spv_surabaya'   => 'spv_sby',
-                'kasir_jakarta'  => 'kasir_jkt',
-                'kasir_bandung'  => 'kasir_bdg',
-                'kasir_surabaya' => 'kasir_sby',
-                'koki_jakarta'   => 'koki_jkt',
-                'koki_bandung'   => 'koki_bdg',
-                'koki_surabaya'  => 'koki_sby',
-                'dapur_jkt'      => 'koki_jkt',
-                'dapur_bdg'      => 'koki_bdg',
-                'dapur_sby'      => 'koki_sby',
-            ];
-            $loginInput = $aliases[$loginInput] ?? $loginInput;
+        if (!$user) {
+            return back()->withErrors([
+                'email' => 'Alamat email tidak terdaftar dalam sistem.',
+            ])->onlyInput('email');
         }
 
-        $credentials = [
-            $loginType => $loginInput,
-            'password' => $request->input('password'),
-        ];
-
-        if (Auth::attempt($credentials)) {
-            $user = Auth::user();
-
-            if (\App\Models\SystemSetting::isMaintenanceMode() && !$user->isSuperAdmin()) {
-                Auth::logout();
-                $request->session()->invalidate();
-                $request->session()->regenerateToken();
-                return back()->withErrors([
-                    'login' => 'Sistem sedang dalam masa pemeliharaan (Maintenance Mode). Hanya Super Admin yang diizinkan masuk saat ini.',
-                ])->onlyInput('login');
-            }
-
-            $request->session()->regenerate();
-            return redirect()->intended($this->redirectBasedOnRole($user));
+        // 2. Cek apakah password benar
+        if (!\Illuminate\Support\Facades\Hash::check($password, $user->password)) {
+            return back()->withErrors([
+                'password' => 'Kata sandi yang Anda masukkan salah.',
+            ])->onlyInput('email');
         }
 
-        return back()->withErrors([
-            'login' => 'Kredensial yang Anda masukkan tidak cocok.',
-        ])->onlyInput('login');
+        // 3. Autentikasi user
+        Auth::login($user);
+
+        if (\App\Models\SystemSetting::isMaintenanceMode() && !$user->isSuperAdmin()) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            return back()->withErrors([
+                'email' => 'Sistem sedang dalam masa pemeliharaan (Maintenance Mode). Hanya Super Admin yang diizinkan masuk saat ini.',
+            ])->onlyInput('email');
+        }
+
+        $request->session()->regenerate();
+        return redirect()->intended($this->redirectBasedOnRole($user));
     }
 
     public function showRegister()

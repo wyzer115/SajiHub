@@ -86,10 +86,14 @@ class TableController extends Controller
             abort(403);
         }
 
-        $orderUrl = url('/order') . '?branch_id=' . $table->branch_id . '&table=' . $table->qr_code_token;
-        // Use Google Charts API for QR generation (no extra package needed)
-        $qrImageUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . urlencode($orderUrl);
+        $tableIdentifier = $table->qr_code_token ?: $table->table_number;
+        // Internal web-only QR Code format: SAJIHUB-TABLE-{branch_id}-{token}
+        $tableQrData = 'SAJIHUB-TABLE-' . $table->branch_id . '-' . $tableIdentifier;
+        $orderUrl = url('/order') . '?branch_id=' . $table->branch_id . '&table=' . $tableIdentifier;
+        
+        // Optimized error correction (ecc=M) & tight margin for large, ultra-sharp readable modules
+        $qrImageUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=500x500&ecc=M&margin=4&data=' . urlencode($tableQrData);
 
-        return view('admin.tables.qr', compact('table', 'orderUrl', 'qrImageUrl'));
+        return view('admin.tables.qr', compact('table', 'tableQrData', 'orderUrl', 'qrImageUrl'));
     }
 }

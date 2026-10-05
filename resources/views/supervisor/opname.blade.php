@@ -27,15 +27,15 @@
         <div class="flex flex-wrap items-center gap-2 p-1.5 bg-stone-100 rounded-2xl w-fit">
             <button type="button" id="tab-quick-adjust" onclick="switchTab('quick-adjust')"
                 class="px-5 py-2.5 rounded-xl text-xs font-extrabold transition-all shadow-sm bg-white text-[#BD2000]">
-                ⚡ Sesuaikan Stok
+                Sesuaikan Stok
             </button>
             <button type="button" id="tab-add-item" onclick="switchTab('add-item')"
                 class="px-5 py-2.5 rounded-xl text-xs font-bold text-stone-600 hover:text-stone-900 transition-all">
-                ➕ Tambah Bahan Baru
+                Tambah Bahan Baru
             </button>
             <button type="button" id="tab-log-history" onclick="switchTab('log-history')"
                 class="px-5 py-2.5 rounded-xl text-xs font-bold text-stone-600 hover:text-stone-900 transition-all">
-                📜 Riwayat Perubahan Stok
+                Riwayat Perubahan Stok
             </button>
         </div>
 
@@ -104,9 +104,8 @@
                             class="cursor-pointer border-2 border-[#BD2000] bg-[#BD2000]/5 rounded-2xl p-4 transition-all flex items-start gap-3">
                             <input type="radio" name="radio_action" id="radio_set_actual" checked class="mt-1 text-[#BD2000]">
                             <div>
-                                <h4 class="text-sm font-extrabold text-[#1C1917] flex items-center gap-1.5">
-                                    <span>🎯</span>
-                                    <span>Koreksi Stok Fisik Dapur</span>
+                                <h4 class="text-sm font-extrabold text-[#1C1917]">
+                                    Koreksi Stok Fisik Dapur
                                 </h4>
                                 <p class="text-[11px] text-stone-600 mt-1 leading-snug">Cukup ketik berapa jumlah riil barang yang dihitung di dapur saat ini.</p>
                             </div>
@@ -117,9 +116,8 @@
                             class="cursor-pointer border border-stone-200 bg-white hover:border-emerald-400 rounded-2xl p-4 transition-all flex items-start gap-3">
                             <input type="radio" name="radio_action" id="radio_add" class="mt-1 text-emerald-600">
                             <div>
-                                <h4 class="text-sm font-extrabold text-[#1C1917] flex items-center gap-1.5">
-                                    <span>📥</span>
-                                    <span>Tambah Stok (Restok)</span>
+                                <h4 class="text-sm font-extrabold text-[#1C1917]">
+                                    Tambah Stok (Restok)
                                 </h4>
                                 <p class="text-[11px] text-stone-600 mt-1 leading-snug">Ada barang baru dibeli atau pasokan baru masuk ke dapur.</p>
                             </div>
@@ -130,9 +128,8 @@
                             class="cursor-pointer border border-stone-200 bg-white hover:border-red-400 rounded-2xl p-4 transition-all flex items-start gap-3">
                             <input type="radio" name="radio_action" id="radio_reduce" class="mt-1 text-red-600">
                             <div>
-                                <h4 class="text-sm font-extrabold text-[#1C1917] flex items-center gap-1.5">
-                                    <span>🗑️</span>
-                                    <span>Kurangi (Rusak / Basi)</span>
+                                <h4 class="text-sm font-extrabold text-[#1C1917]">
+                                    Kurangi (Rusak / Basi)
                                 </h4>
                                 <p class="text-[11px] text-stone-600 mt-1 leading-snug">Ada bahan yang basi, tumpah, atau dibuang (waste).</p>
                             </div>
@@ -152,7 +149,7 @@
                                     oninput="calculateLivePreview()"
                                     placeholder="Contoh: 45"
                                     class="w-full bg-white border border-stone-300 text-[#1C1917] font-black text-xl rounded-xl px-4 py-3.5 focus:border-[#BD2000] focus:outline-none transition-all">
-                                <span id="input-unit-badge" class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-extrabold text-stone-500 bg-stone-100 px-2.5 py-1 rounded-md">unit</span>
+                                <span id="input-unit-badge" class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-extrabold text-stone-500 bg-stone-100 px-2.5 py-1 rounded-md">satuan</span>
                             </div>
                         </div>
 
@@ -203,7 +200,7 @@
                 <input type="hidden" name="date" value="{{ $date }}">
 
                 <h3 class="text-sm font-black text-[#8C0000] uppercase tracking-wider flex items-center gap-2">
-                    <span>✨ Tambah Bahan Baku Baru ke Inventaris Cabang</span>
+                    <span>Tambah Bahan Baku Baru ke Inventaris Cabang</span>
                 </h3>
 
                 <div>
@@ -225,10 +222,10 @@
                     </div>
 
                     <div>
-                        <label for="unit" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Satuan (UOM) *</label>
+                        <label for="unit" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Satuan Barang *</label>
                         <input type="text" name="unit" id="unit" list="unit-suggestions" required value="{{ old('unit', 'kg') }}"
                             class="w-full bg-white border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-4 py-3 text-sm focus:border-[#BD2000] focus:outline-none transition-all"
-                            placeholder="kg, liter, gram, pcs, botol...">
+                            placeholder="kg, liter, gram, buah, botol...">
                         <datalist id="unit-suggestions">
                             <option value="kg"></option>
                             <option value="gram"></option>
@@ -336,7 +333,7 @@
                     <svg class="w-5 h-5 text-[#BD2000]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
                     <span>Daftar Stok Bahan Saat Ini</span>
                 </h3>
-                <p class="text-xs text-stone-500">Klik tombol <strong>"⚡ Sesuaikan"</strong> pada salah satu baris untuk langsung mengisi form di atas.</p>
+                <p class="text-xs text-stone-500">Klik tombol <strong>"Sesuaikan"</strong> pada salah satu baris untuk langsung mengisi form di atas.</p>
             </div>
             <span class="text-xs font-bold bg-stone-100 text-stone-700 px-3 py-1.5 rounded-xl w-fit">
                 Total: {{ $inventories->count() }} Bahan Baku
@@ -371,11 +368,11 @@
                             <td class="py-3 px-4 text-center">
                                 @if($isZero)
                                     <span class="px-3 py-1 rounded-full text-xs font-black bg-red-100 text-red-700 border border-red-200">
-                                        0 {{ $inv->unit }} (HABIS)
+                                        0 {{ $inv->unit }} • Habis
                                     </span>
                                 @elseif($isWarning)
                                     <span class="px-3 py-1 rounded-full text-xs font-black bg-amber-100 text-amber-800 border border-amber-300">
-                                        {{ (float)$inv->stock }} {{ $inv->unit }} (MENIPIS)
+                                        {{ (float)$inv->stock }} {{ $inv->unit }} • Menipis
                                     </span>
                                 @else
                                     <span class="px-3 py-1 rounded-full text-xs font-black bg-emerald-50 text-emerald-800 border border-emerald-200">
@@ -388,7 +385,7 @@
                             <td class="py-3 px-4 text-center">
                                 <button type="button" onclick="selectFromTable({{ $inv->id }})"
                                     class="bg-stone-100 hover:bg-[#BD2000] hover:text-white text-[#BD2000] font-extrabold text-[11px] px-3.5 py-1.5 rounded-xl border border-stone-200 hover:border-transparent transition-all shadow-2xs cursor-pointer">
-                                    ⚡ Sesuaikan
+                                    Sesuaikan
                                 </button>
                             </td>
                         </tr>
@@ -436,13 +433,13 @@
             previewCard.classList.add('hidden');
             currentSelectedStock = 0;
             currentSelectedUnit = '';
-            document.getElementById('input-unit-badge').innerText = 'unit';
+            document.getElementById('input-unit-badge').innerText = 'satuan';
             calculateLivePreview();
             return;
         }
 
         currentSelectedStock = parseFloat(opt.dataset.stock) || 0;
-        currentSelectedUnit = opt.dataset.unit || 'unit';
+        currentSelectedUnit = opt.dataset.unit || 'satuan';
         const price = parseFloat(opt.dataset.price) || 0;
         const name = opt.dataset.name || '';
         const cat = opt.dataset.cat ? opt.dataset.cat.replace('_', ' ') : 'Bahan';
@@ -524,18 +521,18 @@
         if (currentActionType === 'set_actual') {
             const diff = inputVal - currentSelectedStock;
             if (diff === 0) {
-                resultBox.innerHTML = `<span class="text-emerald-700">✅ Stok dikonfirmasi sama dengan sistem: <strong>${inputVal} ${currentSelectedUnit}</strong> (Tidak ada selisih).</span>`;
+                resultBox.innerHTML = `<span class="text-emerald-700">Stok dikonfirmasi sama dengan sistem: <strong>${inputVal} ${currentSelectedUnit}</strong> (Tidak ada selisih).</span>`;
             } else if (diff > 0) {
-                resultBox.innerHTML = `<span class="text-emerald-700">📈 Stok bertambah dari <strong>${currentSelectedStock}</strong> menjadi <strong>${inputVal} ${currentSelectedUnit}</strong> (+${diff.toFixed(2)} ${currentSelectedUnit}).</span>`;
+                resultBox.innerHTML = `<span class="text-emerald-700">Stok bertambah dari <strong>${currentSelectedStock}</strong> menjadi <strong>${inputVal} ${currentSelectedUnit}</strong> (+${diff.toFixed(2)} ${currentSelectedUnit}).</span>`;
             } else {
-                resultBox.innerHTML = `<span class="text-red-700">📉 Stok berkurang dari <strong>${currentSelectedStock}</strong> menjadi <strong>${inputVal} ${currentSelectedUnit}</strong> (${diff.toFixed(2)} ${currentSelectedUnit}).</span>`;
+                resultBox.innerHTML = `<span class="text-red-700">Stok berkurang dari <strong>${currentSelectedStock}</strong> menjadi <strong>${inputVal} ${currentSelectedUnit}</strong> (${diff.toFixed(2)} ${currentSelectedUnit}).</span>`;
             }
         } else if (currentActionType === 'add') {
             const newTotal = currentSelectedStock + inputVal;
-            resultBox.innerHTML = `<span class="text-emerald-700">📦 Stok bertambah: <strong>${currentSelectedStock} + ${inputVal} = ${newTotal.toFixed(2)} ${currentSelectedUnit}</strong>.</span>`;
+            resultBox.innerHTML = `<span class="text-emerald-700">Stok bertambah: <strong>${currentSelectedStock} + ${inputVal} = ${newTotal.toFixed(2)} ${currentSelectedUnit}</strong>.</span>`;
         } else if (currentActionType === 'reduce') {
             const newTotal = Math.max(0, currentSelectedStock - inputVal);
-            resultBox.innerHTML = `<span class="text-red-700">🗑️ Stok berkurang: <strong>${currentSelectedStock} - ${inputVal} = ${newTotal.toFixed(2)} ${currentSelectedUnit}</strong>.</span>`;
+            resultBox.innerHTML = `<span class="text-red-700">Stok berkurang: <strong>${currentSelectedStock} - ${inputVal} = ${newTotal.toFixed(2)} ${currentSelectedUnit}</strong>.</span>`;
         }
     }
 

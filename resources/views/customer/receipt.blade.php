@@ -6,6 +6,8 @@
     <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
     <title>Struk Digital #ORD-{{ $order->id }} — SajiHUB</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @include('partials.head-assets')
     <style>
         body {
@@ -36,9 +38,9 @@
 <body class="min-h-screen flex flex-col items-center justify-center p-4 sm:p-6">
 
     <div class="no-print mb-6 text-center">
-        <a href="{{ route('pesan', ['branch_id' => $order->branch_id, 'table_id' => $order->table_id]) }}" class="inline-flex items-center gap-2 text-xs font-bold text-stone-600 hover:text-[#BD2000] transition-colors bg-white px-4 py-2 rounded-xl border border-stone-200 shadow-sm">
+        <a href="{{ route('landing') }}" class="inline-flex items-center gap-2 text-xs font-bold text-stone-600 hover:text-[#BD2000] transition-colors bg-white px-4 py-2 rounded-xl border border-stone-200 shadow-sm">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-            <span>Kembali ke Halaman Pesan</span>
+            <span>Kembali ke Beranda</span>
         </a>
     </div>
 
@@ -77,22 +79,31 @@
                     <strong class="text-[#BD2000] uppercase font-black">({{ $order->payment_method === 'qris' ? 'QRIS' : 'Tunai' }})</strong>.
                 </p>
 
-                {{-- QR Code for Kasir Scanner --}}
-                <div class="inline-block p-3.5 bg-white rounded-2xl border border-stone-200 shadow-md">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=SAJI-ORD-{{ $order->id }}" 
+                {{-- QR Code for Kasir Scanner (Crisp HD with High Error Correction & Large Modules) --}}
+                <div class="inline-block p-4 bg-white rounded-3xl border-2 border-stone-200 shadow-lg cursor-pointer hover:scale-102 transition-transform" onclick="toggleQrZoom(true)" title="Klik untuk memperbesar QR">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=450x450&ecc=M&margin=4&data=SAJI-ORD-{{ $order->id }}" 
                          alt="QR Konfirmasi Order #{{ $order->id }}" 
-                         class="w-48 h-48 mx-auto object-contain">
+                         class="w-64 h-64 mx-auto object-contain select-none"
+                         style="image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;">
                 </div>
 
                 <div class="flex items-center justify-center gap-2">
-                    <span class="text-[11px] text-stone-500 font-bold uppercase tracking-wider">Kode Tiket:</span>
-                    <span class="text-xs font-mono font-black text-[#BD2000] bg-white py-1 px-3 rounded-xl border border-stone-200 shadow-xs">
+                    <button type="button" onclick="toggleQrZoom(true)" class="text-[11px] text-[#BD2000] hover:text-[#8C0000] font-black uppercase tracking-wider flex items-center gap-1 cursor-pointer bg-white px-3 py-1.5 rounded-xl border border-stone-200 shadow-xs hover:bg-stone-50 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/></svg>
+                        <span>Perbesar QR</span>
+                    </button>
+                    <span class="text-xs font-mono font-black text-[#BD2000] bg-white py-1.5 px-3 rounded-xl border border-stone-200 shadow-xs">
                         SAJI-ORD-{{ $order->id }}
                     </span>
                 </div>
 
-                <div class="pt-2 text-[11px] text-amber-800 font-medium">
-                    <span class="inline-block animate-pulse">⏳ Halaman ini akan otomatis ter-update saat kasir mengonfirmasi pesanan Anda.</span>
+                <div class="flex items-center justify-center gap-1.5 text-[11px] text-amber-800 font-bold bg-amber-100/60 py-1.5 px-3 rounded-xl border border-amber-200/80">
+                    <svg class="w-3.5 h-3.5 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                    <span>Terangkan layar HP Anda agar mudah dibaca scanner kasir</span>
+                </div>
+
+                <div class="pt-1 text-[11px] text-amber-800 font-medium">
+                    <span class="inline-block animate-pulse">Halaman ini akan otomatis kembali ke dashboard awal saat kasir mengonfirmasi.</span>
                 </div>
             </div>
         @else
@@ -101,11 +112,11 @@
                     <span class="text-xs text-emerald-800 font-bold uppercase tracking-wider">Status Pembayaran</span>
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-black uppercase tracking-wider">
                         <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                        <span>LUNAS ({{ strtoupper($order->payment_method) }})</span>
+                        <span>Lunas</span>
                     </span>
                 </div>
                 <p class="text-[11px] text-emerald-700 bg-white/70 border border-emerald-200 rounded-xl p-2.5 font-medium leading-relaxed">
-                    ✨ Pembayaran berhasil dikonfirmasi! Pesanan Anda sedang disiapkan oleh koki di Dapur.
+                    Pembayaran berhasil dikonfirmasi. Pesanan Anda sedang disiapkan oleh staf di Dapur.
                 </p>
             </div>
         @endif
@@ -122,15 +133,15 @@
             </div>
             <div class="flex justify-between text-stone-600">
                 <span>Nomor Meja:</span>
-                <span class="font-bold text-[#BD2000]">{{ $order->table ? $order->table->table_number : 'Takeaway / Bebas' }}</span>
+                <span class="font-bold text-[#BD2000]">{{ $order->table ? $order->table->table_number : 'Bawa Pulang' }}</span>
             </div>
             <div class="flex justify-between text-stone-600">
                 <span>Waktu Pesan:</span>
-                <span class="font-bold text-stone-900">{{ $order->created_at->format('d M Y, H:i') }} WIB</span>
+                <span class="font-bold text-stone-900">{{ $order->created_at->timezone('Asia/Jakarta')->locale('id')->translatedFormat('d M Y, H:i') }} WIB</span>
             </div>
             <div class="flex justify-between text-stone-600">
                 <span>Metode Bayar:</span>
-                <span class="font-bold uppercase text-stone-900">{{ strtoupper($order->payment_method) }}</span>
+                <span class="font-bold text-stone-900">{{ $order->payment_method === 'cash' ? 'Tunai' : ($order->payment_method === 'qris' ? 'QRIS' : 'Transfer') }}</span>
             </div>
         </div>
 
@@ -216,18 +227,73 @@
 
     </div>
 
+    {{-- Fullscreen QR Zoom Lightbox Modal for Effortless Cashier Scanning --}}
+    <div id="qr-zoom-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden items-center justify-center p-4" onclick="toggleQrZoom(false)">
+        <div class="bg-white p-6 rounded-3xl max-w-sm w-full text-center space-y-4 shadow-2xl relative" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center border-b border-stone-100 pb-2">
+                <span class="text-xs font-black text-[#BD2000] uppercase tracking-wider">Tiket Konfirmasi #ORD-{{ $order->id }}</span>
+                <button type="button" onclick="toggleQrZoom(false)" class="text-stone-400 hover:text-stone-800 text-lg font-bold p-1 cursor-pointer">✕</button>
+            </div>
+            <div class="p-3 bg-white border border-stone-200 rounded-2xl shadow-inner">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=600x600&ecc=M&margin=4&data=SAJI-ORD-{{ $order->id }}" 
+                     alt="QR Konfirmasi Order #{{ $order->id }}" 
+                     class="w-72 h-72 mx-auto object-contain select-none"
+                     style="image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;">
+            </div>
+            <p class="text-xs font-bold text-stone-700">Tunjukkan QR ini ke kamera kasir</p>
+            <button type="button" onclick="toggleQrZoom(false)" class="w-full py-3 bg-[#BD2000] hover:bg-[#8C0000] text-white text-xs font-bold uppercase rounded-xl transition-all shadow-md cursor-pointer">Tutup</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleQrZoom(show) {
+            const m = document.getElementById('qr-zoom-modal');
+            if (m) {
+                if (show) {
+                    m.classList.remove('hidden');
+                    m.classList.add('flex');
+                } else {
+                    m.classList.add('hidden');
+                    m.classList.remove('flex');
+                }
+            }
+        }
+    </script>
+
     @if ($order->payment_status !== 'paid')
     <script>
-        setInterval(() => {
+        let isRedirecting = false;
+        const dashboardUrl = "{{ route('landing') }}";
+
+        const checkInterval = setInterval(() => {
+            if (isRedirecting) return;
             fetch("{{ route('pesan.status', $order->id) }}")
                 .then(res => res.json())
                 .then(data => {
-                    if (data && data.payment_status === 'paid') {
-                        window.location.reload();
+                    if (data && (data.payment_status === 'paid' || data.is_confirmed)) {
+                        isRedirecting = true;
+                        clearInterval(checkInterval);
+
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Pesanan Berhasil Dikonfirmasi!',
+                                html: '<p class="text-xs font-bold text-stone-700">Pembayaran tiket <strong>#ORD-{{ $order->id }}</strong> telah diterima oleh kasir.</p><p class="text-[11px] text-stone-500 mt-2 font-medium">Mengarahkan kembali ke dashboard awal...</p>',
+                                showConfirmButton: false,
+                                timer: 2000,
+                                timerProgressBar: true,
+                                allowOutsideClick: false,
+                                customClass: { popup: 'rounded-3xl shadow-2xl font-sans' }
+                            }).then(() => {
+                                window.location.href = dashboardUrl;
+                            });
+                        } else {
+                            window.location.href = dashboardUrl;
+                        }
                     }
                 })
                 .catch(err => console.log('Checking order status...'));
-        }, 3500);
+        }, 2500);
     </script>
     @endif
 

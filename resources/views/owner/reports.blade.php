@@ -44,11 +44,11 @@
 
     <!-- Print Header Only (Tampil saat di-print) -->
     <div class="print-only mb-6 border-b-2 border-stone-800 pb-4">
-        <h1 class="text-2xl font-black text-[#8C0000] uppercase tracking-wide">LAPORAN LABA RUGI EKSEKUTIF (PROFIT & LOSS)</h1>
+        <h1 class="text-2xl font-black text-[#8C0000] uppercase tracking-wide">LAPORAN LABA RUGI EKSEKUTIF</h1>
         <p class="text-sm font-bold text-stone-800">SajiHub Multi-Branch Culinary Enterprise</p>
         <div class="mt-2 text-xs text-stone-600 flex justify-between">
             <span>Cabang: <strong>{{ $selectedBranch ? $selectedBranch->name : 'Semua Cabang (Laporan Gabungan)' }}</strong></span>
-            <span>Periode: <strong>{{ \Carbon\Carbon::parse($startDate)->format('d M Y') }} - {{ \Carbon\Carbon::parse($endDate)->format('d M Y') }}</strong></span>
+            <span>Periode: <strong>{{ \Carbon\Carbon::parse($startDate)->locale('id')->translatedFormat('d M Y') }} - {{ \Carbon\Carbon::parse($endDate)->locale('id')->translatedFormat('d M Y') }}</strong></span>
             <span>Dicetak: {{ now()->format('d/m/Y H:i') }} WIB</span>
         </div>
     </div>
@@ -57,11 +57,11 @@
     <div class="no-print bg-white border border-stone-200 rounded-3xl p-6 shadow-sm flex flex-col xl:flex-row items-start xl:items-center justify-between gap-5">
         <div>
             <div class="flex items-center gap-2">
-                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold uppercase bg-red-100 text-[#8C0000] border border-red-200">Executive Report</span>
+                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold uppercase bg-red-100 text-[#8C0000] border border-red-200">Laporan Eksekutif</span>
                 <span class="text-xs font-bold text-stone-500">• {{ $periodLabel }}</span>
             </div>
             <h2 class="text-2xl font-black text-[#8C0000] mt-1">Laporan Keuangan: {{ $selectedBranch ? $selectedBranch->name : 'Semua Cabang (Gabungan)' }}</h2>
-            <p class="text-slate-600 text-xs mt-0.5 font-medium">Periode terpilih: <span class="text-[#BD2000] font-extrabold">{{ \Carbon\Carbon::parse($startDate)->format('d M Y') }} s/d {{ \Carbon\Carbon::parse($endDate)->format('d M Y') }}</span></p>
+            <p class="text-slate-600 text-xs mt-0.5 font-medium">Periode terpilih: <span class="text-[#BD2000] font-extrabold">{{ \Carbon\Carbon::parse($startDate)->locale('id')->translatedFormat('d M Y') }} s/d {{ \Carbon\Carbon::parse($endDate)->locale('id')->translatedFormat('d M Y') }}</span></p>
         </div>
 
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full xl:w-auto">
@@ -85,15 +85,15 @@
             <form method="GET" action="{{ route('owner.reports') }}" class="flex items-center gap-2 flex-wrap">
                 <input type="hidden" name="preset" value="custom">
                 <select name="branch_id" onchange="this.form.submit()" class="bg-stone-50 border border-stone-300 text-stone-800 text-xs font-bold rounded-xl px-3 py-2 focus:border-[#BD2000] focus:outline-none shadow-sm cursor-pointer">
-                    <option value="all" {{ ($selectedBranchId == 'all' || !$selectedBranchId) ? 'selected' : '' }}>🌐 Semua Cabang</option>
+                    <option value="all" {{ ($selectedBranchId == 'all' || !$selectedBranchId) ? 'selected' : '' }}>Semua Cabang</option>
                     @foreach($branches as $b)
-                        <option value="{{ $b->id }}" {{ $selectedBranchId == $b->id ? 'selected' : '' }}>🏢 {{ $b->name }}</option>
+                        <option value="{{ $b->id }}" {{ $selectedBranchId == $b->id ? 'selected' : '' }}>{{ $b->name }}</option>
                     @endforeach
                 </select>
                 <input type="date" name="start_date" value="{{ $startDate }}" class="bg-stone-50 border border-stone-300 text-[#1C1917] font-bold rounded-xl px-2.5 py-2 text-xs focus:border-[#BD2000] focus:outline-none">
                 <span class="text-slate-400 text-xs font-bold">-</span>
                 <input type="date" name="end_date" value="{{ $endDate }}" class="bg-stone-50 border border-stone-300 text-[#1C1917] font-bold rounded-xl px-2.5 py-2 text-xs focus:border-[#BD2000] focus:outline-none">
-                <button type="submit" class="bg-[#BD2000] hover:bg-[#8C0000] text-white px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all shadow-sm cursor-pointer">Filter</button>
+                <button type="submit" class="bg-[#BD2000] hover:bg-[#8C0000] text-white px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all shadow-sm cursor-pointer">Saring</button>
             </form>
 
             <!-- Export & Print Actions -->
@@ -124,7 +124,7 @@
                 <h3 class="text-2xl font-black text-emerald-600">Rp {{ number_format($revenue, 0, ',', '.') }}</h3>
                 <div class="flex items-center justify-between text-[11px] text-stone-500 font-semibold mt-2 pt-2 border-t border-stone-100">
                     <span>{{ $totalOrders }} pesanan lunas</span>
-                    <span>AOV: Rp {{ number_format($avgOrderValue, 0, ',', '.') }}</span>
+                    <span>Rata-rata: Rp {{ number_format($avgOrderValue, 0, ',', '.') }}</span>
                 </div>
             </div>
         </div>
@@ -149,7 +149,7 @@
         <!-- Laba Bersih Operasional -->
         <div class="bg-white border border-stone-200 rounded-3xl p-5 shadow-sm flex flex-col justify-between page-break-inside-avoid">
             <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-stone-500 uppercase tracking-wider">Laba Bersih (Net Profit)</span>
+                <span class="text-xs font-bold text-stone-500 uppercase tracking-wider">Laba Bersih</span>
                 <div class="p-2.5 {{ $netProfit >= 0 ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-red-50 text-red-600 border border-red-200' }} rounded-2xl">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                 </div>
@@ -163,10 +163,10 @@
             </div>
         </div>
 
-        <!-- Net Profit Margin -->
+        <!-- Margin Laba Bersih -->
         <div class="bg-white border border-stone-200 rounded-3xl p-5 shadow-sm flex flex-col justify-between page-break-inside-avoid">
             <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-stone-500 uppercase tracking-wider">Net Profit Margin</span>
+                <span class="text-xs font-bold text-stone-500 uppercase tracking-wider">Margin Laba Bersih</span>
                 <div class="p-2.5 bg-amber-50 text-amber-600 rounded-2xl border border-amber-200">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
                 </div>
@@ -187,7 +187,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h3 class="text-base font-black text-[#8C0000] flex items-center gap-2">
-                    <span>🏢 Perbandingan Kinerja Seluruh Cabang</span>
+                    <span>Perbandingan Kinerja Seluruh Cabang</span>
                 </h3>
                 <p class="text-xs text-stone-500 font-medium">Analisis kontribusi pendapatan, biaya, dan margin keuntungan antar outlet.</p>
             </div>
@@ -203,7 +203,7 @@
                         <th class="p-3.5 text-right">Pendapatan Kotor</th>
                         <th class="p-3.5 text-right">Beban Operasional</th>
                         <th class="p-3.5 text-right">Laba Bersih</th>
-                        <th class="p-3.5 text-center">Profit Margin</th>
+                        <th class="p-3.5 text-center">Margin Laba</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-stone-200">
@@ -213,7 +213,7 @@
                             <span class="w-2 h-2 rounded-full bg-[#BD2000]"></span>
                             {{ $bp['branch']->name }}
                         </td>
-                        <td class="p-3.5 text-center font-bold text-stone-600">{{ $bp['orders'] }} order</td>
+                        <td class="p-3.5 text-center font-bold text-stone-600">{{ $bp['orders'] }} pesanan</td>
                         <td class="p-3.5 text-right font-black text-emerald-600 text-sm">Rp {{ number_format($bp['revenue'], 0, ',', '.') }}</td>
                         <td class="p-3.5 text-right font-bold text-red-600 text-sm">Rp {{ number_format($bp['expense'], 0, ',', '.') }}</td>
                         <td class="p-3.5 text-right font-black {{ $bp['profit'] >= 0 ? 'text-[#BD2000]' : 'text-red-600' }} text-sm">
@@ -232,22 +232,22 @@
     </div>
     @endif
 
-    <!-- Breakdown Pendapatan: Metode Pembayaran & Top 5 Menu Terlaris -->
+    <!-- Breakdown Pendapatan: Metode Pembayaran & 5 Menu Terlaris -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Metode Pembayaran -->
         <div class="bg-white border border-stone-200 rounded-3xl p-6 shadow-sm space-y-4 page-break-inside-avoid">
             <h3 class="text-base font-black text-[#8C0000] flex items-center gap-2">
-                <span>💳 Komposisi Metode Pembayaran</span>
+                <span>Komposisi Metode Pembayaran</span>
             </h3>
             <div class="space-y-3">
                 @forelse($paymentMethods as $pmKey => $pm)
                 <div class="p-3.5 bg-stone-50 border border-stone-200 rounded-2xl space-y-2">
                     <div class="flex items-center justify-between text-xs">
                         <span class="font-extrabold uppercase text-stone-800">
-                            {{ $pmKey === 'cash' ? '💵 Tunai (Cash Kasir)' : ($pmKey === 'qris' ? '📱 QRIS Digital' : '🏦 ' . strtoupper($pmKey)) }}
+                            {{ $pmKey === 'cash' ? 'Tunai' : ($pmKey === 'qris' ? 'QRIS' : strtoupper($pmKey)) }}
                         </span>
                         <span class="font-black text-stone-900">
-                            Rp {{ number_format($pm['total'], 0, ',', '.') }} <span class="text-stone-500 font-semibold text-[11px]">({{ $pm['count'] }} trx)</span>
+                            Rp {{ number_format($pm['total'], 0, ',', '.') }} <span class="text-stone-500 font-semibold text-[11px]">({{ $pm['count'] }} transaksi)</span>
                         </span>
                     </div>
                     <div class="w-full bg-stone-200 h-2 rounded-full overflow-hidden">
@@ -261,10 +261,10 @@
             </div>
         </div>
 
-        <!-- Top 5 Menu Penyumbang Omset -->
+        <!-- 5 Menu Terlaris Penyumbang Pendapatan -->
         <div class="bg-white border border-stone-200 rounded-3xl p-6 shadow-sm space-y-4 page-break-inside-avoid">
             <h3 class="text-base font-black text-[#8C0000] flex items-center gap-2">
-                <span>🔥 Top 5 Menu Penyumbang Omset</span>
+                <span>5 Menu Terlaris Penyumbang Pendapatan</span>
             </h3>
             <div class="divide-y divide-stone-100">
                 @forelse($topMenus as $idx => $item)

@@ -1,23 +1,23 @@
 @extends('layouts.app')
-@section('title', 'Laporan Omzet Global - SajiHUB')
-@section('page-title', 'Laporan Omzet Global')
+@section('title', 'Laporan Pendapatan Seluruh Cabang - SajiHUB')
+@section('page-title', 'Laporan Pendapatan Seluruh Cabang')
 
 @section('content')
 
 {{-- Summary Cards --}}
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8 animate-fade-in-up">
     <div class="bg-white border border-stone-200 rounded-3xl p-5 shadow-sm hover:shadow-md transition-all">
-        <p class="text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Total Omzet (All-time)</p>
+        <p class="text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Total Pendapatan (Sepanjang Waktu)</p>
         <h3 class="text-2xl font-black text-[#1C1917]">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</h3>
         <p class="text-xs text-slate-500 font-semibold mt-1">Dari semua cabang</p>
     </div>
     <div class="bg-white border border-stone-200 rounded-3xl p-5 shadow-sm hover:shadow-md transition-all">
-        <p class="text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Omzet Bulan Ini</p>
+        <p class="text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Pendapatan Bulan Ini</p>
         <h3 class="text-2xl font-black text-emerald-600">Rp {{ number_format($monthlyRevenue, 0, ',', '.') }}</h3>
         <p class="text-xs text-slate-500 font-semibold mt-1">{{ now()->locale('id')->isoFormat('MMMM YYYY') }}</p>
     </div>
     <div class="bg-white border border-stone-200 rounded-3xl p-5 shadow-sm hover:shadow-md transition-all">
-        <p class="text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Omzet Hari Ini</p>
+        <p class="text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Pendapatan Hari Ini</p>
         <h3 class="text-2xl font-black text-[#BD2000]">Rp {{ number_format($todayRevenue, 0, ',', '.') }}</h3>
         <p class="text-xs text-slate-500 font-semibold mt-1">{{ now()->locale('id')->isoFormat('dddd, D MMM YYYY') }}</p>
     </div>
@@ -33,7 +33,7 @@
     <div class="lg:col-span-2 bg-white border border-stone-200 rounded-3xl p-6 shadow-sm">
         <div class="flex items-center justify-between mb-5">
             <div>
-                <h3 class="text-base font-black text-[#8C0000]">Tren Omzet 6 Bulan Terakhir</h3>
+                <h3 class="text-base font-black text-[#8C0000]">Tren Pendapatan 6 Bulan Terakhir</h3>
                 <p class="text-xs text-slate-600 font-medium">Semua cabang gabungan</p>
             </div>
         </div>
@@ -41,7 +41,7 @@
     </div>
 
     <div class="bg-white border border-stone-200 rounded-3xl p-6 shadow-sm">
-        <h3 class="text-base font-black text-[#8C0000] mb-4">Omzet Bulan Ini per Cabang</h3>
+        <h3 class="text-base font-black text-[#8C0000] mb-4">Pendapatan Bulan Ini per Cabang</h3>
         <div class="space-y-4">
             @php $maxRev = $branchStats->max('monthly_rev') ?: 1; @endphp
             @foreach($branchStats as $stat)
@@ -64,7 +64,7 @@
 {{-- Branch Revenue Breakdown Table --}}
 <div class="bg-white border border-stone-200 rounded-3xl overflow-hidden mb-8 shadow-sm animate-fade-in-up">
     <div class="px-6 py-4 border-b border-stone-200 bg-stone-50">
-        <h3 class="font-black text-[#8C0000]">Rekap Omzet Per Cabang (Keseluruhan)</h3>
+        <h3 class="font-black text-[#8C0000]">Rekap Pendapatan per Cabang (Keseluruhan)</h3>
     </div>
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
@@ -72,7 +72,7 @@
                 <tr class="bg-stone-100 border-b border-stone-200 text-stone-700 text-xs font-extrabold uppercase tracking-wider">
                     <th class="px-6 py-3">Cabang</th>
                     <th class="px-6 py-3">Total Transaksi</th>
-                    <th class="px-6 py-3">Total Omzet</th>
+                    <th class="px-6 py-3">Total Pendapatan</th>
                     <th class="px-6 py-3">Rata-rata/Transaksi</th>
                 </tr>
             </thead>
@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function () {
         data: {
             labels: labels,
             datasets: [{
-                label: 'Omzet (Rp)',
+                label: 'Pendapatan (Rp)',
                 data: data,
                 borderColor: '#bd2000',
                 backgroundColor: gradient,

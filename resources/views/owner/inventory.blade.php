@@ -12,11 +12,11 @@
             <p class="text-slate-600 text-xs mt-0.5 font-medium">Monitoring nilai valuasi dan stok kritis: <span class="text-[#BD2000] font-extrabold">{{ $selectedBranch ? $selectedBranch->name : 'Semua Cabang (Gabungan)' }}</span></p>
         </div>
         <form method="GET" action="{{ route('owner.inventory') }}" class="flex items-center gap-2">
-            <label for="branch_id" class="text-xs font-bold text-stone-600 whitespace-nowrap">Filter Cabang:</label>
+            <label for="branch_id" class="text-xs font-bold text-stone-600 whitespace-nowrap">Saring Cabang:</label>
             <select name="branch_id" id="branch_id" onchange="this.form.submit()" class="bg-stone-50 border border-stone-300 text-stone-800 text-xs font-bold rounded-xl px-4 py-2 focus:border-[#BD2000] focus:outline-none shadow-sm cursor-pointer">
-                <option value="all" {{ ($selectedBranchId == 'all' || !$selectedBranchId) ? 'selected' : '' }}>🌐 Semua Cabang</option>
+                <option value="all" {{ ($selectedBranchId == 'all' || !$selectedBranchId) ? 'selected' : '' }}>Semua Cabang</option>
                 @foreach($branches as $b)
-                    <option value="{{ $b->id }}" {{ $selectedBranchId == $b->id ? 'selected' : '' }}>🏢 {{ $b->name }}</option>
+                    <option value="{{ $b->id }}" {{ $selectedBranchId == $b->id ? 'selected' : '' }}>{{ $b->name }}</option>
                 @endforeach
             </select>
         </form>
@@ -28,7 +28,7 @@
             <div>
                 <p class="text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Total Nilai Valuasi Aset Stok</p>
                 <h3 class="text-3xl font-black text-[#BD2000]">Rp {{ number_format($totalValuation, 0, ',', '.') }}</h3>
-                <p class="text-xs text-slate-500 font-semibold mt-1">Estimasi total nilai kapital stok di gudang {{ $selectedBranch ? $selectedBranch->name : 'seluruh cabang' }}</p>
+                <p class="text-xs text-slate-500 font-semibold mt-1">Perkiraan total nilai modal stok di gudang {{ $selectedBranch ? $selectedBranch->name : 'seluruh cabang' }}</p>
             </div>
             <div class="p-3.5 bg-[#BD2000]/10 text-[#BD2000] rounded-2xl border border-[#BD2000]/20 shrink-0">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
@@ -37,9 +37,9 @@
 
         <div class="bg-white border border-stone-200 rounded-3xl p-6 shadow-sm flex items-center justify-between">
             <div>
-                <p class="text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Status Item Kritis</p>
+                <p class="text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Status Barang Kritis</p>
                 @if($lowStockItems->count() > 0)
-                    <h3 class="text-3xl font-black text-amber-600">{{ $lowStockItems->count() }} <span class="text-sm font-bold text-slate-500">item menipis</span></h3>
+                    <h3 class="text-3xl font-black text-amber-600">{{ $lowStockItems->count() }} <span class="text-sm font-bold text-slate-500">barang menipis</span></h3>
                     <p class="inline-flex items-center gap-1 text-xs text-amber-700 font-semibold mt-1">
                         <svg class="w-3.5 h-3.5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                         Perlu tindakan restok dari Supervisor
@@ -68,11 +68,11 @@
                 <thead class="bg-stone-100 text-stone-700 text-xs font-extrabold uppercase tracking-wider border-b border-stone-200">
                     <tr>
                         <th class="px-6 py-4">Cabang</th>
-                        <th class="px-6 py-4">Nama Item</th>
+                        <th class="px-6 py-4">Nama Barang</th>
                         <th class="px-6 py-4">Kategori</th>
                         <th class="px-6 py-4">Stok Saat Ini</th>
                         <th class="px-6 py-4">Harga Satuan (Rp)</th>
-                        <th class="px-6 py-4">Subtotal Valuasi (Rp)</th>
+                        <th class="px-6 py-4">Total Nilai Valuasi (Rp)</th>
                         <th class="px-6 py-4 text-right">Status</th>
                     </tr>
                 </thead>

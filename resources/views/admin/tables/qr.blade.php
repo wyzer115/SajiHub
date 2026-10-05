@@ -20,18 +20,22 @@
         <div>
             <span class="text-xs font-black uppercase tracking-widest text-[#BD2000] bg-[#BD2000]/10 px-3 py-1 rounded-full border border-[#BD2000]/20">SajiHUB - {{ auth()->user()->branch->name ?? 'Cabang' }}</span>
             <h2 class="text-3xl font-black mt-3 text-[#8C0000]">MEJA {{ $table->table_number }}</h2>
-            <p class="text-sm text-slate-600 font-medium mt-1">Pindai kode QR untuk melihat menu & memesan secara langsung</p>
+            <p class="text-sm text-slate-600 font-medium mt-1">Pindai kode QR melalui scanner website SajiHUB untuk melihat menu & memesan</p>
         </div>
 
         <div class="flex justify-center my-6">
-            <div class="p-4 bg-stone-50 border-2 border-stone-300 rounded-3xl shadow-xs inline-block">
+            <div class="p-4 bg-white border-2 border-stone-300 rounded-3xl shadow-sm inline-block">
                 <img src="{{ $qrImageUrl }}" alt="QR Code Meja {{ $table->table_number }}" class="w-64 h-64 mx-auto rounded-xl">
             </div>
         </div>
 
-        <div class="bg-stone-50 p-4 rounded-2xl text-left border border-stone-200 space-y-2">
-            <div class="text-xs font-bold text-stone-500 uppercase">URL Tautan Langsung:</div>
-            <div class="text-xs font-mono text-[#BD2000] break-all select-all font-bold">{{ $orderUrl }}</div>
+        <div class="bg-amber-50 p-4 rounded-2xl text-left border border-amber-200 space-y-1.5">
+            <div class="text-xs font-bold text-amber-800 uppercase flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-amber-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>Petunjuk Scan:</span>
+            </div>
+            <p class="text-xs text-amber-900 font-medium">Buka website SajiHUB, lalu tekan tombol <strong>"Pindai QR Meja"</strong> untuk membuka kamera dan mulai memesan.</p>
+            <div class="text-[11px] font-mono text-stone-600 break-all select-all font-bold">Kode Meja: {{ $tableQrData }}</div>
         </div>
 
         <div class="text-xs text-slate-500 font-medium">

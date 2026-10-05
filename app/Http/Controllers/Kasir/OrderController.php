@@ -17,13 +17,20 @@ class OrderController extends Controller
     {
         $query = Order::where('branch_id', auth()->user()->branch_id);
 
+        // Jangan masukkan pesanan QR pelanggan yang belum dikonfirmasi lewat scan QR kasir
+        if ($request->get('status') === 'unconfirmed') {
+            $query->whereNull('confirmed_at');
+        } else {
+            $query->whereNotNull('confirmed_at');
+        }
+
         if ($request->filled('payment_status')) {
             $query->where('payment_status', $request->payment_status);
         }
 
         if ($request->get('status') == 'active') {
             $query->where('order_status', '!=', 'completed');
-        } elseif ($request->filled('order_status')) {
+        } elseif ($request->filled('order_status') && $request->order_status !== 'unconfirmed') {
             $query->where('order_status', $request->order_status);
         }
 
@@ -32,7 +39,13 @@ class OrderController extends Controller
         }
 
         $orders = $query->with(['table', 'user', 'items.menu', 'transaction'])->latest()->paginate(15);
-        return view('kasir.orders.index', compact('orders'));
+
+        $unconfirmedCount = Order::where('branch_id', auth()->user()->branch_id)
+            ->whereNull('confirmed_at')
+            ->whereDate('created_at', today())
+            ->count();
+
+        return view('kasir.orders.index', compact('orders', 'unconfirmedCount'));
     }
 
     public function scan()
@@ -68,13 +81,14 @@ class OrderController extends Controller
             'order'   => [
                 'id'             => $order->id,
                 'customer_name'  => $order->customer_name,
-                'table_number'   => $order->table ? $order->table->table_number : '🛍️ Bawa Pulang',
+                'table_number'   => $order->table ? $order->table->table_number : 'Bawa Pulang',
                 'table_id'       => $order->table_id,
                 'order_status'   => $order->order_status,
                 'payment_status' => $order->payment_status,
                 'payment_method' => $order->payment_method ?? 'cash',
+                'is_confirmed'   => !is_null($order->confirmed_at),
                 'total_price'    => (float) $order->total_price,
-                'created_at'     => $order->created_at->format('d M Y, H:i'),
+                'created_at'     => $order->created_at->locale('id')->translatedFormat('d M Y, H:i'),
                 'items'          => $order->items->map(fn($item) => [
                     'name'     => $item->menu->name ?? 'Menu',
                     'quantity' => $item->quantity,
@@ -94,19 +108,29 @@ class OrderController extends Controller
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
 
+        if ($order->payment_status === 'paid') {
+            return response()->json([
+                'success'     => true,
+                'message'     => 'Pesanan #' . $order->id . ' sudah berstatus lunas.',
+                'receipt_url' => route('kasir.orders.receipt', $order->id),
+            ]);
+        }
+
         $validated = $request->validate([
-            'payment_method' => 'required|in:cash,qris',
+            'payment_method' => 'nullable|in:cash,qris',
             'cash_paid'      => 'nullable|numeric|min:0',
             'payment_proof'  => 'nullable|image|max:10240', // max 10MB
         ]);
 
+        // Gunakan metode pembayaran yang telah dipilih customer saat memesan
+        $paymentMethod = $order->payment_method ?? ($validated['payment_method'] ?? 'cash');
         $amount = (float) $order->total_price;
         $proofPath = null;
 
-        if ($validated['payment_method'] === 'cash') {
+        if ($paymentMethod === 'cash') {
             $cashPaid = floatval($validated['cash_paid'] ?? 0);
             if ($cashPaid < $amount) {
-                return response()->json(['success' => false, 'message' => 'Nominal uang tunai kurang dari total tagihan!'], 422);
+                return response()->json(['success' => false, 'message' => 'Nominal uang tunai kurang dari total tagihan.'], 422);
             }
             $cashChange = $cashPaid - $amount;
         } else {
@@ -125,22 +149,23 @@ class OrderController extends Controller
             }
         }
 
-        DB::transaction(function () use ($order, $validated, $amount, $cashPaid, $cashChange, $proofPath) {
+        DB::transaction(function () use ($order, $paymentMethod, $amount, $cashPaid, $cashChange, $proofPath) {
             $isTakeaway = ($order->table_id === null);
             $newOrderStatus = $isTakeaway ? 'completed' : 'cooking';
 
             $order->update([
                 'payment_status' => 'paid',
                 'order_status'   => $newOrderStatus,
-                'payment_method' => $validated['payment_method'],
+                'payment_method' => $paymentMethod,
+                'confirmed_at'   => now(), // Confirmed by cashier via QR!
             ]);
 
             $txData = [
                 'branch_id'      => $order->branch_id,
                 'amount'         => $amount,
-                'payment_method' => $validated['payment_method'],
+                'payment_method' => $paymentMethod,
                 'status'         => 'completed',
-                'merchant_id'    => $validated['payment_method'] === 'qris' ? 'ID1026528881513' : null,
+                'merchant_id'    => $paymentMethod === 'qris' ? 'ID1026528881513' : null,
                 'cash_paid'      => $cashPaid,
                 'cash_change'    => $cashChange,
                 'paid_at'        => now(),
@@ -159,7 +184,7 @@ class OrderController extends Controller
 
         return response()->json([
             'success'     => true,
-            'message'     => 'Pembayaran pesanan #' . $order->id . ' berhasil dikonfirmasi dan lunas!',
+            'message'     => 'Pembayaran pesanan #' . $order->id . ' berhasil dikonfirmasi.',
             'receipt_url' => route('kasir.orders.receipt', $order->id),
         ]);
     }
@@ -195,6 +220,7 @@ class OrderController extends Controller
                 'payment_status' => 'unpaid',
                 'payment_method' => $validated['payment_method'] ?? 'cash',
                 'total_price' => 0,
+                'confirmed_at' => now(), // Handled directly by cashier at POS counter
             ]);
 
             $totalPrice = 0;
@@ -241,11 +267,11 @@ class OrderController extends Controller
         if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Pesanan berhasil ditahan di status Pending. Silakan lakukan pembayaran pada modal.',
+                'message' => 'Pesanan berhasil disimpan. Silakan lanjutkan proses pembayaran.',
                 'order'   => [
                     'id' => $order->id,
                     'customer_name' => $order->customer_name,
-                    'table_number' => $order->table ? ($order->table->table_number) : '🛍️ Takeaway',
+                    'table_number' => $order->table ? ($order->table->table_number) : 'Bawa Pulang',
                     'total_price' => floatval($order->total_price),
                     'payment_method' => $order->payment_method,
                     'items' => $order->items->map(function ($item) {
@@ -260,7 +286,7 @@ class OrderController extends Controller
         }
 
         return redirect()->route('kasir.orders.show', $order)
-            ->with('success', 'Pesanan #' . $order->id . ' ditahan di status Pending. Silakan pilih metode pembayaran.');
+            ->with('success', 'Pesanan #' . $order->id . ' berhasil disimpan. Silakan lakukan pembayaran.');
     }
 
     public function show(Order $order)
@@ -296,6 +322,7 @@ class OrderController extends Controller
             $order->update([
                 'payment_status' => 'paid',
                 'order_status'   => $newOrderStatus,
+                'confirmed_at'   => $order->confirmed_at ?? now(),
             ]);
             if ($order->table && $newOrderStatus === 'completed') {
                 $order->table->update(['status' => 'empty']);
@@ -341,7 +368,7 @@ class OrderController extends Controller
                 if ($validated['payment_method'] === 'cash') {
                     $cashPaid = floatval($validated['cash_paid'] ?? 0);
                     if ($cashPaid < $amount) {
-                        throw new \Exception('Nominal pembayaran kurang dari total tagihan!');
+                        throw new \Exception('Nominal pembayaran kurang dari total tagihan.');
                     }
                     $cashChange = $cashPaid - $amount;
 
@@ -362,6 +389,7 @@ class OrderController extends Controller
                         'payment_status' => 'paid',
                         'order_status'   => $newOrderStatus,
                         'payment_method' => 'cash',
+                        'confirmed_at'   => $order->confirmed_at ?? now(),
                     ]);
 
                     if ($order->table && $newOrderStatus === 'completed') {
@@ -406,6 +434,7 @@ class OrderController extends Controller
                             'payment_status' => 'paid',
                             'order_status'   => $newOrderStatus,
                             'payment_method' => 'qris',
+                            'confirmed_at'   => $order->confirmed_at ?? now(),
                         ]);
 
                         if ($order->table && $newOrderStatus === 'completed') {

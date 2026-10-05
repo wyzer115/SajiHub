@@ -82,7 +82,7 @@
                                 {{ $branch->status === 'buka' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : '' }}
                                 {{ $branch->status === 'tutup' ? 'bg-red-100 text-red-600 border-red-200' : '' }}
                                 {{ $branch->status === 'maintenance' ? 'bg-amber-100 text-amber-800 border-amber-300' : '' }}">
-                                <span class="capitalize">{{ $branch->status }}</span>
+                                <span class="capitalize">{{ $branch->status === 'maintenance' ? 'Pemeliharaan' : $branch->status }}</span>
                             </button>
                         </td>
                         <td class="px-6 py-4 text-sm text-slate-700 font-bold">{{ $branch->users_count ?? 0 }}</td>
@@ -166,7 +166,7 @@
                         class="w-full bg-stone-50 border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-4 py-2.5 focus:border-[#BD2000] focus:outline-none transition-all text-sm cursor-pointer">
                         <option value="buka">Buka</option>
                         <option value="tutup">Tutup</option>
-                        <option value="maintenance">Maintenance</option>
+                        <option value="maintenance">Pemeliharaan</option>
                     </select>
                 </div>
                 <div class="flex justify-end gap-3 pt-4">
@@ -256,7 +256,7 @@
                         :class="newStatus === 'maintenance' ? 'border-amber-500 bg-amber-50 text-amber-800' : 'border-stone-200 bg-white text-stone-700'">
                         <input type="radio" name="status" value="maintenance" x-model="newStatus" class="sr-only">
                         <span class="w-2.5 h-2.5 rounded-full bg-amber-500 mb-2"></span>
-                        <span class="text-xs font-black uppercase tracking-wider">Maintenance</span>
+                        <span class="text-xs font-black uppercase tracking-wider">Pemeliharaan</span>
                     </label>
                 </div>
 

@@ -85,7 +85,7 @@
     <div class="grid lg:grid-cols-3 gap-6 animate-fade-in-up">
         <!-- Daily Revenue Trend Chart -->
         <div class="lg:col-span-2 bg-white border border-stone-200 rounded-3xl p-6 shadow-sm flex flex-col">
-            <h3 class="text-lg font-black text-[#8C0000] mb-4">Tren Omzet Harian</h3>
+            <h3 class="text-lg font-black text-[#8C0000] mb-4">Tren Pendapatan Harian</h3>
             <div class="relative w-full flex-grow min-h-[300px]">
                 <canvas id="revenueChart"></canvas>
             </div>
@@ -129,7 +129,7 @@
                         <th class="px-6 py-4">No</th>
                         <th class="px-6 py-4">Tanggal & Waktu</th>
                         <th class="px-6 py-4">Pelanggan / Meja</th>
-                        <th class="px-6 py-4">Metode</th>
+                        <th class="px-6 py-4">Metode Pembayaran</th>
                         <th class="px-6 py-4 text-right">Total Transaksi</th>
                     </tr>
                 </thead>
@@ -137,17 +137,17 @@
                     @forelse($paginatedOrders as $order)
                     <tr class="hover:bg-stone-50 transition-colors">
                         <td class="px-6 py-4 text-xs font-bold text-slate-500">{{ ($paginatedOrders->currentPage() - 1) * $paginatedOrders->perPage() + $loop->iteration }}</td>
-                        <td class="px-6 py-4 text-sm text-slate-600 font-semibold">{{ $order->created_at->format('d M Y, H:i') }}</td>
+                        <td class="px-6 py-4 text-sm text-slate-600 font-semibold">{{ $order->created_at->locale('id')->translatedFormat('d M Y, H:i') }}</td>
                         <td class="px-6 py-4">
                             <div class="text-sm font-extrabold text-[#1C1917]">{{ $order->customer_name }}</div>
-                            <div class="text-xs text-slate-500 font-medium">{{ $order->table ? 'Meja ' . $order->table->table_number : 'Takeaway / Non-meja' }}</div>
+                            <div class="text-xs text-slate-500 font-medium">{{ $order->table ? 'Meja ' . $order->table->table_number : 'Bawa Pulang' }}</div>
                         </td>
                         <td class="px-6 py-4">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold uppercase
                                 {{ $order->payment_method === 'cash' ? 'bg-amber-100 text-amber-800 border border-amber-300' : '' }}
                                 {{ $order->payment_method === 'qris' ? 'bg-[#BD2000]/10 text-[#BD2000] border border-[#BD2000]/20' : '' }}
                                 {{ $order->payment_method === 'transfer' ? 'bg-blue-100 text-blue-800 border border-blue-300' : '' }}">
-                                {{ $order->payment_method }}
+                                {{ $order->payment_method === 'cash' ? 'Tunai' : ($order->payment_method === 'qris' ? 'QRIS' : ($order->payment_method === 'transfer' ? 'Transfer' : $order->payment_method)) }}
                             </span>
                         </td>
                         <td class="px-6 py-4 text-sm font-black text-emerald-700 text-right">Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>

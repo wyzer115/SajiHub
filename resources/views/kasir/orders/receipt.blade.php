@@ -122,7 +122,7 @@
     <table class="info-table">
         <tr>
             <td>No. Pesanan: #{{ $order->id }}</td>
-            <td>Meja: {{ $order->table ? $order->table->table_number : 'Takeaway (Bungkus)' }}</td>
+            <td>Meja: {{ $order->table ? $order->table->table_number : 'Bawa Pulang' }}</td>
         </tr>
         <tr>
             <td>Tanggal: {{ $order->created_at->format('d/m/Y H:i') }}</td>
@@ -140,7 +140,7 @@
         <thead>
             <tr>
                 <th>Menu</th>
-                <th style="text-align: center;">Qty</th>
+                <th style="text-align: center;">Jml</th>
                 <th style="text-align: right;">Harga</th>
                 <th style="text-align: right;">Total</th>
             </tr>
@@ -166,11 +166,11 @@
 
     <div class="totals">
         <div class="totals-row">
-            <span>TOTAL BELANJA:</span>
+            <span>TOTAL PEMBAYARAN:</span>
             <span>Rp {{ number_format($order->total_price, 0, ',', '.') }}</span>
         </div>
         <div class="totals-row" style="font-size: 10px; font-weight: normal; margin-top: 5px;">
-            <span>STATUS BAYAR:</span>
+            <span>STATUS PEMBAYARAN:</span>
             <span>{{ strtoupper($order->payment_status == 'paid' ? 'Lunas' : 'Belum Bayar') }}</span>
         </div>
     </div>
@@ -178,8 +178,8 @@
     <div class="separator"></div>
 
     <div class="footer">
-        <p>Terima Kasih atas Kunjungan Anda!</p>
-        <p>SajiHUB Restaurant Systems</p>
+        <p>Terima kasih atas kunjungan Anda!</p>
+        <p>SajiHub Restaurant System</p>
     </div>
 
 </body>
