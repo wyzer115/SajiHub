@@ -90,9 +90,9 @@
     {{-- Header --}}
     <header class="border-b border-stone-200 bg-white sticky top-0 z-40 shadow-sm">
         <div class="max-w-7xl mx-auto px-6 lg:px-8 h-16 flex items-center justify-between">
-            <a href="{{ route('landing') }}" class="flex items-center gap-2.5 group">
-                <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-9 sm:h-10 w-auto object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-300">
-                <span class="font-black text-xl sm:text-2xl tracking-tight text-[#8C0000] leading-none group-hover:opacity-90 transition-opacity">
+            <a href="{{ route('landing') }}" class="flex items-center gap-2.5 flex-shrink-0 group">
+                <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-8 sm:h-9 w-auto object-contain flex-shrink-0 drop-shadow-sm group-hover:scale-105 transition-transform duration-200">
+                <span class="font-black text-xl sm:text-2xl tracking-tight text-[#8C0000] leading-none select-none flex-shrink-0">
                     Saji<span class="text-[#FFBE0F]">HUB</span>
                 </span>
             </a>

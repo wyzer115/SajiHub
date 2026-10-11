@@ -168,7 +168,8 @@
                             if (rows.length > 1) {
                                 e.target.closest('.ingredient-row').remove();
                             } else {
-                                alert('Minimal harus ada 1 baris bahan atau kosongkan pilihan!');
+                                if (window.showToast) window.showToast('Minimal harus ada 1 baris bahan atau kosongkan pilihan!', 'warning');
+                                else alert('Minimal harus ada 1 baris bahan atau kosongkan pilihan!');
                             }
                         }
                     });

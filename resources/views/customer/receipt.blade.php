@@ -49,10 +49,13 @@
         
         {{-- Top Brand Banner --}}
         <div class="text-center border-b border-dashed border-stone-300 pb-5 space-y-2">
-            <div class="flex justify-center mb-2">
-                <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-12 w-auto object-contain">
+            <div class="flex items-center justify-center gap-2 mb-2">
+                <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-8 w-auto object-contain flex-shrink-0">
+                <span class="font-black text-xl tracking-tight text-[#8C0000] leading-none select-none">
+                    Saji<span class="text-[#FFBE0F]">HUB</span>
+                </span>
             </div>
-            <h1 class="text-lg font-black text-[#8C0000] tracking-wide uppercase">
+            <h1 class="text-sm font-extrabold text-stone-700 tracking-wide uppercase">
                 {{ $order->branch->name ?? 'SajiHUB Restaurant' }}
             </h1>
             <p class="text-xs text-stone-500 font-medium">
@@ -292,7 +295,7 @@
                         }
                     }
                 })
-                .catch(err => console.log('Checking order status...'));
+                .catch(() => {});
         }, 2500);
     </script>
     @endif

@@ -650,7 +650,8 @@
                         videoEl.style.webkitTransform = 'scaleX(1)';
                     }
                 }).catch(e3 => {
-                    alert('Akses kamera belum diizinkan pada peramban ini.');
+                    if (window.showToast) window.showToast('Akses kamera belum diizinkan pada peramban ini.', 'error');
+                    else alert('Akses kamera belum diizinkan pada peramban ini.');
                     stopScanner();
                 });
             });
@@ -730,7 +731,7 @@
                 await html5QrcodeScanner.stop();
                 html5QrcodeScanner.clear();
             } catch(e) {
-                console.log(e);
+                // scanner stop cleanup
             }
             isScannerRunning = false;
             isScanLocked = false;
@@ -796,7 +797,8 @@
                 currentOrder = data.order;
                 openVerifyModal(data.order);
             } else {
-                alert(data.message || 'Nomor nota tidak ditemukan. Periksa kembali kodenya.');
+                if (window.showToast) window.showToast(data.message || 'Nomor nota tidak ditemukan. Periksa kembali kodenya.', 'error');
+                else alert(data.message || 'Nomor nota tidak ditemukan. Periksa kembali kodenya.');
                 // Unlock scanner so cashier can scan again
                 isScanLocked = false;
                 if (html5QrcodeScanner && isScannerRunning) {
@@ -804,7 +806,8 @@
                 }
             }
         } catch (err) {
-            alert('Terjadi kendala jaringan saat mencari pesanan.');
+            if (window.showToast) window.showToast('Terjadi kendala jaringan saat mencari pesanan.', 'error');
+            else alert('Terjadi kendala jaringan saat mencari pesanan.');
             isScanLocked = false;
             if (html5QrcodeScanner && isScannerRunning) {
                 try { html5QrcodeScanner.resume(); } catch(e) {}
@@ -943,7 +946,8 @@
         if (!currentOrder) return;
         const paid = parseFloat(document.getElementById('modal_cash_paid').value) || 0;
         if (paid < currentOrder.total_price) {
-            alert('Nominal pembayaran tunai kurang dari total tagihan.');
+            if (window.showToast) window.showToast('Nominal pembayaran tunai kurang dari total tagihan.', 'warning');
+            else alert('Nominal pembayaran tunai kurang dari total tagihan.');
             return;
         }
 
@@ -981,10 +985,12 @@
                     closeVerifyModal();
                 });
             } else {
-                alert(data.message || 'Gagal mengonfirmasi pembayaran.');
+                if (window.showToast) window.showToast(data.message || 'Gagal mengonfirmasi pembayaran.', 'error');
+                else alert(data.message || 'Gagal mengonfirmasi pembayaran.');
             }
         } catch (err) {
-            alert('Terjadi kendala jaringan saat memproses pembayaran.');
+            if (window.showToast) window.showToast('Terjadi kendala jaringan saat memproses pembayaran.', 'error');
+            else alert('Terjadi kendala jaringan saat memproses pembayaran.');
         } finally {
             btn.disabled = false;
             btn.innerText = 'Konfirmasi Pembayaran Tunai';
@@ -995,7 +1001,8 @@
         if (!currentOrder) return;
         const fileInput = document.getElementById('modal_qris_proof');
         if (!fileInput.files || fileInput.files.length === 0) {
-            alert('Pilih foto atau unggah bukti transfer QRIS terlebih dahulu.');
+            if (window.showToast) window.showToast('Pilih foto atau unggah bukti transfer QRIS terlebih dahulu.', 'warning');
+            else alert('Pilih foto atau unggah bukti transfer QRIS terlebih dahulu.');
             return;
         }
 
@@ -1033,10 +1040,12 @@
                     closeVerifyModal();
                 });
             } else {
-                alert(data.message || 'Gagal memproses verifikasi QRIS.');
+                if (window.showToast) window.showToast(data.message || 'Gagal memproses verifikasi QRIS.', 'error');
+                else alert(data.message || 'Gagal memproses verifikasi QRIS.');
             }
         } catch (err) {
-            alert('Terjadi kendala jaringan saat mengunggah bukti.');
+            if (window.showToast) window.showToast('Terjadi kendala jaringan saat mengunggah bukti.', 'error');
+            else alert('Terjadi kendala jaringan saat mengunggah bukti.');
         } finally {
             btn.disabled = false;
             btn.innerText = 'Konfirmasi Pembayaran QRIS';

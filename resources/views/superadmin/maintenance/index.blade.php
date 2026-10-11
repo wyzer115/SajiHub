@@ -207,9 +207,9 @@
                     <svg class="w-4 h-4 text-stone-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
                     <span id="copy-btn-text">Salin URL</span>
                 </button>
-                <form action="{{ route('superadmin.maintenance.regenerate-secret') }}" method="POST">
+                <form action="{{ route('superadmin.maintenance.regenerate-secret') }}" method="POST" onsubmit="return showConfirm(event, 'Apakah Anda yakin ingin memperbarui token bypass? Token lama tidak akan berlaku lagi.', 'Perbarui Token Bypass', 'Ya, Perbarui')">
                     @csrf
-                    <button type="submit" onclick="return confirm('Apakah Anda yakin ingin memperbarui token bypass? Token lama tidak akan berlaku lagi.')" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-stone-200 hover:bg-stone-300 text-stone-700 text-xs font-bold transition-all cursor-pointer">
+                    <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-stone-200 hover:bg-stone-300 text-stone-700 text-xs font-bold transition-all cursor-pointer">
                         <svg class="w-4 h-4 text-stone-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                         <span>Perbarui Kunci</span>
                     </button>

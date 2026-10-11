@@ -1,9 +1,14 @@
+Options -Indexes
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes
     </IfModule>
 
     RewriteEngine On
+
+    # Block access to hidden files and directories (starting with a dot)
+    RewriteRule "(^|/)\." - [F]
 
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .

@@ -83,7 +83,8 @@
 
     <!-- Table Transactions -->
     <div class="bg-white border border-stone-200 rounded-3xl overflow-hidden shadow-sm">
-        <div class="overflow-x-auto">
+        {{-- 1. Desktop Table View (Tetap Utuh untuk Layar Besar) --}}
+        <div class="hidden md:block overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead class="bg-stone-100 text-stone-700 text-xs font-extrabold border-b border-stone-200">
                     <tr>
@@ -151,6 +152,75 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
+
+        {{-- 2. Mobile Responsive Card View (Bebas Geser Horizontal di Mobile) --}}
+        <div class="block md:hidden p-3.5 space-y-3">
+            @forelse($orders as $order)
+                <div class="bg-stone-50/80 border border-stone-200 rounded-2xl p-4 space-y-3 shadow-2xs">
+                    {{-- Baris Atas: Nomor Transaksi + Status Bayar --}}
+                    <div class="flex items-center justify-between gap-2 border-b border-stone-200/80 pb-2.5">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-black text-[#8C0000]">#TRX-{{ $order->id }}</span>
+                            <span class="text-[11px] font-bold text-stone-300">•</span>
+                            <span class="text-[11px] font-semibold text-stone-500">{{ $order->created_at->format('d/m/Y H:i') }}</span>
+                        </div>
+                        @if($order->payment_status == 'paid')
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                Lunas
+                            </span>
+                        @else
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-50 text-amber-800 border border-amber-200">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                Belum Bayar
+                            </span>
+                        @endif
+                    </div>
+
+                    {{-- Isi Tengah: Pelanggan, Meja, Metode & Total --}}
+                    <div class="space-y-1.5">
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="font-extrabold text-[#1C1917] truncate">{{ $order->customer_name }}</span>
+                            <span class="font-bold text-stone-700 text-xs px-2.5 py-1 bg-white border border-stone-200 rounded-lg shrink-0">
+                                {{ $order->table ? 'Meja ' . $order->table->table_number : 'Bawa Pulang' }}
+                            </span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs pt-1">
+                            <span class="text-stone-500 font-medium">
+                                Metode: <span class="font-bold text-stone-700 capitalize">{{ $order->payment_method ?? 'Tunai' }}</span>
+                            </span>
+                            <span class="font-black text-base text-emerald-700">
+                                Rp {{ number_format($order->total_price, 0, ',', '.') }}
+                            </span>
+                        </div>
+                    </div>
+
+                    {{-- Baris Bawah: Tombol Aksi Thumb-Friendly --}}
+                    <div class="pt-2.5 border-t border-stone-200/80 flex items-center gap-2">
+                        @if($order->payment_status == 'paid')
+                            <a href="{{ route('kasir.orders.receipt', $order) }}" target="_blank" class="flex-1 inline-flex items-center justify-center gap-1.5 bg-white hover:bg-stone-100 text-stone-700 text-xs font-bold py-2.5 px-3 rounded-xl border border-stone-300 transition-all active:scale-95 shadow-2xs">
+                                <svg class="w-3.5 h-3.5 text-stone-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                                <span>Cetak Struk</span>
+                            </a>
+                        @else
+                            <a href="{{ route('kasir.orders.show', $order) }}" class="flex-1 inline-flex items-center justify-center gap-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 text-xs font-bold py-2.5 px-3 rounded-xl border border-amber-200 transition-all active:scale-95 shadow-2xs">
+                                <svg class="w-3.5 h-3.5 text-amber-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                <span>Bayar Kasir</span>
+                            </a>
+                        @endif
+                        <a href="{{ route('kasir.orders.show', $order) }}" class="inline-flex items-center justify-center gap-1 bg-[#BD2000]/10 hover:bg-[#BD2000]/20 text-[#BD2000] text-xs font-extrabold px-4 py-2.5 rounded-xl border border-[#BD2000]/20 transition-all active:scale-95">
+                            <span>Rincian</span>
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        </a>
+                    </div>
+                </div>
+            @empty
+                <div class="py-12 px-4 text-center bg-white border border-stone-200 rounded-2xl">
+                    <svg class="w-10 h-10 text-stone-300 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012 2"/></svg>
+                    <p class="text-sm font-semibold text-stone-500">Belum ada riwayat transaksi pada periode ini.</p>
+                </div>
+            @endforelse
         </div>
 
         @if($orders->hasPages())

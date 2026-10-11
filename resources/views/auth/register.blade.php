@@ -17,12 +17,14 @@
     <div class="w-full max-w-md px-6 z-10 animate-fade-in-up">
         
         <!-- Logo / Branding -->
-        <div class="text-center mb-8">
-            <a href="{{ route('landing') }}" class="inline-block">
-                <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-20 w-20 object-contain drop-shadow-md mx-auto mb-2">
+        <div class="text-center mb-6">
+            <a href="{{ route('landing') }}" class="inline-flex items-center justify-center gap-2.5 flex-shrink-0 group">
+                <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-10 w-auto object-contain flex-shrink-0 drop-shadow-md group-hover:scale-105 transition-transform duration-300">
+                <span class="font-black text-2xl sm:text-3xl tracking-tight text-[#8C0000] leading-none select-none flex-shrink-0">
+                    Saji<span class="text-[#FFBE0F]">HUB</span>
+                </span>
             </a>
-            <h1 class="font-black text-2xl tracking-tight text-[#1C1917]">Saji<span class="text-[#BD2000]">HUB</span></h1>
-            <p class="text-stone-500 font-semibold text-xs mt-0.5">Manajemen Kuliner Enterprise</p>
+            <p class="text-stone-500 font-semibold text-xs mt-2">Manajemen Kuliner Enterprise</p>
         </div>
 
         {{-- Back Button --}}

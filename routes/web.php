@@ -53,6 +53,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 Route::get('/order', [CustomerOrderController::class, 'index'])->name('order.qr');
 Route::get('/pesan', [CustomerOrderController::class, 'index'])->name('pesan');
 Route::post('/pesan', [CustomerOrderController::class, 'store'])->name('pesan.store')->middleware('throttle:15,1');
+Route::post('/pesan', [CustomerOrderController::class, 'store'])->name('pesan.store')->middleware('throttle:30,1');
 Route::get('/pesan/{order}/receipt', [CustomerOrderController::class, 'showReceipt'])->name('pesan.receipt');
 Route::get('/pesan/{order}/status', [CustomerOrderController::class, 'checkStatus'])->name('pesan.status');
 

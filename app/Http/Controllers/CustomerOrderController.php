@@ -92,6 +92,7 @@ class CustomerOrderController extends Controller
             'items.*.notes'    => 'nullable|string|max:500',
         ]);
 
+<<<<<<< HEAD
         $branch = Branch::findOrFail($validated['branch_id']);
         if ($branch->status !== 'buka') {
             return redirect()->back()->with('error', 'Cabang ini sedang tidak dapat menerima pesanan (' . ucfirst($branch->status) . ').');
@@ -104,6 +105,18 @@ class CustomerOrderController extends Controller
 
         if (!$table) {
             return redirect()->back()->with('error', 'Meja yang dipilih tidak valid untuk cabang ini.')->withInput();
+=======
+        $table = Table::findOrFail($validated['table_id']);
+        if ((int) $table->branch_id !== (int) $validated['branch_id']) {
+            return back()->withErrors(['table_id' => 'Meja yang dipilih tidak terdaftar pada cabang ini.'])->withInput();
+        }
+
+        // Validate all requested items belong strictly to the target branch
+        $menuIds = collect($validated['items'])->pluck('menu_id')->unique();
+        $validMenuCount = Menu::where('branch_id', $validated['branch_id'])->whereIn('id', $menuIds)->count();
+        if ($validMenuCount !== $menuIds->count()) {
+            return back()->withErrors(['items' => 'Terdapat menu yang tidak valid atau tidak tersedia pada cabang ini.'])->withInput();
+>>>>>>> c4f03bd (revisi mobile)
         }
 
         $customerName = trim($validated['customer_name']);

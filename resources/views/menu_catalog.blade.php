@@ -119,9 +119,9 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             
             {{-- Logo Merk --}}
-            <a href="{{ route('landing') }}" class="flex items-center gap-2.5 sm:gap-3 group">
-                <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-9 sm:h-10 w-auto object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-300">
-                <span class="font-black text-xl sm:text-2xl tracking-tight text-[#8C0000] leading-none group-hover:opacity-90 transition-opacity">
+            <a href="{{ route('landing') }}" class="flex items-center gap-2.5 sm:gap-3 group flex-shrink-0">
+                <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-8 sm:h-9 w-auto object-contain flex-shrink-0 drop-shadow-sm group-hover:scale-105 transition-transform duration-300">
+                <span class="font-black text-xl sm:text-2xl tracking-tight text-[#8C0000] leading-none select-none flex-shrink-0">
                     Saji<span class="text-[#FFBE0F]">HUB</span>
                 </span>
             </a>
@@ -134,27 +134,27 @@
             </div>
 
             {{-- Tombol Aksi Kanan --}}
-            <div class="flex items-center gap-3">
-                <button type="button" onclick="openQrScannerModal()" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-[#BD2000] bg-white border border-[#BD2000] hover:bg-[#BD2000]/10 transition-all shadow-sm flex items-center gap-2 cursor-pointer">
-                    <svg class="w-4 h-4 text-[#BD2000]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
+                <button type="button" onclick="openQrScannerModal()" class="px-2.5 sm:px-4 py-2 sm:py-2.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-bold text-[#BD2000] bg-white border border-[#BD2000] hover:bg-[#BD2000]/10 transition-all shadow-sm flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer flex-shrink-0">
+                    <svg class="w-4 h-4 text-[#BD2000] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 116 0z"/>
                     </svg>
-                    Pindai QR Meja
+                    <span>Pindai QR<span class="hidden min-[400px]:inline"> Meja</span></span>
                 </button>
 
                 @auth
-                    <div class="flex items-center gap-3 border-l border-stone-200 pl-4">
+                    <div class="flex items-center gap-2 sm:gap-3 border-l border-stone-200 pl-2 sm:pl-4 flex-shrink-0">
                         <span class="text-sm font-bold text-stone-700 hidden sm:inline">Halo, <span class="text-[#BD2000] font-black">{{ auth()->user()->name }}</span></span>
                         <form action="{{ route('logout') }}" method="POST" class="inline">
                             @csrf
-                            <button type="submit" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-stone-700 bg-stone-100 hover:bg-stone-200 transition-colors cursor-pointer">
+                            <button type="submit" class="px-3 sm:px-4 py-2 rounded-xl min-h-[44px] text-xs sm:text-sm font-bold text-stone-700 bg-stone-100 hover:bg-stone-200 transition-colors cursor-pointer flex items-center justify-center">
                                 Keluar
                             </button>
                         </form>
                     </div>
                 @else
-                    <a href="{{ route('login') }}" class="bg-[#BD2000] text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-[#8C0000] transition shadow-md inline-block">
+                    <a href="{{ route('login') }}" class="bg-[#BD2000] text-white px-3.5 sm:px-6 py-2 sm:py-2.5 min-h-[44px] rounded-xl text-xs sm:text-base font-semibold hover:bg-[#8C0000] transition shadow-md inline-flex items-center justify-center flex-shrink-0">
                         Masuk
                     </a>
                 @endauth
@@ -184,8 +184,22 @@
     </section>
 
     {{-- 3. FILTER & PENCARIAN --}}
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <form method="GET" action="{{ route('menu.catalog') }}" class="bg-white border border-stone-200 rounded-3xl p-6 shadow-sm space-y-6">
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        @php
+            $selectedBranch = $branches->firstWhere('id', request('branch_id'));
+            $selectedBranchName = $selectedBranch ? $selectedBranch->name : 'Semua Cabang';
+
+            $sortOptions = [
+                'popular' => 'Terpopuler',
+                'price_low' => 'Harga: Terendah',
+                'price_high' => 'Harga: Tertinggi',
+                'name' => 'Nama (A - Z)',
+            ];
+            $currentSort = request('sort', 'popular');
+            $selectedSortName = $sortOptions[$currentSort] ?? 'Terpopuler';
+        @endphp
+
+        <form id="catalog-filter-form" method="GET" action="{{ route('menu.catalog') }}" class="bg-white border border-stone-200 rounded-3xl p-5 sm:p-6 shadow-sm space-y-6">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 
                 {{-- Input Pencarian --}}
@@ -200,26 +214,76 @@
                     </div>
                 </div>
 
-                {{-- Filter Cabang --}}
-                <div>
+                {{-- Filter Cabang (Custom Popover Dropdown) --}}
+                <div class="relative" id="dropdown-branch-wrapper">
                     <label class="block text-xs font-bold text-stone-500 uppercase mb-1.5">Cabang Restoran</label>
-                    <select name="branch_id" onchange="this.form.submit()" class="w-full px-4 py-3 bg-stone-50 border border-stone-300 rounded-2xl text-sm font-semibold text-[#1C1917] focus:outline-none focus:border-[#BD2000] transition-all">
-                        <option value="">Semua Cabang</option>
+                    <input type="hidden" name="branch_id" id="filter-branch-id" value="{{ request('branch_id') }}">
+                    <button type="button" 
+                            id="dropdown-branch-btn"
+                            onclick="toggleDropdownPopover('branch')"
+                            aria-haspopup="listbox"
+                            aria-expanded="false"
+                            class="w-full px-4 py-3 bg-stone-50 border border-stone-300 rounded-2xl text-sm font-semibold text-[#1C1917] flex items-center justify-between text-left hover:border-stone-400 focus:outline-none focus:border-[#BD2000] transition-all cursor-pointer">
+                        <span class="truncate font-semibold text-stone-800" id="dropdown-branch-label">{{ $selectedBranchName }}</span>
+                        <svg class="w-4 h-4 text-stone-400 transition-transform duration-200 shrink-0 ml-2" id="dropdown-branch-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    {{-- Popover Menu --}}
+                    <div id="dropdown-branch-menu" 
+                         class="hidden absolute top-full left-0 mt-1.5 w-full z-50 bg-white border border-slate-200 rounded-xl shadow-lg py-1 max-h-60 overflow-y-auto"
+                         role="listbox">
+                        <button type="button" 
+                                onclick="selectFilterBranch('', 'Semua Cabang')"
+                                class="w-full text-left px-4 py-2.5 text-xs sm:text-sm font-semibold flex items-center justify-between transition-colors cursor-pointer {{ !request('branch_id') ? 'bg-[#BD2000]/10 text-[#BD2000] font-black' : 'text-stone-700 hover:bg-stone-50' }}">
+                            <span>Semua Cabang</span>
+                            @if(!request('branch_id'))
+                                <svg class="w-4 h-4 text-[#BD2000]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                            @endif
+                        </button>
                         @foreach($branches as $b)
-                            <option value="{{ $b->id }}" {{ request('branch_id') == $b->id ? 'selected' : '' }}>{{ $b->name }}</option>
+                            <button type="button" 
+                                    onclick="selectFilterBranch('{{ $b->id }}', '{{ addslashes($b->name) }}')"
+                                    class="w-full text-left px-4 py-2.5 text-xs sm:text-sm font-semibold flex items-center justify-between transition-colors cursor-pointer {{ request('branch_id') == $b->id ? 'bg-[#BD2000]/10 text-[#BD2000] font-black' : 'text-stone-700 hover:bg-stone-50' }}">
+                                <span class="truncate">{{ $b->name }}</span>
+                                @if(request('branch_id') == $b->id)
+                                    <svg class="w-4 h-4 text-[#BD2000]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                @endif
+                            </button>
                         @endforeach
-                    </select>
+                    </div>
                 </div>
 
-                {{-- Filter Urutan --}}
-                <div>
+                {{-- Filter Urutan (Custom Popover Dropdown) --}}
+                <div class="relative" id="dropdown-sort-wrapper">
                     <label class="block text-xs font-bold text-stone-500 uppercase mb-1.5">Urutkan Berdasarkan</label>
-                    <select name="sort" onchange="this.form.submit()" class="w-full px-4 py-3 bg-stone-50 border border-stone-300 rounded-2xl text-sm font-semibold text-[#1C1917] focus:outline-none focus:border-[#BD2000] transition-all">
-                        <option value="popular" {{ request('sort') == 'popular' ? 'selected' : '' }}>Terpopuler</option>
-                        <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Harga: Terendah</option>
-                        <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Harga: Tertinggi</option>
-                        <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>Nama (A - Z)</option>
-                    </select>
+                    <input type="hidden" name="sort" id="filter-sort" value="{{ $currentSort }}">
+                    <button type="button" 
+                            id="dropdown-sort-btn"
+                            onclick="toggleDropdownPopover('sort')"
+                            aria-haspopup="listbox"
+                            aria-expanded="false"
+                            class="w-full px-4 py-3 bg-stone-50 border border-stone-300 rounded-2xl text-sm font-semibold text-[#1C1917] flex items-center justify-between text-left hover:border-stone-400 focus:outline-none focus:border-[#BD2000] transition-all cursor-pointer">
+                        <span class="truncate font-semibold text-stone-800" id="dropdown-sort-label">{{ $selectedSortName }}</span>
+                        <svg class="w-4 h-4 text-stone-400 transition-transform duration-200 shrink-0 ml-2" id="dropdown-sort-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    {{-- Popover Menu --}}
+                    <div id="dropdown-sort-menu" 
+                         class="hidden absolute top-full left-0 mt-1.5 w-full z-50 bg-white border border-slate-200 rounded-xl shadow-lg py-1 max-h-60 overflow-y-auto"
+                         role="listbox">
+                        @foreach($sortOptions as $key => $label)
+                            <button type="button" 
+                                    onclick="selectFilterSort('{{ $key }}', '{{ $label }}')"
+                                    class="w-full text-left px-4 py-2.5 text-xs sm:text-sm font-semibold flex items-center justify-between transition-colors cursor-pointer {{ $currentSort === $key ? 'bg-[#BD2000]/10 text-[#BD2000] font-black' : 'text-stone-700 hover:bg-stone-50' }}">
+                                <span>{{ $label }}</span>
+                                @if($currentSort === $key)
+                                    <svg class="w-4 h-4 text-[#BD2000]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                @endif
+                            </button>
+                        @endforeach
+                    </div>
                 </div>
 
             </div>
@@ -272,30 +336,32 @@
             @endif
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
             @forelse($menus as $menu)
-                <div class="bg-white border border-stone-200 rounded-3xl p-5 shadow-sm hover:shadow-xl hover:border-[#BD2000]/40 transition-all duration-300 flex flex-col justify-between group reveal-on-scroll reveal-scale">
+                <div class="bg-white border border-stone-200 rounded-2xl sm:rounded-3xl p-2.5 sm:p-5 shadow-xs sm:shadow-sm hover:shadow-xl hover:border-[#BD2000]/40 transition-all duration-300 flex flex-col justify-between group reveal-on-scroll reveal-scale">
                     <div>
-                        {{-- Foto Makanan --}}
-                        <div class="aspect-[4/3] rounded-2xl overflow-hidden relative mb-4 bg-stone-100 border border-stone-200">
+                        {{-- Foto Makanan Kompak (Square di Mobile, 4/3 di Desktop) --}}
+                        <div class="aspect-square sm:aspect-[4/3] rounded-xl sm:rounded-2xl overflow-hidden relative mb-2 sm:mb-4 bg-stone-100 border border-stone-200">
                             @if($menu->image_url)
                                 <img src="{{ $menu->image_url }}" 
                                      alt="{{ $menu->name }}" 
-                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                     loading="lazy">
                             @else
                                 <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80" 
                                      alt="{{ $menu->name }}" 
-                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                     loading="lazy">
                             @endif
 
                             {{-- Status Tag --}}
-                            <div class="absolute top-3 left-3 z-10">
+                            <div class="absolute top-2 left-2 sm:top-3 sm:left-3 z-10">
                                 @if(($menu->status ?? 'available') === 'available')
-                                    <span class="bg-emerald-600 text-white px-2.5 py-1 text-[10px] font-black rounded-full shadow-md">
+                                    <span class="bg-emerald-600/95 backdrop-blur-2xs text-white px-2 py-0.5 sm:px-2.5 sm:py-1 text-[9px] sm:text-[10px] font-black rounded-full shadow-xs sm:shadow-md">
                                         Tersedia
                                     </span>
                                 @else
-                                    <span class="bg-red-600 text-white px-2.5 py-1 text-[10px] font-black rounded-full shadow-md">
+                                    <span class="bg-red-600/95 backdrop-blur-2xs text-white px-2 py-0.5 sm:px-2.5 sm:py-1 text-[9px] sm:text-[10px] font-black rounded-full shadow-xs sm:shadow-md">
                                         Habis
                                     </span>
                                 @endif
@@ -303,37 +369,37 @@
 
                             {{-- Branch Tag --}}
                             @if($menu->branch)
-                                <div class="absolute bottom-3 right-3 z-10">
-                                    <span class="bg-white/90 backdrop-blur-xs text-stone-800 px-2.5 py-1 text-[10px] font-extrabold rounded-lg border border-stone-200 shadow-xs flex items-center gap-1">
-                                        <svg class="w-3 h-3 text-[#BD2000]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <div class="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 z-10">
+                                    <span class="bg-white/95 backdrop-blur-xs text-stone-800 px-1.5 py-0.5 sm:px-2.5 sm:py-1 text-[9px] sm:text-[10px] font-extrabold rounded-md sm:rounded-lg border border-stone-200 shadow-xs flex items-center gap-1 max-w-[85px] sm:max-w-none truncate">
+                                        <svg class="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#BD2000] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                                         </svg>
-                                        {{ $menu->branch->name }}
+                                        <span class="truncate">{{ $menu->branch->name }}</span>
                                     </span>
                                 </div>
                             @endif
                         </div>
 
                         {{-- Kategori & Judul --}}
-                        <div class="space-y-1">
-                            <span class="text-[11px] font-bold text-[#BD2000] uppercase tracking-wider">
+                        <div class="space-y-0.5 sm:space-y-1">
+                            <span class="text-[9px] sm:text-[11px] font-bold text-[#BD2000] uppercase tracking-wider block truncate">
                                 {{ $menu->category->name ?? 'Kuliner Nusantara' }}
                             </span>
-                            <h3 class="font-black text-lg text-[#1C1917] leading-snug group-hover:text-[#BD2000] transition-colors">
+                            <h3 class="font-bold sm:font-black text-xs sm:text-base lg:text-lg text-[#1C1917] leading-tight sm:leading-snug line-clamp-2 group-hover:text-[#BD2000] transition-colors mt-0.5 sm:mt-1">
                                 {{ $menu->name }}
                             </h3>
-                            <p class="text-xs text-slate-500 line-clamp-2 mt-1 leading-relaxed font-medium">
+                            <p class="hidden sm:block text-xs text-slate-500 line-clamp-2 mt-1 leading-relaxed font-medium">
                                 {{ $menu->description ?? 'Olahan masakan segar pilihan khas SajiHUB dengan rasa bumbu rempah otentik meresap sempurna.' }}
                             </p>
                         </div>
                     </div>
 
                     {{-- Harga Menu --}}
-                    <div class="pt-4 mt-4 border-t border-stone-100 flex items-center justify-between">
+                    <div class="pt-2 sm:pt-4 mt-2 sm:mt-4 border-t border-stone-100 flex items-center justify-between">
                         <div>
-                            <span class="text-[10px] font-bold text-slate-400 uppercase block">Harga</span>
-                            <span class="font-black text-xl text-[#BD2000]">Rp {{ number_format($menu->price, 0, ',', '.') }}</span>
+                            <span class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase hidden sm:block">Harga</span>
+                            <span class="font-extrabold sm:font-black text-xs sm:text-lg lg:text-xl text-[#BD2000]">Rp {{ number_format($menu->price, 0, ',', '.') }}</span>
                         </div>
                     </div>
                 </div>
@@ -354,17 +420,17 @@
         </div>
     </section>
 
-    {{-- 5. FOOTER --}}
-    <footer class="w-full bg-[#1C1917] text-white py-12 border-t border-stone-800">
+    {{-- 5. FOOTER (KAKI HALAMAN - WADAH MARUN GELAP #8C0000) --}}
+    <footer class="w-full bg-[#8C0000] text-stone-100 py-10 border-t border-white/10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
             <div class="flex items-center justify-center gap-3">
-                <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-10 w-10 object-contain">
-                <span class="font-black text-xl tracking-tight text-white">Saji<span class="text-[#BD2000]">HUB</span></span>
+                <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-10 w-10 object-contain drop-shadow-sm">
+                <span class="font-black text-2xl tracking-tight text-white">Saji<span class="text-[#FFBE0F]">HUB</span></span>
             </div>
-            <p class="text-stone-400 text-xs font-medium max-w-md mx-auto">
+            <p class="text-stone-200 text-xs sm:text-sm font-medium max-w-md mx-auto leading-relaxed">
                 Restoran & Kuliner Otentik Nusantara. Menghidangkan rasa otentik dengan pelayanan terbaik.
             </p>
-            <div class="text-xs text-stone-500 pt-4 border-t border-stone-800">
+            <div class="text-xs text-stone-300 pt-4 border-t border-white/10 font-medium">
                 &copy; {{ date('Y') }} SajiHUB Resto. Seluruh Hak Cipta Dilindungi.
             </div>
         </div>
@@ -680,6 +746,105 @@
             }, observerOptions);
 
             document.querySelectorAll('.reveal-on-scroll').forEach(el => revealObserver.observe(el));
+        });
+
+        // Custom Dropdown Popover Filters
+        function toggleDropdownPopover(type) {
+            const branchMenu = document.getElementById('dropdown-branch-menu');
+            const branchChevron = document.getElementById('dropdown-branch-chevron');
+            const sortMenu = document.getElementById('dropdown-sort-menu');
+            const sortChevron = document.getElementById('dropdown-sort-chevron');
+
+            if (type === 'branch') {
+                if (sortMenu) {
+                    sortMenu.classList.add('hidden');
+                    if (sortChevron) sortChevron.classList.remove('rotate-180');
+                }
+                if (branchMenu) {
+                    const isClosed = branchMenu.classList.contains('hidden');
+                    if (isClosed) {
+                        branchMenu.classList.remove('hidden');
+                        if (branchChevron) branchChevron.classList.add('rotate-180');
+                    } else {
+                        branchMenu.classList.add('hidden');
+                        if (branchChevron) branchChevron.classList.remove('rotate-180');
+                    }
+                }
+            } else if (type === 'sort') {
+                if (branchMenu) {
+                    branchMenu.classList.add('hidden');
+                    if (branchChevron) branchChevron.classList.remove('rotate-180');
+                }
+                if (sortMenu) {
+                    const isClosed = sortMenu.classList.contains('hidden');
+                    if (isClosed) {
+                        sortMenu.classList.remove('hidden');
+                        if (sortChevron) sortChevron.classList.add('rotate-180');
+                    } else {
+                        sortMenu.classList.add('hidden');
+                        if (sortChevron) sortChevron.classList.remove('rotate-180');
+                    }
+                }
+            }
+        }
+
+        function selectFilterBranch(branchId, branchName) {
+            const input = document.getElementById('filter-branch-id');
+            const label = document.getElementById('dropdown-branch-label');
+            const menu = document.getElementById('dropdown-branch-menu');
+            const chevron = document.getElementById('dropdown-branch-chevron');
+            if (input) input.value = branchId;
+            if (label) label.innerText = branchName;
+            if (menu) menu.classList.add('hidden');
+            if (chevron) chevron.classList.remove('rotate-180');
+            document.getElementById('catalog-filter-form').submit();
+        }
+
+        function selectFilterSort(sortKey, sortName) {
+            const input = document.getElementById('filter-sort');
+            const label = document.getElementById('dropdown-sort-label');
+            const menu = document.getElementById('dropdown-sort-menu');
+            const chevron = document.getElementById('dropdown-sort-chevron');
+            if (input) input.value = sortKey;
+            if (label) label.innerText = sortName;
+            if (menu) menu.classList.add('hidden');
+            if (chevron) chevron.classList.remove('rotate-180');
+            document.getElementById('catalog-filter-form').submit();
+        }
+
+        document.addEventListener('click', function(e) {
+            const branchWrapper = document.getElementById('dropdown-branch-wrapper');
+            const sortWrapper = document.getElementById('dropdown-sort-wrapper');
+            
+            if (branchWrapper && !branchWrapper.contains(e.target)) {
+                const menu = document.getElementById('dropdown-branch-menu');
+                const chevron = document.getElementById('dropdown-branch-chevron');
+                if (menu && !menu.classList.contains('hidden')) {
+                    menu.classList.add('hidden');
+                    if (chevron) chevron.classList.remove('rotate-180');
+                }
+            }
+            if (sortWrapper && !sortWrapper.contains(e.target)) {
+                const menu = document.getElementById('dropdown-sort-menu');
+                const chevron = document.getElementById('dropdown-sort-chevron');
+                if (menu && !menu.classList.contains('hidden')) {
+                    menu.classList.add('hidden');
+                    if (chevron) chevron.classList.remove('rotate-180');
+                }
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const branchMenu = document.getElementById('dropdown-branch-menu');
+                const branchChevron = document.getElementById('dropdown-branch-chevron');
+                const sortMenu = document.getElementById('dropdown-sort-menu');
+                const sortChevron = document.getElementById('dropdown-sort-chevron');
+                if (branchMenu) branchMenu.classList.add('hidden');
+                if (branchChevron) branchChevron.classList.remove('rotate-180');
+                if (sortMenu) sortMenu.classList.add('hidden');
+                if (sortChevron) sortChevron.classList.remove('rotate-180');
+            }
         });
     </script>
 </body>

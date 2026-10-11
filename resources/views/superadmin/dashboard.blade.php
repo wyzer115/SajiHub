@@ -38,7 +38,7 @@
         </div>
     </div>
     <div class="flex items-center gap-2 shrink-0">
-        <form action="{{ route('superadmin.maintenance.toggle') }}" method="POST" onsubmit="return confirm('{{ $sysMaintenance['active'] ? 'Buka kembali akses website untuk publik?' : 'Aktifkan mode pemeliharaan sekarang? Website akan dinonaktifkan untuk umum.' }}')">
+        <form action="{{ route('superadmin.maintenance.toggle') }}" method="POST" onsubmit="return showConfirm(event, '{{ $sysMaintenance['active'] ? 'Buka kembali akses website untuk publik?' : 'Aktifkan mode pemeliharaan sekarang? Website akan dinonaktifkan untuk umum.' }}', 'Konfirmasi Mode Pemeliharaan', '{{ $sysMaintenance['active'] ? 'Buka Akses Publik' : 'Aktifkan' }}')">
             @csrf
             <button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer
                 {{ $sysMaintenance['active'] 

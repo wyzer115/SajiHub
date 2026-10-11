@@ -98,16 +98,17 @@
 
     <div class="flex h-screen overflow-hidden">
 
-        <!-- Sidebar Overlay (Mobile) -->
-        <div id="sidebar-overlay" class="fixed inset-0 bg-stone-900/60 z-40 hidden lg:hidden backdrop-blur-sm"></div>
+        <!-- Sidebar Backdrop (Mobile) -->
+        <div id="mobile-sidebar-backdrop" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-40 hidden lg:hidden transition-opacity duration-300"></div>
+        <div id="sidebar-overlay" class="hidden"></div>
 
         <!-- Sidebar -->
-        <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-50 w-[260px] bg-white border-r border-stone-200 transform -translate-x-full lg:translate-x-0 sidebar-transition flex flex-col h-full shadow-xl">
+        <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-50 w-[260px] bg-white border-r border-stone-200 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out sidebar-transition flex flex-col h-full shadow-xl">
             <!-- Logo Area -->
             <div class="h-16 flex items-center px-6 border-b border-stone-200 bg-white">
-                <a href="{{ route('landing') }}" class="flex items-center gap-2.5 group">
-                    <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-9 w-auto object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-300">
-                    <span class="font-black text-xl tracking-tight text-[#8C0000] leading-none group-hover:opacity-90 transition-opacity">
+                <a href="{{ route('landing') }}" class="flex items-center gap-2.5 flex-shrink-0 group">
+                    <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-8 w-auto object-contain flex-shrink-0 drop-shadow-sm group-hover:scale-105 transition-transform duration-200">
+                    <span class="font-black text-xl tracking-tight text-[#8C0000] leading-none select-none flex-shrink-0">
                         Saji<span class="text-[#FFBE0F]">HUB</span>
                     </span>
                 </a>
@@ -364,40 +365,104 @@
         </div>
     </div>
 
-    <!-- Global Toast Notification Container -->
-    <div id="toast-container" class="fixed top-6 right-6 z-[99999] space-y-3 pointer-events-none"></div>
+    <!-- Global Toast Notification Container (Mobile: Top-Center, Desktop: Top-Right) -->
+    <div id="toast-container" class="fixed top-4 inset-x-4 max-w-sm mx-auto sm:top-6 sm:right-6 sm:left-auto sm:mx-0 sm:max-w-md z-[99999] pointer-events-none space-y-2.5 flex flex-col items-center sm:items-end"></div>
 
     <!-- Toggle & Toast & SweetAlert Script -->
     <script>
-        // SweetAlert2 Global Configuration
+        // SweetAlert2 Global Configuration for Web Modals
         window.customSwal = Swal.mixin({
             customClass: {
-                popup: 'rounded-3xl shadow-2xl font-sans border border-stone-100 p-6',
+                popup: 'rounded-3xl shadow-2xl font-sans border border-stone-200 p-6 bg-white max-w-md w-full',
                 title: 'text-lg font-black text-[#1C1917]',
-                htmlContainer: 'text-sm font-semibold text-stone-600',
-                confirmButton: 'px-6 py-2.5 rounded-xl font-bold bg-[#BD2000] text-white shadow-md hover:bg-[#8C0000] transition-all cursor-pointer mx-1.5',
-                cancelButton: 'px-6 py-2.5 rounded-xl font-bold bg-stone-200 text-stone-700 hover:bg-stone-300 transition-all cursor-pointer mx-1.5'
+                htmlContainer: 'text-sm font-semibold text-stone-600 mt-2',
+                confirmButton: 'px-5 py-2.5 rounded-xl font-bold bg-[#BD2000] hover:bg-[#8C0000] text-white shadow-md transition-all cursor-pointer mx-1.5 inline-flex items-center justify-center',
+                cancelButton: 'px-5 py-2.5 rounded-xl font-bold bg-stone-200 text-stone-700 hover:bg-stone-300 transition-all cursor-pointer mx-1.5 inline-flex items-center justify-center'
             },
-            buttonsStyling: false
+            buttonsStyling: false,
+            backdrop: 'rgba(28, 25, 23, 0.65)'
         });
 
-        // Override native window.alert with SweetAlert2
-        window.alert = function(message, title = 'Pemberitahuan') {
-            window.customSwal.fire({
-                title: title,
-                text: message,
-                icon: 'warning',
-                confirmButtonText: 'Mengerti'
+        // Floating Web Toast Notification Handler
+        window.showToast = function(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            // Visual tokens per type
+            let iconSvg = '';
+            let iconWrapClass = '';
+
+            if (type === 'success') {
+                iconWrapClass = 'bg-emerald-50 text-emerald-600 border border-emerald-200/60';
+                iconSvg = `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>`;
+            } else if (type === 'error' || type === 'danger') {
+                iconWrapClass = 'bg-red-50 text-red-600 border border-red-200/60';
+                iconSvg = `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>`;
+            } else if (type === 'warning') {
+                iconWrapClass = 'bg-amber-50 text-amber-600 border border-amber-200/60';
+                iconSvg = `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`;
+            } else {
+                iconWrapClass = 'bg-stone-100 text-stone-700 border border-stone-200';
+                iconSvg = `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
+            }
+
+            const toast = document.createElement('div');
+            toast.className = 'w-full bg-white shadow-xl border border-stone-200/90 rounded-2xl p-4 flex items-center gap-3.5 pointer-events-auto transform transition-all duration-300 ease-out -translate-y-2 opacity-0 select-text';
+            toast.innerHTML = `
+                <div class="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${iconWrapClass}">
+                    ${iconSvg}
+                </div>
+                <div class="flex-1 text-xs sm:text-sm font-semibold text-stone-800 leading-snug">
+                    ${message}
+                </div>
+                <button type="button" aria-label="Tutup" class="text-stone-400 hover:text-stone-600 p-1 rounded-lg hover:bg-stone-100 transition-colors shrink-0 cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            `;
+
+            const closeBtn = toast.querySelector('button');
+            let isRemoved = false;
+            const removeToast = () => {
+                if (isRemoved) return;
+                isRemoved = true;
+                toast.classList.add('-translate-y-2', 'opacity-0');
+                setTimeout(() => {
+                    if (toast.parentElement) toast.remove();
+                }, 300);
+            };
+
+            closeBtn.addEventListener('click', removeToast);
+
+            container.appendChild(toast);
+            requestAnimationFrame(() => {
+                toast.classList.remove('-translate-y-2', 'opacity-0');
             });
+
+            setTimeout(removeToast, 3500);
         };
 
-        // Global Confirm Helper for Forms or Action Buttons
+        // Override native window.alert with modern Web Toast
+        window.alert = function(message) {
+            window.showToast(message, 'warning');
+        };
+
+        // Intercept native window.confirm to prevent browser dialog popups
+        window.confirm = function(message) {
+            window.showToast(message, 'warning');
+            return false;
+        };
+
+        // Global Confirm Helper for Forms or Action Buttons (Pengganti confirm())
         window.showConfirm = function(event, message = 'Apakah Anda yakin ingin melanjutkan tindakan ini?', title = 'Konfirmasi Tindakan', confirmText = 'Ya, Lanjutkan') {
             if (event) {
                 event.preventDefault();
                 event.stopPropagation();
             }
-            const targetForm = event ? (event.target.tagName === 'FORM' ? event.target : event.target.closest('form')) : null;
+            const target = event ? event.target : null;
+            const targetForm = target ? (target.tagName === 'FORM' ? target : target.closest('form')) : null;
+            const targetHref = target ? (target.tagName === 'A' ? target.href : target.closest('a')?.href) : null;
 
             window.customSwal.fire({
                 title: title,
@@ -407,60 +472,110 @@
                 confirmButtonText: confirmText,
                 cancelButtonText: 'Batal'
             }).then((result) => {
-                if (result.isConfirmed && targetForm) {
-                    targetForm.submit();
+                if (result.isConfirmed) {
+                    if (targetForm) {
+                        targetForm.submit();
+                    } else if (targetHref) {
+                        window.location.href = targetHref;
+                    }
                 }
             });
             return false;
         };
 
-        window.showToast = function(message, type = 'info') {
-            const container = document.getElementById('toast-container');
-            if (!container) return;
-
-            const toast = document.createElement('div');
-            const bgClass = type === 'success' ? 'bg-emerald-600 border-emerald-500 text-white' :
-                            type === 'error' ? 'bg-red-600 border-red-500 text-white' :
-                            type === 'warning' ? 'bg-amber-500 border-amber-400 text-white' :
-                            'bg-stone-900 border-stone-800 text-white';
-            const icon = type === 'success' ? '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>' : 
-                         type === 'error' ? '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>' : 
-                         '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
-
-            toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-2xl shadow-2xl border text-xs font-bold transition-all duration-300 transform translate-y-2 opacity-0 max-w-sm ${bgClass}`;
-            toast.innerHTML = `
-                <div class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center font-black text-sm shrink-0">${icon}</div>
-                <span class="flex-1">${message}</span>
-            `;
-
-            container.appendChild(toast);
-            requestAnimationFrame(() => {
-                toast.classList.remove('translate-y-2', 'opacity-0');
+        // Display session flash messages as Toasts if present
+        @if(session('success'))
+            document.addEventListener('DOMContentLoaded', () => {
+                window.showToast(@json(session('success')), 'success');
             });
+        @endif
+        @if(session('error'))
+            document.addEventListener('DOMContentLoaded', () => {
+                window.showToast(@json(session('error')), 'error');
+            });
+        @endif
+        @if(session('warning'))
+            document.addEventListener('DOMContentLoaded', () => {
+                window.showToast(@json(session('warning')), 'warning');
+            });
+        @endif
 
-            setTimeout(() => {
-                toast.classList.add('translate-y-2', 'opacity-0');
-                setTimeout(() => toast.remove(), 300);
-            }, 3500);
-        };
+        // Mobile Sidebar Navigation Drawer & Backdrop Handler
+        function initMobileSidebar() {
+            if (window.__mobileSidebarInitialized) return;
+            window.__mobileSidebarInitialized = true;
 
-        document.addEventListener('DOMContentLoaded', () => {
             const toggleBtn = document.getElementById('sidebar-toggle');
             const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebar-overlay');
+            const backdrop = document.getElementById('mobile-sidebar-backdrop') || document.getElementById('sidebar-overlay');
 
-            if (toggleBtn && sidebar && overlay) {
-                toggleBtn.addEventListener('click', () => {
-                    sidebar.classList.toggle('-translate-x-full');
-                    overlay.classList.toggle('hidden');
-                });
+            if (!sidebar) return;
 
-                overlay.addEventListener('click', () => {
-                    sidebar.classList.add('-translate-x-full');
-                    overlay.classList.add('hidden');
+            function openSidebar() {
+                sidebar.classList.remove('-translate-x-full');
+                sidebar.classList.add('translate-x-0');
+                if (backdrop) backdrop.classList.remove('hidden');
+                document.body.classList.add('overflow-hidden', 'lg:overflow-auto');
+            }
+
+            function closeSidebar() {
+                sidebar.classList.add('-translate-x-full');
+                sidebar.classList.remove('translate-x-0');
+                if (backdrop) backdrop.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden', 'lg:overflow-auto');
+            }
+
+            function toggleSidebar() {
+                const isOpen = !sidebar.classList.contains('-translate-x-full');
+                if (isOpen) {
+                    closeSidebar();
+                } else {
+                    openSidebar();
+                }
+            }
+
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleSidebar();
                 });
             }
-        });
+
+            if (backdrop) {
+                backdrop.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    closeSidebar();
+                });
+                backdrop.addEventListener('touchstart', () => {
+                    closeSidebar();
+                }, { passive: true });
+            }
+
+            // Click outside handler: close drawer when clicking outside sidebar in mobile
+            document.addEventListener('click', (e) => {
+                if (window.innerWidth >= 1024) return; // Desktop unaffected
+                const isOpen = !sidebar.classList.contains('-translate-x-full');
+                if (isOpen && !sidebar.contains(e.target) && (!toggleBtn || !toggleBtn.contains(e.target))) {
+                    closeSidebar();
+                }
+            });
+
+            // Keyboard handler: close drawer on Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' || e.key === 'Esc') {
+                    closeSidebar();
+                }
+            });
+
+            // Auto close if resized to desktop
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 1024) {
+                    closeSidebar();
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', initMobileSidebar);
     </script>
     @stack('scripts')
 </body>

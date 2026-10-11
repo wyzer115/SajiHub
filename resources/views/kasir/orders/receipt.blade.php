@@ -108,8 +108,10 @@
     </div>
 
     <div class="header">
-        <img src="{{ asset('images/logo.png') }}" alt="SajiHUB" style="height: 36px; width: 36px; object-fit: contain; margin: 0 auto 6px auto; display: block;">
-        <h2>SajiHUB</h2>
+        <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 6px;">
+            <img src="{{ asset('images/logo.png') }}" alt="SajiHUB" style="height: 32px; width: 32px; object-fit: contain;">
+            <span style="font-size: 20px; font-weight: 900; letter-spacing: -0.5px;">SajiHUB</span>
+        </div>
         <h3>{{ $order->branch->name ?? 'Cabang Restoran' }}</h3>
         <p>{{ $order->branch->address ?? '' }}</p>
         @if($order->branch->phone)

@@ -122,7 +122,11 @@ class OrderController extends Controller
         $validated = $request->validate([
             'payment_method' => 'nullable|in:cash,qris',
             'cash_paid'      => 'nullable|numeric|min:0',
+<<<<<<< HEAD
             'payment_proof'  => 'nullable|file|mimes:jpeg,png,jpg,webp|max:5120',
+=======
+            'payment_proof'  => 'nullable|file|image|mimes:jpeg,png,jpg,webp|max:10240', // max 10MB
+>>>>>>> c4f03bd (revisi mobile)
         ]);
 
         // Gunakan metode pembayaran yang telah dipilih customer saat memesan
@@ -142,8 +146,13 @@ class OrderController extends Controller
 
             if ($request->hasFile('payment_proof')) {
                 $file = $request->file('payment_proof');
+<<<<<<< HEAD
                 $extension = strtolower($file->extension() ?: 'jpg');
                 $filename = 'proof_' . $order->id . '_' . Str::random(24) . '.' . $extension;
+=======
+                $extension = $file->guessExtension() ?: 'jpg';
+                $filename = 'proof_' . $order->id . '_' . time() . '_' . \Illuminate\Support\Str::random(8) . '.' . $extension;
+>>>>>>> c4f03bd (revisi mobile)
                 $destinationPath = public_path('uploads/payment_proofs');
                 if (!file_exists($destinationPath)) {
                     mkdir($destinationPath, 0755, true);
@@ -378,12 +387,21 @@ class OrderController extends Controller
             'payment_method' => 'required|in:cash,qris',
             'status'         => 'required|in:pending,completed,cancelled',
             'cash_paid'      => 'nullable|numeric|min:0',
+<<<<<<< HEAD
             'merchant_id'    => 'nullable|string',
             'payment_proof'  => 'nullable|file|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
 
         try {
             DB::transaction(function () use ($validated, $order, $request, &$transaction) {
+=======
+            'merchant_id'    => 'nullable|string|max:100',
+            'payment_proof'  => 'nullable|file|image|mimes:jpeg,png,jpg,webp|max:10240',
+        ]);
+
+        try {
+            DB::transaction(function () use ($request, $validated, $order, &$transaction) {
+>>>>>>> c4f03bd (revisi mobile)
                 $amount = floatval($order->total_price);
                 $isTakeaway = ($order->table_id === null);
                 $newOrderStatus = $isTakeaway 
@@ -429,8 +447,13 @@ class OrderController extends Controller
                         $proofPath = null;
                         if ($request->hasFile('payment_proof')) {
                             $file = $request->file('payment_proof');
+<<<<<<< HEAD
                             $extension = strtolower($file->extension() ?: 'jpg');
                             $filename = 'proof_' . $order->id . '_' . Str::random(24) . '.' . $extension;
+=======
+                            $extension = $file->guessExtension() ?: 'jpg';
+                            $filename = 'proof_' . $order->id . '_' . time() . '_' . \Illuminate\Support\Str::random(8) . '.' . $extension;
+>>>>>>> c4f03bd (revisi mobile)
                             $destinationPath = public_path('uploads/payment_proofs');
                             if (!file_exists($destinationPath)) {
                                 mkdir($destinationPath, 0755, true);

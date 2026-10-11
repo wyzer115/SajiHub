@@ -28,7 +28,8 @@
     </div>
 
     <div class="bg-white border border-stone-200 rounded-3xl overflow-hidden shadow-sm animate-fade-in-up">
-        <div class="overflow-x-auto">
+        {{-- 1. Desktop Table View (Tetap Utuh untuk Layar Besar) --}}
+        <div class="hidden md:block overflow-x-auto">
             <table class="w-full text-left">
                 <thead class="bg-stone-100 text-stone-700 text-xs font-extrabold border-b border-stone-200">
                     <tr>
@@ -139,6 +140,103 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
+
+        {{-- 2. Mobile Responsive Card View (Bebas Geser Horizontal di Mobile) --}}
+        <div class="block md:hidden p-3.5 space-y-3">
+            @forelse($orders ?? [] as $order)
+                <div class="bg-stone-50/80 border border-stone-200 rounded-2xl p-4 space-y-3 shadow-2xs">
+                    {{-- Baris Atas: ID Pesanan + Status Badge --}}
+                    <div class="flex items-center justify-between gap-2 border-b border-stone-200/80 pb-2.5">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-black text-[#8C0000]">#{{ $order->id }}</span>
+                            <span class="text-[11px] font-bold text-stone-300">•</span>
+                            <span class="text-[11px] font-semibold text-stone-500">{{ $order->created_at->diffForHumans() }}</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 flex-wrap justify-end">
+                            @if($order->order_status == 'pending')
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300">Menunggu</span>
+                            @elseif($order->order_status == 'cooking')
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-orange-100 text-orange-800 border border-orange-300">Dimasak</span>
+                            @elseif($order->order_status == 'served')
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-100 text-blue-800 border border-blue-300">Disajikan</span>
+                            @else
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">Selesai</span>
+                            @endif
+
+                            @if($order->payment_status == 'paid')
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">Lunas</span>
+                            @else
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-red-100 text-red-600 border border-red-200">Belum Bayar</span>
+                            @endif
+                        </div>
+                    </div>
+
+                    {{-- Isi Tengah: Pelanggan, Meja, Menu & Total --}}
+                    <div class="space-y-1.5">
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="font-extrabold text-[#1C1917] truncate">{{ $order->customer_name }}</span>
+                            <span class="font-bold text-stone-700 text-xs px-2.5 py-1 bg-white border border-stone-200 rounded-lg shrink-0">
+                                {{ $order->table ? 'Meja ' . $order->table->table_number : 'Bawa Pulang' }}
+                            </span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs pt-1">
+                            <span class="text-stone-500 font-medium">
+                                {{ $order->items_count ?? ($order->items ? $order->items->count() : 0) }} menu • 
+                                <span class="font-bold text-stone-700 capitalize">{{ $order->payment_method ?? 'Tunai' }}</span>
+                            </span>
+                            <span class="font-black text-base text-[#BD2000]">
+                                Rp {{ number_format($order->total_price, 0, ',', '.') }}
+                            </span>
+                        </div>
+                    </div>
+
+                    {{-- Baris Bawah: Tombol Aksi Thumb-Friendly --}}
+                    <div class="pt-2.5 border-t border-stone-200/80 flex items-center justify-end gap-2">
+                        @if($order->payment_status == 'unpaid')
+                            @if(($order->payment_method ?? 'cash') === 'qris')
+                                <form action="{{ route('kasir.orders.pay', $order) }}" method="POST" class="flex-1" onsubmit="return showConfirm(event, 'Konfirmasi pembayaran QRIS pesanan #{{ $order->id }} sebagai lunas?', 'Konfirmasi QRIS', 'Ya, Tandai Lunas')">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-3 text-xs font-extrabold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-all shadow-xs cursor-pointer active:scale-95">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                        <span>Tandai Lunas</span>
+                                    </button>
+                                </form>
+                            @else
+                                <button type="button" 
+                                        onclick='openCheckoutModal({!! json_encode([
+                                            "orderId" => $order->id,
+                                            "customerName" => $order->customer_name,
+                                            "tableNumber" => $order->table ? $order->table->table_number : "Bawa Pulang",
+                                            "totalAmount" => (float)$order->total_price,
+                                            "paymentMethod" => "cash",
+                                            "items" => $order->items->map(function($item) {
+                                                return [
+                                                    "name" => $item->menu->name ?? "Menu",
+                                                    "qty" => (int)$item->quantity,
+                                                    "price" => (float)$item->price,
+                                                ];
+                                            })->values()->all()
+                                        ], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) !!})'
+                                        class="flex-1 inline-flex items-center justify-center gap-1.5 text-xs font-extrabold text-white bg-[#BD2000] hover:bg-[#8C0000] py-2.5 px-3 rounded-xl transition-all shadow-xs cursor-pointer active:scale-95">
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                    <span>Bayar Kasir</span>
+                                </button>
+                            @endif
+                        @endif
+                        <a href="{{ route('kasir.orders.show', $order) }}" class="{{ $order->payment_status == 'unpaid' ? 'px-4 py-2.5' : 'w-full justify-center py-2.5' }} inline-flex items-center justify-center gap-1 text-xs font-extrabold text-stone-700 bg-white hover:bg-stone-100 border border-stone-300 rounded-xl transition-all active:scale-95">
+                            <span>Rincian</span>
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        </a>
+                    </div>
+                </div>
+            @empty
+                <div class="py-12 px-4 text-center bg-white border border-stone-200 rounded-2xl">
+                    <svg class="w-10 h-10 text-stone-300 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                    <p class="text-sm font-semibold text-stone-500">Belum ada data pesanan saat ini.</p>
+                </div>
+            @endforelse
         </div>
     </div>
 </div>

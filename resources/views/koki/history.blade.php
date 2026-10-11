@@ -22,7 +22,8 @@
 
     <!-- History Table -->
     <div class="bg-white border border-stone-200 rounded-3xl overflow-hidden shadow-sm">
-        <div class="overflow-x-auto">
+        {{-- 1. Desktop Table View --}}
+        <div class="hidden md:block overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead class="bg-stone-100 text-stone-700 text-xs font-extrabold uppercase tracking-wider border-b border-stone-200">
                     <tr>
@@ -67,6 +68,54 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
+
+        {{-- 2. Mobile Responsive Card View --}}
+        <div class="block md:hidden p-3.5 space-y-3">
+            @forelse($completedOrders as $order)
+                <div class="bg-stone-50/80 border border-stone-200 rounded-2xl p-4 space-y-3 shadow-2xs">
+                    {{-- Baris Atas: Nomor Pesanan + Status Dapur --}}
+                    <div class="flex items-center justify-between gap-2 border-b border-stone-200/80 pb-2.5">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-black text-[#8C0000]">#{{ $order->id }}</span>
+                            <span class="text-[11px] font-bold text-stone-300">•</span>
+                            <span class="text-[11px] font-semibold text-stone-500">{{ $order->updated_at->format('H:i') }} WIB</span>
+                        </div>
+                        @if($order->order_status === 'served')
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-100 text-blue-800 border border-blue-300">
+                                Disajikan
+                            </span>
+                        @else
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                Selesai
+                            </span>
+                        @endif
+                    </div>
+
+                    {{-- Isi Tengah: Pelanggan & Meja --}}
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="font-extrabold text-[#1C1917] truncate">{{ $order->customer_name }}</span>
+                        <span class="font-bold text-stone-700 text-xs px-2.5 py-1 bg-white border border-stone-200 rounded-lg shrink-0">
+                            {{ $order->table ? 'Meja ' . $order->table->table_number : 'Takeaway' }}
+                        </span>
+                    </div>
+
+                    {{-- Rincian Menu Masakan --}}
+                    <div class="bg-white border border-stone-200/80 rounded-xl p-3 text-xs space-y-1">
+                        @foreach($order->items as $item)
+                            <div class="flex items-center justify-between">
+                                <span class="text-stone-700 font-medium">{{ $item->menu->name ?? 'Menu' }}</span>
+                                <span class="font-black text-[#1C1917] px-1.5 py-0.5 bg-stone-100 rounded text-[11px]">{{ $item->quantity }}x</span>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @empty
+                <div class="py-12 px-4 text-center bg-white border border-stone-200 rounded-2xl">
+                    <svg class="w-10 h-10 text-stone-300 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    <p class="text-sm font-semibold text-stone-500">Belum ada hidangan yang diselesaikan hari ini.</p>
+                </div>
+            @endforelse
         </div>
 
         @if($completedOrders->hasPages())

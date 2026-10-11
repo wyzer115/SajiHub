@@ -73,10 +73,13 @@
 
     <!-- Header Logo & Badge -->
     <header class="w-full max-w-4xl mx-auto px-6 pt-8 pb-4 relative z-10 flex items-center justify-between">
-        <a href="{{ url('/') }}" class="inline-block">
-            <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-10 w-auto object-contain drop-shadow-sm">
+        <a href="{{ url('/') }}" class="inline-flex items-center gap-2.5 flex-shrink-0 group">
+            <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-8 sm:h-9 w-auto object-contain flex-shrink-0 drop-shadow-sm group-hover:scale-105 transition-transform duration-200">
+            <span class="font-black text-xl sm:text-2xl tracking-tight text-[#8C0000] leading-none select-none flex-shrink-0">
+                Saji<span class="text-[#FFBE0F]">HUB</span>
+            </span>
         </a>
-        <div class="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-50 border border-red-200 text-red-600 text-xs font-extrabold shadow-sm">
+        <div class="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-50 border border-red-200 text-red-600 text-xs font-extrabold shadow-sm flex-shrink-0">
             <span class="w-2 h-2 rounded-full bg-red-600 animate-ping"></span>
             <span class="w-2 h-2 rounded-full bg-red-600 -ml-4"></span>
             <span class="uppercase tracking-wider">Mode Pemeliharaan</span>
@@ -144,7 +147,7 @@
                     <svg class="w-4 h-4 text-stone-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
                     </svg>
-                    <span>Login Super Admin</span>
+                    <span>Masuk ke Sistem</span>
                 </a>
             </div>
 

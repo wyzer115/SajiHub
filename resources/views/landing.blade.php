@@ -118,9 +118,9 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             
             {{-- Logo Merk --}}
-            <a href="#beranda" class="flex items-center gap-2.5 sm:gap-3 group">
-                <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-9 sm:h-10 w-auto object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-300">
-                <span class="font-black text-xl sm:text-2xl tracking-tight text-[#8C0000] leading-none group-hover:opacity-90 transition-opacity">
+            <a href="#beranda" class="flex items-center gap-2.5 sm:gap-3 group flex-shrink-0">
+                <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-8 sm:h-9 w-auto object-contain flex-shrink-0 drop-shadow-sm group-hover:scale-105 transition-transform duration-300">
+                <span class="font-black text-xl sm:text-2xl tracking-tight text-[#8C0000] leading-none select-none flex-shrink-0">
                     Saji<span class="text-[#FFBE0F]">HUB</span>
                 </span>
             </a>
@@ -133,9 +133,9 @@
             </div>
 
             {{-- Tombol Aksi Kanan --}}
-            <div class="flex items-center gap-3">
-                <button type="button" onclick="openQrScannerModal()" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-[#BD2000] bg-white border border-[#BD2000] hover:bg-[#BD2000]/10 transition-all shadow-sm flex items-center gap-2 cursor-pointer">
-                    <svg class="w-4 h-4 text-[#BD2000]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                <button type="button" onclick="openQrScannerModal()" class="hidden sm:inline-flex px-4 py-2.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-bold text-[#BD2000] bg-white border border-[#BD2000] hover:bg-[#BD2000]/10 transition-all shadow-sm items-center justify-center gap-2 cursor-pointer flex-shrink-0">
+                    <svg class="w-4 h-4 text-[#BD2000] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 116 0z"/>
                     </svg>
@@ -143,17 +143,17 @@
                 </button>
 
                 @auth
-                    <div class="flex items-center gap-3 border-l border-stone-200 pl-4">
+                    <div class="flex items-center gap-2 sm:gap-3 border-l border-stone-200 pl-2 sm:pl-4 flex-shrink-0">
                         <span class="text-sm font-bold text-stone-700 hidden sm:inline">Halo, <span class="text-[#BD2000] font-black">{{ auth()->user()->name }}</span></span>
                         <form action="{{ route('logout') }}" method="POST" class="inline">
                             @csrf
-                            <button type="submit" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-stone-700 bg-stone-100 hover:bg-stone-200 transition-colors cursor-pointer">
+                            <button type="submit" class="px-3.5 sm:px-4 py-2 rounded-xl min-h-[44px] text-xs sm:text-sm font-bold text-stone-700 bg-stone-100 hover:bg-stone-200 transition-colors cursor-pointer flex items-center justify-center">
                                 Keluar
                             </button>
                         </form>
                     </div>
                 @else
-                    <a href="{{ route('login') }}" class="bg-[#BD2000] text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-[#8C0000] transition shadow-md inline-block">
+                    <a href="{{ route('login') }}" class="bg-[#BD2000] text-white px-5 sm:px-6 py-2.5 rounded-xl font-semibold hover:bg-[#8C0000] transition shadow-md inline-flex items-center justify-center min-h-[44px] text-sm sm:text-base flex-shrink-0">
                         Masuk
                     </a>
                 @endauth
@@ -350,27 +350,27 @@
                 </p>
             </div>
 
-            {{-- Ambil Top Menu Dinamis (3 Menu Terlaris) --}}
+            {{-- Ambil Top Menu Dinamis (4 Menu Terlaris untuk Tampilan 2x2 Mobile & 4 Kolom Desktop) --}}
             @php
                 $topMenus = \App\Models\Menu::with('category')
                     ->withSum('orderItems as count', 'quantity')
                     ->orderByDesc('count')
-                    ->take(3)
+                    ->take(4)
                     ->get();
 
                 if ($topMenus->isEmpty()) {
-                    $topMenus = \App\Models\Menu::with('category')->take(3)->get();
+                    $topMenus = \App\Models\Menu::with('category')->take(4)->get();
                 }
             @endphp
 
-            {{-- Grid 3 Kolom Lapang (6 Menu Card) --}}
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
+            {{-- Grid 2 Kolom Mobile (ala Gacoan), 4 Kolom Desktop --}}
+            <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 w-full">
                 @foreach($topMenus as $index => $menu)
-                    <div class="bg-white border border-stone-200 rounded-2xl p-5 shadow-sm hover:shadow-xl hover:border-[#BD2000]/40 transition-all duration-300 flex flex-col justify-between group w-full reveal-on-scroll reveal-scale delay-{{ ($index + 1) * 100 }}">
+                    <div class="bg-white border border-stone-200 rounded-2xl p-2.5 sm:p-5 shadow-sm hover:shadow-xl hover:border-[#BD2000]/40 transition-all duration-300 flex flex-col justify-between group w-full reveal-on-scroll reveal-scale delay-{{ ($index + 1) * 100 }}">
                         
                         <div>
-                            {{-- Container Foto Makanan (Rasio 4:3) --}}
-                            <div class="aspect-[4/3] rounded-xl overflow-hidden relative mb-4 bg-stone-100 border border-stone-200 w-full">
+                            {{-- Container Foto Makanan (aspect-square di mobile, aspect-[4/3] di desktop) --}}
+                            <div class="aspect-square sm:aspect-[4/3] rounded-xl overflow-hidden relative mb-2 sm:mb-4 bg-stone-100 border border-stone-200 w-full">
                                 @if($menu->image_url)
                                     <img src="{{ $menu->image_url }}" 
                                          alt="{{ $menu->name }}" 
@@ -381,39 +381,39 @@
                                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                 @endif
 
-                                {{-- Lencana Terlaris --}}
-                                <div class="absolute top-3 left-3 z-10">
-                                    <span class="bg-[#FA1E0E] text-white px-3 py-1 text-xs font-extrabold rounded-full shadow-md flex items-center gap-1">
-                                        <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/></svg>
+                                {{-- Lencana Terlaris Mini di Sudut Gambar --}}
+                                <div class="absolute top-1.5 left-1.5 sm:top-3 sm:left-3 z-10">
+                                    <span class="bg-[#FA1E0E] text-white px-1.5 py-0.5 sm:px-3 sm:py-1 text-[10px] sm:text-xs font-extrabold rounded-md sm:rounded-full shadow-md flex items-center gap-1">
+                                        <svg class="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/></svg>
                                         <span>Terlaris</span>
                                     </span>
                                 </div>
                             </div>
 
-                            {{-- Informasi Menu --}}
-                            <div class="space-y-2">
-                                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                            {{-- Informasi Menu Ringkas & Padat --}}
+                            <div class="space-y-1 sm:space-y-2">
+                                <span class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider block truncate">
                                     {{ $menu->category->name ?? 'Kuliner Nusantara' }}
                                 </span>
-                                <h3 class="font-extrabold text-xl text-[#1C1917] group-hover:text-[#BD2000] transition-colors leading-snug">
+                                <h3 class="font-extrabold text-xs sm:text-lg text-[#1C1917] group-hover:text-[#BD2000] transition-colors leading-snug line-clamp-1 sm:line-clamp-none">
                                     {{ $menu->name }}
                                 </h3>
-                                <p class="text-xs text-slate-600 line-clamp-2 leading-relaxed font-medium">
+                                <p class="hidden sm:block text-xs text-slate-600 line-clamp-2 leading-relaxed font-medium">
                                     {{ $menu->description ?? 'Olahan masakan segar pilihan khas SajiHUB dengan rasa bumbu rempah otentik meresap sempurna.' }}
                                 </p>
                             </div>
                         </div>
 
-                        {{-- Harga & Tombol Pesan --}}
-                        <div class="pt-5 mt-4 border-t border-stone-100 flex items-center justify-between gap-4 w-full">
-                            <div>
-                                <span class="text-[11px] font-bold text-slate-400 uppercase block">Harga Porsi</span>
-                                <span class="font-black text-2xl text-[#BD2000]">Rp {{ number_format($menu->price, 0, ',', '.') }}</span>
+                        {{-- Harga Tegas & Tombol Pesan Kompak --}}
+                        <div class="pt-2 sm:pt-4 mt-2 sm:mt-4 border-t border-stone-100 flex items-center justify-between gap-1 sm:gap-4 w-full">
+                            <div class="min-w-0">
+                                <span class="hidden sm:block text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase">Harga</span>
+                                <span class="font-black text-xs sm:text-xl text-[#BD2000] block truncate">Rp {{ number_format($menu->price, 0, ',', '.') }}</span>
                             </div>
 
-                            <button type="button" onclick="openOrderTypeModal()" class="px-5 py-2.5 rounded-xl bg-[#BD2000] hover:bg-[#8C0000] text-white font-extrabold text-xs sm:text-sm transition-all shadow-md hover:shadow-lg flex items-center gap-1.5 cursor-pointer">
-                                Pesan
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                            <button type="button" onclick="openOrderTypeModal()" class="px-2.5 py-1 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl bg-[#BD2000] hover:bg-[#8C0000] text-white font-extrabold text-[11px] sm:text-xs transition-all shadow-sm hover:shadow-md flex items-center gap-1 cursor-pointer flex-shrink-0">
+                                <span>Pesan</span>
+                                <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
                             </button>
                         </div>
 
@@ -442,53 +442,53 @@
     {{-- 4. FOOTER (KAKI HALAMAN - WADAH MARUN GELAP #8C0000) --}}
     <footer class="w-full bg-[#8C0000] text-stone-100 pt-10 pb-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 pb-8 border-b border-white/10 w-full reveal-on-scroll">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 pb-8 border-b border-white/10 w-full">
                 
                 {{-- Kolom 1: Tentang SajiHUB & Langganan Promo --}}
-                <div class="lg:col-span-4 space-y-3">
+                <div class="w-full lg:col-span-4 space-y-3">
                     <div class="flex items-center gap-3">
                         <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-9 w-9 object-contain">
                         <span class="font-black text-2xl tracking-tight text-white">Saji<span class="text-[#FFBE0F]">HUB</span></span>
                     </div>
                     
-                    <p class="text-stone-200 text-sm leading-relaxed font-medium">
+                    <p class="text-stone-200 text-xs sm:text-sm leading-relaxed font-medium">
                         SajiHUB berkomitmen menghadirkan pengalaman kuliner khas Nusantara terbaik dengan bumbu rempah otentik meresap, bahan segar, serta pelayanan prima di setiap restoran kami.
                     </p>
                 </div>
 
                 {{-- Kolom 2: Navigasi Cepat --}}
-                <div class="lg:col-span-2 space-y-3">
-                    <h4 class="font-extrabold text-white text-sm uppercase tracking-wider">Navigasi Cepat</h4>
-                    <ul class="space-y-2 text-sm font-medium text-stone-200">
-                        <li><a href="#beranda" class="hover:text-[#FFBE0F] transition-colors">Beranda</a></li>
-                        <li><a href="#menu-terlaris" class="hover:text-[#FFBE0F] transition-colors">Menu Terlaris</a></li>
-                        <li><a href="javascript:void(0)" onclick="openQrScannerModal()" class="hover:text-[#FFBE0F] transition-colors">Pesan dari Meja (Scan QR)</a></li>
+                <div class="w-full lg:col-span-2 space-y-3">
+                    <h4 class="font-extrabold text-white text-xs sm:text-sm uppercase tracking-wider">Navigasi Cepat</h4>
+                    <ul class="space-y-2 text-xs sm:text-sm font-medium text-stone-200">
+                        <li><a href="#beranda" class="hover:text-[#FFBE0F] transition-colors inline-block py-0.5">Beranda</a></li>
+                        <li><a href="#menu-terlaris" class="hover:text-[#FFBE0F] transition-colors inline-block py-0.5">Menu Terlaris</a></li>
+                        <li><a href="javascript:void(0)" onclick="openQrScannerModal()" class="hover:text-[#FFBE0F] transition-colors inline-block py-0.5">Pesan dari Meja (Scan QR)</a></li>
                     </ul>
                 </div>
 
                 {{-- Kolom 3: Layanan Kontak --}}
-                <div class="lg:col-span-3 space-y-3">
-                    <h4 class="font-extrabold text-white text-sm uppercase tracking-wider">Layanan Pelanggan</h4>
-                    <ul class="space-y-2 text-sm font-medium text-stone-200">
-                        <li class="flex items-center gap-2">
-                            <svg class="w-4 h-4 text-[#FFBE0F]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-                            <span>0895-3685-22726 (WhatsApp)</span>
+                <div class="w-full lg:col-span-3 space-y-3">
+                    <h4 class="font-extrabold text-white text-xs sm:text-sm uppercase tracking-wider">Layanan Pelanggan</h4>
+                    <ul class="space-y-2.5 text-xs sm:text-sm font-medium text-stone-200">
+                        <li class="flex items-start gap-2.5">
+                            <svg class="w-4 h-4 text-[#FFBE0F] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                            <span class="break-words">0895-3685-22726 (WhatsApp)</span>
                         </li>
-                        <li class="flex items-center gap-2">
-                            <svg class="w-4 h-4 text-[#FFBE0F]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                            <span>@sajihub.resto (Instagram)</span>
+                        <li class="flex items-start gap-2.5">
+                            <svg class="w-4 h-4 text-[#FFBE0F] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 116 0z"/></svg>
+                            <span class="break-words">@sajihub.resto (Instagram)</span>
                         </li>
-                        <li class="flex items-center gap-2">
-                            <svg class="w-4 h-4 text-[#FFBE0F]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            <span>Setiap Hari (09.00 - 22.00 WIB)</span>
+                        <li class="flex items-start gap-2.5">
+                            <svg class="w-4 h-4 text-[#FFBE0F] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span class="break-words">Setiap Hari (09.00 - 22.00 WIB)</span>
                         </li>
                     </ul>
                 </div>
 
                 {{-- Kolom 4: Alamat Resto --}}
-                <div class="lg:col-span-3 space-y-3">
-                    <h4 class="font-extrabold text-white text-sm uppercase tracking-wider">Alamat Kantor Restoran</h4>
-                    <p class="text-sm text-stone-200 leading-relaxed font-medium">
+                <div class="w-full lg:col-span-3 space-y-3">
+                    <h4 class="font-extrabold text-white text-xs sm:text-sm uppercase tracking-wider">Alamat Kantor Restoran</h4>
+                    <p class="text-xs sm:text-sm text-stone-200 leading-relaxed font-medium">
                         Jl. Raya Kuliner Nusantara No. 88, Jakarta Selatan, Indonesia.
                     </p>
                 </div>
@@ -496,7 +496,7 @@
             </div>
 
             {{-- Copyright Text --}}
-            <div class="pt-5 text-center text-xs text-stone-300 font-medium">
+            <div class="pt-6 text-center text-xs text-stone-300 font-medium">
                 © 2026 SajiHUB Resto. Seluruh Hak Cipta Dilindungi.
             </div>
         </div>
@@ -504,7 +504,7 @@
 
     {{-- MODAL PILIH LAYANAN PEMESANAN --}}
     <div id="order-type-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300">
-        <div class="bg-white border border-stone-200 w-full max-w-3xl rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 relative text-left">
+        <div class="bg-white border border-stone-200 w-full max-w-3xl rounded-3xl p-5 sm:p-8 shadow-2xl space-y-5 sm:space-y-6 relative text-left max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-start border-b border-stone-200 pb-4">
                 <div>
                     <h3 class="font-black text-xl text-[#8C0000]">Pilih Metode Pemesanan</h3>
@@ -515,12 +515,12 @@
                 </button>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 {{-- Opsi 1: Makan di Tempat (Dine-In) --}}
-                <div class="bg-stone-50 border border-stone-200 rounded-3xl p-6 flex flex-col justify-between space-y-4 hover:border-[#BD2000] hover:shadow-md transition-all group">
+                <div class="bg-stone-50 border border-stone-200 rounded-3xl p-5 sm:p-6 flex flex-col justify-between space-y-4 hover:border-[#BD2000] hover:shadow-md transition-all group">
                     <div class="space-y-3">
-                        <div class="p-3.5 bg-[#BD2000]/10 text-[#BD2000] rounded-2xl border border-[#BD2000]/20 w-max">
-                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="p-3 bg-[#BD2000]/10 text-[#BD2000] rounded-2xl border border-[#BD2000]/20 w-max">
+                            <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                             </svg>
                         </div>
@@ -528,14 +528,14 @@
                             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                             Makan di Tempat (Dine-In)
                         </span>
-                        <h4 class="text-lg font-black text-[#1C1917]">Pesan dari Meja Makan</h4>
+                        <h4 class="text-base sm:text-lg font-black text-[#1C1917]">Pesan dari Meja Makan</h4>
                         <p class="text-xs text-slate-600 font-medium leading-relaxed">
                             Silakan <strong>tempati meja kosong</strong> di restoran, kemudian <strong>pindai (scan) Kode QR</strong> yang tertera di meja Anda untuk langsung memilih menu & memesan dari smartphone.
                         </p>
                     </div>
 
                     <div class="pt-2">
-                        <button type="button" onclick="openQrFromOrderType()" class="w-full bg-[#BD2000] hover:bg-[#8C0000] text-white font-extrabold py-3 px-4 rounded-xl text-xs uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer">
+                        <button type="button" onclick="openQrFromOrderType()" class="w-full bg-[#BD2000] hover:bg-[#8C0000] text-white font-extrabold py-3 px-4 rounded-xl text-xs uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 116 0z"/>
@@ -546,10 +546,10 @@
                 </div>
 
                 {{-- Opsi 2: Bawa Pulang (Takeaway) --}}
-                <div class="bg-stone-50 border border-stone-200 rounded-3xl p-6 flex flex-col justify-between space-y-4 hover:border-amber-500 hover:shadow-md transition-all group">
+                <div class="bg-stone-50 border border-stone-200 rounded-3xl p-5 sm:p-6 flex flex-col justify-between space-y-4 hover:border-amber-500 hover:shadow-md transition-all group">
                     <div class="space-y-3">
-                        <div class="p-3.5 bg-amber-100 text-amber-700 rounded-2xl border border-amber-300 w-max">
-                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="p-3 bg-amber-100 text-amber-700 rounded-2xl border border-amber-300 w-max">
+                            <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                             </svg>
                         </div>
@@ -557,19 +557,27 @@
                             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
                             Bawa Pulang (Takeaway)
                         </span>
-                        <h4 class="text-lg font-black text-[#1C1917]">Pesan Langsung di Kasir</h4>
-                        <p class="text-xs text-slate-600 font-medium leading-relaxed">
-                            Untuk pesanan bawa pulang / dibungkus, silakan <strong>langsung menuju ke area Kasir</strong> restoran kami. Petugas kasir kami siap mencatat & melayani pesanan Anda secara cepat.
-                        </p>
+                        <h4 class="text-base sm:text-lg font-black text-[#1C1917]">Pesan Bawa Pulang</h4>
+                        
+                        {{-- Callout Info Box Netral / Kasir --}}
+                        <div class="p-3.5 bg-stone-100/90 border border-stone-200/90 rounded-2xl flex items-start gap-2.5">
+                            <div class="p-1 bg-white text-stone-600 rounded-lg shrink-0 mt-0.5 border border-stone-200 shadow-2xs">
+                                <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                            </div>
+                            <p class="text-xs text-slate-600 font-medium leading-relaxed">
+                                Pesanan bungkus/takeaway dilayani langsung di kasir. Anda dapat meninjau katalog menu & harga terlebih dahulu.
+                            </p>
+                        </div>
                     </div>
 
-                    <div class="pt-2 space-y-2">
-                        <div class="w-full bg-amber-500 text-white font-extrabold py-3 px-4 rounded-xl text-xs uppercase tracking-wider text-center flex items-center justify-center gap-2">
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                            <span>Silakan Pesan di Kasir</span>
-                        </div>
-                        <a href="{{ route('menu.catalog') }}" class="block text-center text-[11px] text-[#BD2000] hover:underline font-extrabold">
-                            Lihat Menu & Harga →
+                    <div class="pt-2">
+                        <a href="{{ route('menu.catalog') }}" class="w-full bg-stone-900 hover:bg-[#8C0000] text-white font-extrabold py-3 px-4 rounded-xl text-xs uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer text-center active:scale-[0.99]">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                            </svg>
+                            <span>Lihat Menu & Harga</span>
                         </a>
                     </div>
                 </div>

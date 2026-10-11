@@ -71,54 +71,6 @@ class AuthController extends Controller
         return redirect($this->redirectBasedOnRole($user));
     }
 
-    public function showRegister()
-    {
-        if (Auth::check()) {
-            return redirect($this->redirectBasedOnRole(Auth::user()));
-        }
-        return view('auth.register');
-    }
-
-    public function register(Request $request)
-    {
-        $loginInput = $request->input('username_or_email');
-        $isEmail = filter_var($loginInput, FILTER_VALIDATE_EMAIL);
-
-        if ($isEmail) {
-            $request->merge([
-                'email' => $loginInput,
-                'username' => explode('@', $loginInput)[0],
-            ]);
-        } else {
-            $request->merge([
-                'username' => $loginInput,
-                'email' => $loginInput . '@sajihub.com',
-            ]);
-        }
-
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'username' => 'required|string|max:255|unique:users,username',
-            'email' => 'required|string|email|max:255|unique:users,email',
-            'phone' => 'nullable|string|max:20',
-            'password' => 'required|string|min:6|confirmed',
-            'role' => 'required|in:customer,kasir,dapur,koki',
-        ]);
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'username' => $request->username,
-            'phone' => $request->phone,
-            'password' => bcrypt($request->password),
-            'role' => $request->role === 'koki' ? 'dapur' : $request->role,
-        ]);
-
-        Auth::login($user);
-
-        return redirect()->route('landing')->with('success', 'Registrasi berhasil! Selamat bergabung di Waroeng SajiHUB.');
-    }
-
     public function logout(Request $request)
     {
         Auth::logout();

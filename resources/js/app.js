@@ -1,29 +1,74 @@
 // SajiHUB - Main Application JavaScript
 
-// Sidebar Toggle
+// Sidebar Navigation Drawer (Mobile)
 document.addEventListener('DOMContentLoaded', function() {
+    if (window.__mobileSidebarInitialized) return;
+    window.__mobileSidebarInitialized = true;
+
     const sidebarToggle = document.getElementById('sidebar-toggle');
     const sidebar = document.getElementById('sidebar');
-    const mainContent = document.getElementById('main-content');
-    const sidebarOverlay = document.getElementById('sidebar-overlay');
+    const backdrop = document.getElementById('mobile-sidebar-backdrop') || document.getElementById('sidebar-overlay');
+
+    function openMobileDrawer() {
+        if (!sidebar) return;
+        sidebar.classList.remove('-translate-x-full');
+        sidebar.classList.add('translate-x-0');
+        if (backdrop) backdrop.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden', 'lg:overflow-auto');
+    }
+
+    function closeMobileDrawer() {
+        if (!sidebar) return;
+        sidebar.classList.add('-translate-x-full');
+        sidebar.classList.remove('translate-x-0');
+        if (backdrop) backdrop.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden', 'lg:overflow-auto');
+    }
 
     if (sidebarToggle && sidebar) {
-        sidebarToggle.addEventListener('click', function() {
-            sidebar.classList.toggle('-translate-x-full');
-            sidebar.classList.toggle('translate-x-0');
-            if (sidebarOverlay) {
-                sidebarOverlay.classList.toggle('hidden');
+        sidebarToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const isOpen = !sidebar.classList.contains('-translate-x-full');
+            if (isOpen) {
+                closeMobileDrawer();
+            } else {
+                openMobileDrawer();
             }
         });
     }
 
-    if (sidebarOverlay) {
-        sidebarOverlay.addEventListener('click', function() {
-            sidebar.classList.add('-translate-x-full');
-            sidebar.classList.remove('translate-x-0');
-            sidebarOverlay.classList.add('hidden');
+    if (backdrop) {
+        backdrop.addEventListener('click', function(e) {
+            e.stopPropagation();
+            closeMobileDrawer();
         });
+        backdrop.addEventListener('touchstart', function() {
+            closeMobileDrawer();
+        }, { passive: true });
     }
+
+    // Click outside handler for mobile
+    document.addEventListener('click', function(e) {
+        if (window.innerWidth >= 1024 || !sidebar) return;
+        const isOpen = !sidebar.classList.contains('-translate-x-full');
+        if (isOpen && !sidebar.contains(e.target) && (!sidebarToggle || !sidebarToggle.contains(e.target))) {
+            closeMobileDrawer();
+        }
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' || e.key === 'Esc') {
+            closeMobileDrawer();
+        }
+    });
+
+    // Reset when resizing to desktop
+    window.addEventListener('resize', function() {
+        if (window.innerWidth >= 1024) {
+            closeMobileDrawer();
+        }
+    });
 
     // Dropdown toggle
     document.querySelectorAll('[data-dropdown-toggle]').forEach(function(toggle) {
@@ -53,13 +98,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     });
 
-    // Delete confirmation
+    // Delete confirmation using Custom Modal instead of native confirm
     document.querySelectorAll('[data-confirm-delete]').forEach(function(form) {
         form.addEventListener('submit', function(e) {
             e.preventDefault();
             if (window.showConfirm) {
                 window.showConfirm(e, 'Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.', 'Konfirmasi Hapus', 'Ya, Hapus');
-            } else if (confirm('Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.')) {
+            } else {
                 form.submit();
             }
         });

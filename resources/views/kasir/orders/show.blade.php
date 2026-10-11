@@ -154,7 +154,8 @@
 
         <div class="p-6">
             <h4 class="text-[#8C0000] font-black text-sm uppercase tracking-wider mb-4">Daftar Menu Pesanan</h4>
-            <div class="overflow-x-auto rounded-2xl border border-stone-200">
+            {{-- 1. Desktop Table View --}}
+            <div class="hidden md:block overflow-x-auto rounded-2xl border border-stone-200">
                 <table class="w-full text-left">
                     <thead class="bg-stone-100 text-stone-700 text-xs font-extrabold border-b border-stone-200">
                         <tr>
@@ -180,6 +181,29 @@
                         @endforeach
                     </tbody>
                 </table>
+            </div>
+
+            {{-- 2. Mobile Cards View --}}
+            <div class="block md:hidden space-y-2.5">
+                @foreach($order->items as $item)
+                    <div class="bg-stone-50 border border-stone-200 rounded-xl p-3.5 space-y-2">
+                        <div class="flex items-start justify-between gap-2">
+                            <div>
+                                <span class="font-extrabold text-sm text-[#1C1917]">{{ $item->menu->name ?? 'Menu Dihapus' }}</span>
+                                @if($item->notes)
+                                    <div class="text-xs text-[#BD2000] font-bold mt-0.5">Catatan: "{{ $item->notes }}"</div>
+                                @endif
+                            </div>
+                            <span class="px-2 py-0.5 bg-stone-200 text-stone-800 rounded-lg text-xs font-black shrink-0">
+                                {{ $item->quantity }}x
+                            </span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs pt-1.5 border-t border-stone-200/60">
+                            <span class="text-stone-500 font-medium">@ Rp {{ number_format($item->price, 0, ',', '.') }}</span>
+                            <span class="font-black text-sm text-[#1C1917]">Rp {{ number_format($item->price * $item->quantity, 0, ',', '.') }}</span>
+                        </div>
+                    </div>
+                @endforeach
             </div>
         </div>
     </div>
