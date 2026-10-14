@@ -6,9 +6,10 @@
     <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
     <title>SajiHUB — Restoran & Kuliner Otentik Nusantara</title>
     <meta name="description" content="SajiHUB — Nikmati sajian kuliner khas Nusantara dengan bumbu meresap, bahan segar, dan pelayanan cepat di berbagai cabang restoran kami.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     @include('partials.head-assets')
     <style>
@@ -119,7 +120,7 @@
             
             {{-- Logo Merk --}}
             <a href="#beranda" class="flex items-center gap-2.5 sm:gap-3 group flex-shrink-0">
-                <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-8 sm:h-9 w-auto object-contain flex-shrink-0 drop-shadow-sm group-hover:scale-105 transition-transform duration-300">
+                <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" width="144" height="36" decoding="async" class="h-8 sm:h-9 w-auto object-contain flex-shrink-0 drop-shadow-sm group-hover:scale-105 transition-transform duration-300">
                 <span class="font-black text-xl sm:text-2xl tracking-tight text-[#8C0000] leading-none select-none flex-shrink-0">
                     Saji<span class="text-[#FFBE0F]">HUB</span>
                 </span>
@@ -268,7 +269,11 @@
                         <div class="hero-slide absolute inset-0 w-full h-full transition-all duration-700 ease-in-out" 
                              style="{{ $index === 0 ? 'opacity: 1; pointer-events: auto; transform: scale(1); z-index: 10;' : 'opacity: 0; pointer-events: none; transform: scale(0.95); z-index: 0;' }}" 
                              data-slide-index="{{ $index }}">
-                            <img src="{{ $slide['image'] }}" alt="{{ $slide['name'] }}" class="w-full h-full object-cover">
+                            @if($index === 0)
+                                <img src="{{ $slide['image'] }}" alt="{{ $slide['name'] }}" fetchpriority="high" decoding="async" class="w-full h-full object-cover">
+                            @else
+                                <img src="{{ $slide['image'] }}" alt="{{ $slide['name'] }}" loading="lazy" decoding="async" class="w-full h-full object-cover">
+                            @endif
                             <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent"></div>
 
                             <div class="absolute bottom-6 left-6 right-6 bg-white/95 backdrop-blur-md p-4 rounded-2xl border border-stone-200 shadow-xl flex items-center justify-between z-10">
@@ -352,12 +357,20 @@
 
             {{-- Ambil Top Menu Dinamis (4 Menu Terlaris untuk Tampilan 2x2 Mobile & 4 Kolom Desktop) --}}
             @php
+                $landingBranchId = auth()->check() && auth()->user()->branch_id 
+                    ? auth()->user()->branch_id 
+                    : (\App\Models\Branch::first()?->id ?? 11);
+
                 $topMenus = \App\Models\Menu::with('category')
+                    ->where('branch_id', $landingBranchId)
                     ->withSum('orderItems as count', 'quantity')
                     ->orderByDesc('count')
                     ->take(4)
                     ->get();
 
+                if ($topMenus->isEmpty()) {
+                    $topMenus = \App\Models\Menu::with('category')->where('branch_id', $landingBranchId)->take(4)->get();
+                }
                 if ($topMenus->isEmpty()) {
                     $topMenus = \App\Models\Menu::with('category')->take(4)->get();
                 }
@@ -374,10 +387,14 @@
                                 @if($menu->image_url)
                                     <img src="{{ $menu->image_url }}" 
                                          alt="{{ $menu->name }}" 
+                                         loading="lazy"
+                                         decoding="async"
                                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                 @else
                                     <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80" 
                                          alt="{{ $menu->name }}" 
+                                         loading="lazy"
+                                         decoding="async"
                                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                 @endif
 
@@ -447,7 +464,7 @@
                 {{-- Kolom 1: Tentang SajiHUB & Langganan Promo --}}
                 <div class="w-full lg:col-span-4 space-y-3">
                     <div class="flex items-center gap-3">
-                        <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-9 w-9 object-contain">
+                        <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" width="36" height="36" loading="lazy" decoding="async" class="h-9 w-9 object-contain">
                         <span class="font-black text-2xl tracking-tight text-white">Saji<span class="text-[#FFBE0F]">HUB</span></span>
                     </div>
                     
@@ -732,20 +749,41 @@
             }
         }
 
-        function openQrScannerModal() {
+        function loadQrScannerLib() {
+            return new Promise((resolve, reject) => {
+                if (window.Html5Qrcode) {
+                    return resolve();
+                }
+                const script = document.createElement('script');
+                script.src = 'https://unpkg.com/html5-qrcode';
+                script.async = true;
+                script.onload = () => resolve();
+                script.onerror = () => reject(new Error('Gagal memuat pustaka scanner'));
+                document.body.appendChild(script);
+            });
+        }
+
+        async function openQrScannerModal() {
             const modal = document.getElementById('qr-scanner-modal');
             modal.classList.remove('opacity-0', 'pointer-events-none');
             modal.classList.add('opacity-100');
             isScanLocked = false;
             updateCustomerCamLabel();
 
-            setTimeout(() => {
+            try {
+                await loadQrScannerLib();
                 startCustomerCamera();
-            }, 150);
+            } catch(e) {
+                console.error(e);
+            }
         }
 
         function startCustomerCamera() {
             updateCustomerCamLabel();
+
+            if (html5QrCodeInstance && html5QrCodeInstance.isScanning) {
+                return;
+            }
 
             if (!html5QrCodeInstance) {
                 html5QrCodeInstance = new Html5Qrcode("qr-reader", {
@@ -844,10 +882,13 @@
                 try { html5QrCodeInstance.pause(true); } catch(e) {}
             }
 
-            const text = (decodedText || '').trim();
+            let text = (decodedText || '').trim();
+            if (text.startsWith('"') && text.endsWith('"')) {
+                text = text.slice(1, -1).trim();
+            }
 
             // 1. Format resmi SajiHub: SAJIHUB-TABLE-{branch_id}-{tableIdentifier}
-            if (text.startsWith('SAJIHUB-TABLE-')) {
+            if (text.toUpperCase().startsWith('SAJIHUB-TABLE-')) {
                 const parts = text.split('-');
                 if (parts.length >= 4) {
                     const branchId = parts[2];
@@ -1030,5 +1071,6 @@
         window.addEventListener('scroll', activateScrollSpy);
         activateScrollSpy();
     </script>
+    @include('components.logout-modal')
 </body>
 </html>

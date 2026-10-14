@@ -38,12 +38,10 @@
 ::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #64748b; }
 
-/* Hide Microsoft Edge / IE native password reveal & clear icons (eliminates duplicate eye icon) */
+/* Disable native browser password reveal & clear icons (Edge/Chrome/Chromium) */
 input[type="password"]::-ms-reveal,
 input[type="password"]::-ms-clear {
     display: none !important;
-    width: 0 !important;
-    height: 0 !important;
 }
 
 /* Smooth transitions for all interactive elements */

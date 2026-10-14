@@ -14,12 +14,22 @@ class PublicMenuController extends Controller
         $branches = Branch::all();
         $query = Menu::with(['branch', 'category']);
 
-        // Filter by branch
-        if ($request->filled('branch_id')) {
-            $query->where('branch_id', $request->branch_id);
+        // Tentukan cabang aktif default jika parameter branch_id tidak disediakan
+        // 1. Jika staf/admin login, ikuti cabang milik staf tersebut
+        // 2. Jika pengunjung umum, gunakan cabang utama (misal: SajiHUB Jakarta Selatan / ID cabang pertama)
+        $defaultBranchId = null;
+        if (auth()->check() && auth()->user()->branch_id) {
+            $defaultBranchId = (string) auth()->user()->branch_id;
         } else {
-            // Default to branch 1 so only 9 unique menus are listed matching POS Kasir
-            $query->where('branch_id', 1);
+            $defaultBranchId = (string) (Branch::first()?->id ?? 11);
+        }
+
+        // Tentukan branch_id yang sedang dipilih
+        $currentBranchId = $request->has('branch_id') ? $request->get('branch_id') : $defaultBranchId;
+
+        // Filter cabang: Jika 'all' atau kosong maka tampilkan semua, selain itu filter sesuai ID cabang
+        if (!empty($currentBranchId) && $currentBranchId !== 'all') {
+            $query->where('branch_id', $currentBranchId);
         }
 
         // Filter by simple category type: 'makanan' or 'minuman'
@@ -36,12 +46,14 @@ class PublicMenuController extends Controller
             }
         }
 
-        // Search by keyword
+        // Search by keyword (cari berdasarkan nama menu atau kategori)
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                  ->orWhereHas('category', function($cq) use ($search) {
+                      $cq->where('name', 'like', "%{$search}%");
+                  });
             });
         }
 
@@ -62,6 +74,6 @@ class PublicMenuController extends Controller
 
         $menus = $query->get();
 
-        return view('menu_catalog', compact('menus', 'branches'));
+        return view('menu_catalog', compact('menus', 'branches', 'currentBranchId'));
     }
 }

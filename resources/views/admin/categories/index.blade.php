@@ -44,7 +44,7 @@
                                 @method('PUT')
                                 <input type="text" name="name" value="{{ $category->name }}" required
                                     class="bg-stone-50 border border-stone-300 focus:border-[#BD2000] text-[#1C1917] font-extrabold rounded-xl px-3 py-1.5 focus:outline-none transition-all w-full sm:w-auto">
-                                <button type="submit" class="opacity-0 group-hover:opacity-100 bg-stone-100 hover:bg-[#BD2000] text-stone-700 hover:text-white px-3 py-1.5 rounded-xl transition-all text-xs font-bold border border-stone-300 cursor-pointer">
+                                <button type="submit" class="bg-stone-100 hover:bg-[#BD2000] text-stone-800 hover:text-white px-3.5 py-1.5 rounded-xl transition-all text-xs font-extrabold border border-stone-300 hover:border-[#BD2000] shadow-2xs hover:shadow-xs cursor-pointer flex-shrink-0">
                                     Simpan
                                 </button>
                             </form>

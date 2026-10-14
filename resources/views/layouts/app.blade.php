@@ -5,10 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
     <title>@yield('title', 'SajiHUB - Manajemen Kuliner Enterprise')</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     @include('partials.head-assets')
     <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
@@ -107,7 +109,7 @@
             <!-- Logo Area -->
             <div class="h-16 flex items-center px-6 border-b border-stone-200 bg-white">
                 <a href="{{ route('landing') }}" class="flex items-center gap-2.5 flex-shrink-0 group">
-                    <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-8 w-auto object-contain flex-shrink-0 drop-shadow-sm group-hover:scale-105 transition-transform duration-200">
+                    <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" width="128" height="32" decoding="async" class="h-8 w-auto object-contain flex-shrink-0 drop-shadow-sm group-hover:scale-105 transition-transform duration-200">
                     <span class="font-black text-xl tracking-tight text-[#8C0000] leading-none select-none flex-shrink-0">
                         Saji<span class="text-[#FFBE0F]">HUB</span>
                     </span>
@@ -177,7 +179,7 @@
 
                 @if($user && $user->isAdminCabang())
                     <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all {{ request()->routeIs('admin.dashboard') ? 'bg-[#BD2000]/10 text-[#BD2000] border-l-4 border-[#BD2000] font-extrabold shadow-sm' : 'text-stone-600 hover:bg-stone-100 hover:text-[#BD2000] font-semibold' }}">
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"></path></svg>
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                         <span>Beranda</span>
                     </a>
                     <a href="{{ route('admin.menus.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all {{ request()->routeIs('admin.menus.*') ? 'bg-[#BD2000]/10 text-[#BD2000] border-l-4 border-[#BD2000] font-extrabold shadow-sm' : 'text-stone-600 hover:bg-stone-100 hover:text-[#BD2000] font-semibold' }}">
@@ -577,6 +579,7 @@
 
         document.addEventListener('DOMContentLoaded', initMobileSidebar);
     </script>
+    @include('components.logout-modal')
     @stack('scripts')
 </body>
 </html>

@@ -4,10 +4,7 @@
 
 @section('content')
 <div class="space-y-6">
-    <div class="flex flex-col sm:flex-row justify-between gap-4 items-start sm:items-center animate-fade-in-up">
-        <div class="flex space-x-4 w-full sm:w-auto">
-            <input type="text" placeholder="Cari menu..." class="bg-white border border-stone-300 text-[#1C1917] font-semibold rounded-xl px-4 py-3 text-sm focus:border-[#BD2000] focus:outline-none transition-all flex-1 sm:w-64">
-        </div>
+    <div class="flex justify-end items-center animate-fade-in-up">
         <a href="{{ route('admin.menus.create') }}" class="bg-[#BD2000] hover:bg-[#8C0000] text-white font-extrabold px-6 py-3 rounded-xl transition-all shadow-md flex items-center space-x-2 cursor-pointer">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
             <span>Tambah Menu</span>

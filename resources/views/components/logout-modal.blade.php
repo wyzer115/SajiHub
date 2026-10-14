@@ -32,28 +32,14 @@
             </div>
 
             <!-- Title -->
-            <h3 class="text-lg font-bold text-slate-900 tracking-tight mb-1">
+            <h3 class="text-xl font-black tracking-tight mb-2" style="color: #111827 !important;">
                 Konfirmasi Keluar Akun
             </h3>
 
-            <!-- Subtitle Question -->
-            <p class="text-xs font-medium text-slate-500 leading-relaxed max-w-xs mx-auto mb-4">
-                Apakah Anda yakin ingin logout dari role <span class="font-bold text-red-600">{{ $roleName }}</span>?
+            <!-- Confirmation Text -->
+            <p class="text-sm font-semibold leading-relaxed max-w-sm mx-auto mb-6" style="color: #4b5563 !important;">
+                Apakah Anda yakin ingin keluar dari sistem SajiHUB? Sesi akun Anda akan diakhiri.
             </p>
-
-            <!-- User Info Profile Card -->
-            <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-3 mb-6 text-left flex items-center gap-3 shadow-xs">
-                <div class="w-9 h-9 rounded-lg bg-red-600 text-white flex items-center justify-center font-bold text-xs shadow-xs shrink-0 font-mono">
-                    {{ strtoupper(substr($user->name, 0, 1)) }}
-                </div>
-                <div class="min-w-0 flex-1">
-                    <div class="text-xs font-bold text-slate-900 truncate">{{ $user->name }}</div>
-                    <div class="text-[11px] font-medium text-red-600 flex items-center gap-1 mt-0.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-red-600"></span>
-                        <span>Role: {{ $roleName }}</span>
-                    </div>
-                </div>
-            </div>
 
             <!-- Action Buttons -->
             <div class="grid grid-cols-2 gap-3">
@@ -104,12 +90,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Intercept all logout forms in the app
-    document.querySelectorAll('form[action*="logout"]').forEach(form => {
-        form.addEventListener('submit', function(e) {
+    document.addEventListener('submit', function(e) {
+        const form = e.target;
+        if (form && form.action && form.action.includes('logout') && !form.dataset.confirmedLogout) {
             e.preventDefault();
+            e.stopPropagation();
             openLogoutModal(form);
-        });
-    });
+        }
+    }, true);
 
     if (btnCancel) btnCancel.addEventListener('click', closeLogoutModal);
     if (modalBackdrop) modalBackdrop.addEventListener('click', closeLogoutModal);

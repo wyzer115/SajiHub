@@ -107,4 +107,36 @@
         transform: scaleX(1) !important;
         -webkit-transform: scaleX(1) !important;
     }
+    /* Cegah duplikasi atau crash tombol intip password bawaan Microsoft Edge / peramban */
+    input::-ms-reveal,
+    input::-ms-clear,
+    input[type="password"]::-ms-reveal,
+    input[type="password"]::-ms-clear,
+    input::-webkit-contacts-auto-fill-button,
+    input::-webkit-credentials-auto-fill-button {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        pointer-events: none !important;
+    }
 </style>
+<script>
+    window.toggleInputPassword = function(inputId, btn) {
+        if (!inputId || !btn) return;
+        const input = document.getElementById(inputId);
+        if (!input) return;
+        const openSvg = btn.querySelector('.eye-open-svg');
+        const closedSvg = btn.querySelector('.eye-closed-svg');
+        if (input.type === 'password') {
+            input.type = 'text';
+            if (openSvg) { openSvg.classList.add('hidden'); openSvg.classList.remove('block'); }
+            if (closedSvg) { closedSvg.classList.remove('hidden'); closedSvg.classList.add('block'); }
+            btn.setAttribute('aria-label', 'Sembunyikan Kata Sandi');
+        } else {
+            input.type = 'password';
+            if (closedSvg) { closedSvg.classList.add('hidden'); closedSvg.classList.remove('block'); }
+            if (openSvg) { openSvg.classList.remove('hidden'); openSvg.classList.add('block'); }
+            btn.setAttribute('aria-label', 'Tampilkan Kata Sandi');
+        }
+    };
+</script>

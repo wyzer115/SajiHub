@@ -6,10 +6,11 @@
     <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
     <title>Daftar Menu & Katalog Kuliner — SajiHUB</title>
     <meta name="description" content="Lihat seluruh daftar menu kuliner otentik, pilihan minuman segar, dan hidangan penutup khas SajiHUB dengan harga terjangkau.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
     <script>
         window.alert = function(message, title = 'Pemberitahuan') {
             Swal.fire({
@@ -120,7 +121,7 @@
             
             {{-- Logo Merk --}}
             <a href="{{ route('landing') }}" class="flex items-center gap-2.5 sm:gap-3 group flex-shrink-0">
-                <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-8 sm:h-9 w-auto object-contain flex-shrink-0 drop-shadow-sm group-hover:scale-105 transition-transform duration-300">
+                <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" width="144" height="36" decoding="async" class="h-8 sm:h-9 w-auto object-contain flex-shrink-0 drop-shadow-sm group-hover:scale-105 transition-transform duration-300">
                 <span class="font-black text-xl sm:text-2xl tracking-tight text-[#8C0000] leading-none select-none flex-shrink-0">
                     Saji<span class="text-[#FFBE0F]">HUB</span>
                 </span>
@@ -186,7 +187,10 @@
     {{-- 3. FILTER & PENCARIAN --}}
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         @php
-            $selectedBranch = $branches->firstWhere('id', request('branch_id'));
+            $activeBranchId = $currentBranchId ?? request('branch_id');
+            $selectedBranch = (!empty($activeBranchId) && $activeBranchId !== 'all') 
+                ? $branches->firstWhere('id', $activeBranchId) 
+                : null;
             $selectedBranchName = $selectedBranch ? $selectedBranch->name : 'Semua Cabang';
 
             $sortOptions = [
@@ -206,7 +210,7 @@
                 <div class="lg:col-span-2 relative">
                     <label class="block text-xs font-bold text-stone-500 uppercase mb-1.5">Cari Nama Menu</label>
                     <div class="relative">
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari Nasi Goreng, Ayam Bakar, Es Teh..." 
+                        <input type="text" name="search" id="catalog-search-input" value="{{ request('search') }}" placeholder="Cari Nasi Goreng, Ayam Bakar, Es Teh..." autocomplete="off"
                             class="w-full pl-10 pr-4 py-3 bg-stone-50 border border-stone-300 rounded-2xl text-sm font-semibold focus:outline-none focus:border-[#BD2000] transition-all">
                         <svg class="w-5 h-5 text-stone-400 absolute left-3.5 top-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -217,7 +221,7 @@
                 {{-- Filter Cabang (Custom Popover Dropdown) --}}
                 <div class="relative" id="dropdown-branch-wrapper">
                     <label class="block text-xs font-bold text-stone-500 uppercase mb-1.5">Cabang Restoran</label>
-                    <input type="hidden" name="branch_id" id="filter-branch-id" value="{{ request('branch_id') }}">
+                    <input type="hidden" name="branch_id" id="filter-branch-id" value="{{ (!empty($activeBranchId) && $activeBranchId !== 'all') ? $activeBranchId : '' }}">
                     <button type="button" 
                             id="dropdown-branch-btn"
                             onclick="toggleDropdownPopover('branch')"
@@ -234,19 +238,19 @@
                          class="hidden absolute top-full left-0 mt-1.5 w-full z-50 bg-white border border-slate-200 rounded-xl shadow-lg py-1 max-h-60 overflow-y-auto"
                          role="listbox">
                         <button type="button" 
-                                onclick="selectFilterBranch('', 'Semua Cabang')"
-                                class="w-full text-left px-4 py-2.5 text-xs sm:text-sm font-semibold flex items-center justify-between transition-colors cursor-pointer {{ !request('branch_id') ? 'bg-[#BD2000]/10 text-[#BD2000] font-black' : 'text-stone-700 hover:bg-stone-50' }}">
+                                onclick="selectFilterBranch('all', 'Semua Cabang')"
+                                class="w-full text-left px-4 py-2.5 text-xs sm:text-sm font-semibold flex items-center justify-between transition-colors cursor-pointer {{ (!$selectedBranch) ? 'bg-[#BD2000]/10 text-[#BD2000] font-black' : 'text-stone-700 hover:bg-stone-50' }}">
                             <span>Semua Cabang</span>
-                            @if(!request('branch_id'))
+                            @if(!$selectedBranch)
                                 <svg class="w-4 h-4 text-[#BD2000]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                             @endif
                         </button>
                         @foreach($branches as $b)
                             <button type="button" 
                                     onclick="selectFilterBranch('{{ $b->id }}', '{{ addslashes($b->name) }}')"
-                                    class="w-full text-left px-4 py-2.5 text-xs sm:text-sm font-semibold flex items-center justify-between transition-colors cursor-pointer {{ request('branch_id') == $b->id ? 'bg-[#BD2000]/10 text-[#BD2000] font-black' : 'text-stone-700 hover:bg-stone-50' }}">
+                                    class="w-full text-left px-4 py-2.5 text-xs sm:text-sm font-semibold flex items-center justify-between transition-colors cursor-pointer {{ ($selectedBranch && (string)$selectedBranch->id === (string)$b->id) ? 'bg-[#BD2000]/10 text-[#BD2000] font-black' : 'text-stone-700 hover:bg-stone-50' }}">
                                 <span class="truncate">{{ $b->name }}</span>
-                                @if(request('branch_id') == $b->id)
+                                @if($selectedBranch && (string)$selectedBranch->id === (string)$b->id)
                                     <svg class="w-4 h-4 text-[#BD2000]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                                 @endif
                             </button>
@@ -293,7 +297,7 @@
                 
                 {{-- Tab 1: Semua --}}
                 @php $catType = request('category_type'); @endphp
-                <a href="{{ route('menu.catalog', array_merge(request()->except('category_type'), ['category_type' => null])) }}" 
+                <a href="{{ route('menu.catalog', array_merge(request()->except('category_type'), array_filter(['branch_id' => $activeBranchId, 'category_type' => null]))) }}" 
                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all border {{ !$catType ? 'bg-[#BD2000] text-white border-[#BD2000] shadow-sm' : 'bg-stone-100 text-stone-700 border-stone-200 hover:bg-stone-200' }}">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
@@ -302,7 +306,7 @@
                 </a>
 
                 {{-- Tab 2: Makanan --}}
-                <a href="{{ route('menu.catalog', array_merge(request()->except('category_type'), ['category_type' => 'makanan'])) }}" 
+                <a href="{{ route('menu.catalog', array_merge(request()->except('category_type'), array_filter(['branch_id' => $activeBranchId, 'category_type' => 'makanan']))) }}" 
                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all border {{ $catType === 'makanan' ? 'bg-[#BD2000] text-white border-[#BD2000] shadow-sm' : 'bg-stone-100 text-stone-700 border-stone-200 hover:bg-stone-200' }}">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
@@ -311,7 +315,7 @@
                 </a>
 
                 {{-- Tab 3: Minuman --}}
-                <a href="{{ route('menu.catalog', array_merge(request()->except('category_type'), ['category_type' => 'minuman'])) }}" 
+                <a href="{{ route('menu.catalog', array_merge(request()->except('category_type'), array_filter(['branch_id' => $activeBranchId, 'category_type' => 'minuman']))) }}" 
                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all border {{ $catType === 'minuman' ? 'bg-[#BD2000] text-white border-[#BD2000] shadow-sm' : 'bg-stone-100 text-stone-700 border-stone-200 hover:bg-stone-200' }}">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L5.605 15.12a2 2 0 00-1.806.547M8 4h8l-1 8H9L8 4z"/>
@@ -326,7 +330,7 @@
     {{-- 4. DAFTAR KARTU MENU (KATALOG VIEW SAJA - TANPA TOMBOL PESAN) --}}
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
         <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-black text-[#8C0000]">
+            <h2 class="text-xl font-black text-[#8C0000]" id="catalog-count-heading">
                 Menampilkan {{ $menus->count() }} Menu
             </h2>
             @if(request()->anyFilled(['search', 'branch_id', 'category_type', 'sort']))
@@ -336,9 +340,11 @@
             @endif
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6" id="menu-cards-grid">
             @forelse($menus as $menu)
-                <div class="bg-white border border-stone-200 rounded-2xl sm:rounded-3xl p-2.5 sm:p-5 shadow-xs sm:shadow-sm hover:shadow-xl hover:border-[#BD2000]/40 transition-all duration-300 flex flex-col justify-between group reveal-on-scroll reveal-scale">
+                <div class="menu-item-card bg-white border border-stone-200 rounded-2xl sm:rounded-3xl p-2.5 sm:p-5 shadow-xs sm:shadow-sm hover:shadow-xl hover:border-[#BD2000]/40 transition-all duration-300 flex flex-col justify-between group reveal-on-scroll reveal-scale"
+                     data-name="{{ strtolower($menu->name) }}" 
+                     data-category="{{ strtolower($menu->category->name ?? '') }}">
                     <div>
                         {{-- Foto Makanan Kompak (Square di Mobile, 4/3 di Desktop) --}}
                         <div class="aspect-square sm:aspect-[4/3] rounded-xl sm:rounded-2xl overflow-hidden relative mb-2 sm:mb-4 bg-stone-100 border border-stone-200">
@@ -346,12 +352,14 @@
                                 <img src="{{ $menu->image_url }}" 
                                      alt="{{ $menu->name }}" 
                                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                     loading="lazy">
+                                     loading="lazy"
+                                     decoding="async">
                             @else
                                 <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80" 
                                      alt="{{ $menu->name }}" 
                                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                     loading="lazy">
+                                     loading="lazy"
+                                     decoding="async">
                             @endif
 
                             {{-- Status Tag --}}
@@ -417,6 +425,17 @@
                     </a>
                 </div>
             @endforelse
+
+            {{-- Pesan Hasil Live Search Kosong --}}
+            <div id="live-search-empty" class="hidden col-span-full py-16 text-center bg-white border border-stone-200 rounded-3xl p-8">
+                <div class="w-16 h-16 bg-stone-100 text-[#BD2000] rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-[#BD2000]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-black text-[#1C1917]">Menu Tidak Ditemukan</h3>
+                <p class="text-slate-500 text-sm font-medium mt-1" id="live-search-empty-text">Tidak ada menu yang sesuai dengan kata kunci pencarian.</p>
+            </div>
         </div>
     </section>
 
@@ -424,7 +443,7 @@
     <footer class="w-full bg-[#8C0000] text-stone-100 py-10 border-t border-white/10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
             <div class="flex items-center justify-center gap-3">
-                <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-10 w-10 object-contain drop-shadow-sm">
+                <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" width="40" height="40" loading="lazy" decoding="async" class="h-10 w-10 object-contain drop-shadow-sm">
                 <span class="font-black text-2xl tracking-tight text-white">Saji<span class="text-[#FFBE0F]">HUB</span></span>
             </div>
             <p class="text-stone-200 text-xs sm:text-sm font-medium max-w-md mx-auto leading-relaxed">
@@ -554,20 +573,41 @@
             }
         }
 
-        function openQrScannerModal() {
+        function loadQrScannerLib() {
+            return new Promise((resolve, reject) => {
+                if (window.Html5Qrcode) {
+                    return resolve();
+                }
+                const script = document.createElement('script');
+                script.src = 'https://unpkg.com/html5-qrcode';
+                script.async = true;
+                script.onload = () => resolve();
+                script.onerror = () => reject(new Error('Gagal memuat pustaka scanner'));
+                document.body.appendChild(script);
+            });
+        }
+
+        async function openQrScannerModal() {
             const modal = document.getElementById('qr-scanner-modal');
             modal.classList.remove('opacity-0', 'pointer-events-none', 'hidden');
             modal.classList.add('opacity-100');
             isScanLocked = false;
             updateCustomerCamLabel();
 
-            setTimeout(() => {
+            try {
+                await loadQrScannerLib();
                 startCustomerCamera();
-            }, 150);
+            } catch(e) {
+                console.error(e);
+            }
         }
 
         function startCustomerCamera() {
             updateCustomerCamLabel();
+
+            if (html5QrcodeScanner && html5QrcodeScanner.isScanning) {
+                return;
+            }
 
             if (!html5QrcodeScanner) {
                 html5QrcodeScanner = new Html5Qrcode("qr-reader", {
@@ -666,10 +706,13 @@
                 try { html5QrcodeScanner.pause(true); } catch(e) {}
             }
 
-            const text = (decodedText || '').trim();
+            let text = (decodedText || '').trim();
+            if (text.startsWith('"') && text.endsWith('"')) {
+                text = text.slice(1, -1).trim();
+            }
 
             // 1. Format resmi SajiHub: SAJIHUB-TABLE-{branch_id}-{tableIdentifier}
-            if (text.startsWith('SAJIHUB-TABLE-')) {
+            if (text.toUpperCase().startsWith('SAJIHUB-TABLE-')) {
                 const parts = text.split('-');
                 if (parts.length >= 4) {
                     const branchId = parts[2];
@@ -834,18 +877,47 @@
             }
         });
 
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                const branchMenu = document.getElementById('dropdown-branch-menu');
-                const branchChevron = document.getElementById('dropdown-branch-chevron');
-                const sortMenu = document.getElementById('dropdown-sort-menu');
-                const sortChevron = document.getElementById('dropdown-sort-chevron');
-                if (branchMenu) branchMenu.classList.add('hidden');
-                if (branchChevron) branchChevron.classList.remove('rotate-180');
-                if (sortMenu) sortMenu.classList.add('hidden');
-                if (sortChevron) sortChevron.classList.remove('rotate-180');
+        // Live Instant Search (langsung menyaring saat diketik tanpa harus menunggu enter)
+        const catalogSearchInput = document.getElementById('catalog-search-input');
+        if (catalogSearchInput) {
+            const cards = document.querySelectorAll('.menu-item-card');
+            const emptyNotice = document.getElementById('live-search-empty');
+            const emptyText = document.getElementById('live-search-empty-text');
+            const countHeading = document.getElementById('catalog-count-heading');
+
+            function filterMenuCards() {
+                const query = catalogSearchInput.value.trim().toLowerCase();
+                let visibleCount = 0;
+
+                cards.forEach(card => {
+                    const name = (card.getAttribute('data-name') || '').toLowerCase();
+                    const category = (card.getAttribute('data-category') || '').toLowerCase();
+
+                    if (!query || name.includes(query) || category.includes(query)) {
+                        card.style.display = '';
+                        visibleCount++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                if (emptyNotice) {
+                    if (visibleCount === 0 && query !== '') {
+                        emptyNotice.classList.remove('hidden');
+                        if (emptyText) emptyText.innerText = `Tidak ada menu yang sesuai dengan kata kunci "${catalogSearchInput.value.trim()}".`;
+                    } else {
+                        emptyNotice.classList.add('hidden');
+                    }
+                }
+
+                if (countHeading) {
+                    countHeading.innerText = `Menampilkan ${visibleCount} Menu`;
+                }
             }
-        });
+
+            catalogSearchInput.addEventListener('input', filterMenuCards);
+        }
     </script>
+    @include('components.logout-modal')
 </body>
 </html>

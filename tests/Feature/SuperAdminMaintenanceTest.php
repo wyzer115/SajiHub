@@ -148,16 +148,16 @@ class SuperAdminMaintenanceTest extends TestCase
 
         // Kasir attempt
         $response = $this->post(route('login.post'), [
-            'login'    => 'kasir_jkt',
+            'email'    => 'kasir@sajihub.com',
             'password' => 'password',
         ]);
 
-        $response->assertSessionHasErrors(['login']);
+        $response->assertSessionHasErrors(['email']);
         $this->assertGuest();
 
         // Superadmin attempt succeeds
         $responseSuper = $this->post(route('login.post'), [
-            'login'    => 'superadmin',
+            'email'    => 'superadmin@sajihub.com',
             'password' => 'password',
         ]);
 

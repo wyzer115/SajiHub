@@ -7,7 +7,7 @@
 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 animate-fade-in-up">
     <div>
         <h2 class="text-2xl font-black text-[#8C0000]">Staff Cabang Saya</h2>
-        <p class="text-slate-600 text-sm mt-1 font-medium">Kelola akun Owner, Supervisor, Kasir, dan Dapur untuk cabang <span class="text-[#BD2000] font-extrabold">{{ auth()->user()->branch->name }}</span></p>
+        <p class="text-slate-600 text-sm mt-1 font-medium">Kelola akun Supervisor, Kasir, dan Dapur untuk cabang <span class="text-[#BD2000] font-extrabold">{{ auth()->user()->branch->name }}</span></p>
     </div>
     <a href="{{ route('admin.staff.create') }}"
        class="inline-flex items-center gap-2 bg-[#BD2000] hover:bg-[#8C0000] text-white px-5 py-2.5 rounded-xl font-extrabold text-sm transition-all shadow-md cursor-pointer">

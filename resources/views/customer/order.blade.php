@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
     <title>Pesan Menu - Waroeng SajiHUB</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
     <script>
         window.alert = function(message, title = 'Pemberitahuan') {
             Swal.fire({
@@ -91,7 +92,7 @@
     <header class="border-b border-stone-200 bg-white sticky top-0 z-40 shadow-sm">
         <div class="max-w-7xl mx-auto px-6 lg:px-8 h-16 flex items-center justify-between">
             <a href="{{ route('landing') }}" class="flex items-center gap-2.5 flex-shrink-0 group">
-                <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" class="h-8 sm:h-9 w-auto object-contain flex-shrink-0 drop-shadow-sm group-hover:scale-105 transition-transform duration-200">
+                <img src="{{ asset('images/logo.png') }}" alt="SajiHUB Logo" width="144" height="36" decoding="async" class="h-8 sm:h-9 w-auto object-contain flex-shrink-0 drop-shadow-sm group-hover:scale-105 transition-transform duration-200">
                 <span class="font-black text-xl sm:text-2xl tracking-tight text-[#8C0000] leading-none select-none flex-shrink-0">
                     Saji<span class="text-[#FFBE0F]">HUB</span>
                 </span>
@@ -192,7 +193,7 @@
                                         <div class="p-4 bg-white border {{ $isSoldOut ? 'border-red-300 bg-red-50/50' : 'border-stone-200 hover:border-[#BD2000]/40' }} rounded-2xl flex gap-4 items-start group transition-all shadow-sm relative overflow-hidden">
                                              {{-- Menu Image --}}
                                              @if($menu->image_url)
-                                                 <img src="{{ $menu->image_url }}" alt="{{ $menu->name }}" class="w-20 h-20 rounded-xl object-cover flex-shrink-0 border border-stone-200 {{ $isSoldOut ? 'grayscale opacity-60' : '' }}">
+                                                 <img src="{{ $menu->image_url }}" alt="{{ $menu->name }}" width="80" height="80" loading="lazy" decoding="async" class="w-20 h-20 rounded-xl object-cover flex-shrink-0 border border-stone-200 {{ $isSoldOut ? 'grayscale opacity-60' : '' }}">
                                              @else
                                                  <div class="w-20 h-20 rounded-xl border border-stone-200 flex flex-col items-center justify-center bg-stone-100 text-stone-400 flex-shrink-0">
                                                     <svg class="w-6 h-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
@@ -295,7 +296,7 @@
                             
                             <!-- Real Official QRIS Image -->
                             <div id="qris-qr" class="hidden flex flex-col items-center justify-center p-3 bg-white rounded-2xl mx-auto border border-stone-200 mt-2 animate-fade-in shadow-md max-w-[240px]">
-                                <img src="{{ asset('images/qris.jpg') }}" alt="QRIS Resmi Warung Akid" class="w-full h-auto rounded-xl object-contain">
+                                <img src="{{ asset('images/qris.jpg') }}" alt="QRIS Resmi Warung Akid" width="216" height="280" loading="lazy" decoding="async" class="w-full h-auto rounded-xl object-contain">
                                 <p class="text-[9px] text-stone-800 font-extrabold mt-2 text-center uppercase tracking-tight">NMID: ID1026528881513 (WARUNG AKID)</p>
                             </div>
                         </div>
@@ -592,20 +593,41 @@
             }
         }
 
-        function openQrScannerModal() {
+        function loadQrScannerLib() {
+            return new Promise((resolve, reject) => {
+                if (window.Html5Qrcode) {
+                    return resolve();
+                }
+                const script = document.createElement('script');
+                script.src = 'https://unpkg.com/html5-qrcode';
+                script.async = true;
+                script.onload = () => resolve();
+                script.onerror = () => reject(new Error('Gagal memuat pustaka scanner'));
+                document.body.appendChild(script);
+            });
+        }
+
+        async function openQrScannerModal() {
             const modal = document.getElementById('qr-scanner-modal');
             modal.classList.remove('opacity-0', 'pointer-events-none');
             modal.classList.add('opacity-100');
             isScanLocked = false;
             updateCustomerCamLabel();
 
-            setTimeout(() => {
+            try {
+                await loadQrScannerLib();
                 startCustomerCamera();
-            }, 150);
+            } catch(e) {
+                console.error(e);
+            }
         }
 
         function startCustomerCamera() {
             updateCustomerCamLabel();
+
+            if (html5QrCodeInstance && html5QrCodeInstance.isScanning) {
+                return;
+            }
 
             if (!html5QrCodeInstance) {
                 html5QrCodeInstance = new Html5Qrcode("qr-reader", {
@@ -702,10 +724,13 @@
                 try { html5QrCodeInstance.pause(true); } catch(e) {}
             }
 
-            const text = (decodedText || '').trim();
+            let text = (decodedText || '').trim();
+            if (text.startsWith('"') && text.endsWith('"')) {
+                text = text.slice(1, -1).trim();
+            }
 
             // 1. Format resmi SajiHub: SAJIHUB-TABLE-{branch_id}-{tableIdentifier}
-            if (text.startsWith('SAJIHUB-TABLE-')) {
+            if (text.toUpperCase().startsWith('SAJIHUB-TABLE-')) {
                 const parts = text.split('-');
                 if (parts.length >= 4) {
                     const branchId = parts[2];
@@ -945,5 +970,6 @@
         });
     </script>
     @endif
+    @include('components.logout-modal')
 </body>
 </html>

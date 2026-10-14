@@ -7,13 +7,15 @@
     <title>Masuk Portal Staf - SajiHUB Enterprise</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     @include('partials.head-assets')
+    <!-- Alpine.js -->
+    <script defer src="{{ asset('js/alpine.min.js') }}"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
-        /* Mencegah duplikasi tombol intip password bawaan Microsoft Edge */
+        [x-cloak] { display: none !important; }
+        /* Disable native browser password reveal & clear icons (Edge/Chrome/Chromium) */
         input[type="password"]::-ms-reveal,
         input[type="password"]::-ms-clear {
             display: none !important;
-            width: 0 !important;
-            height: 0 !important;
         }
     </style>
 </head>
@@ -112,14 +114,26 @@
                             </span>
                         @enderror
                     </div>
-                    <div class="relative">
+                    <div class="relative" x-data="{ show: false }">
                         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none {{ $errors->has('password') ? 'text-red-500' : 'text-stone-400' }}">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                         </div>
-                        <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="••••••••"
-                            class="block w-full pl-11 pr-11 py-3 border rounded-2xl text-sm font-medium transition-all focus:outline-none {{ $errors->has('password') ? 'bg-red-50/70 border-red-500 text-red-950 placeholder-red-300 ring-2 ring-red-500/20 focus:border-red-600 focus:ring-red-500/30' : 'bg-stone-50/80 border-stone-300 text-[#1C1917] placeholder-stone-400 focus:border-[#BD2000] focus:ring-2 focus:ring-[#BD2000]/20' }}">
-                        <button type="button" id="toggle-password" class="absolute inset-y-0 right-0 pr-3.5 flex items-center {{ $errors->has('password') ? 'text-red-500 hover:text-red-700' : 'text-stone-400 hover:text-stone-600' }} transition-colors cursor-pointer focus:outline-none" aria-label="Tampilkan / Sembunyikan Kata Sandi">
-                            <svg id="eye-icon" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        <input :type="show ? 'text' : 'password'" id="password" name="password" required autocomplete="current-password" placeholder="••••••••"
+                            class="block w-full pl-11 pr-12 py-3 border rounded-2xl text-sm font-medium transition-all focus:outline-none {{ $errors->has('password') ? 'bg-red-50/70 border-red-500 text-red-950 placeholder-red-300 ring-2 ring-red-500/20 focus:border-red-600 focus:ring-red-500/30' : 'bg-stone-50/80 border-stone-300 text-[#1C1917] placeholder-stone-400 focus:border-[#BD2000] focus:ring-2 focus:ring-[#BD2000]/20' }}">
+                        <button type="button" 
+                                @click="show = !show" 
+                                tabindex="-1" 
+                                class="absolute top-1/2 right-3 -translate-y-1/2 flex items-center justify-center cursor-pointer focus:outline-none" 
+                                aria-label="Tampilkan / Sembunyikan Kata Sandi">
+                            <img src="{{ asset('images/eye-open.png') }}" 
+                                 alt="Tampilkan Kata Sandi" 
+                                 x-show="show" 
+                                 class="h-5 w-5 block select-none pointer-events-none object-contain" />
+                            <img src="{{ asset('images/eye-closed.png') }}" 
+                                 alt="Sembunyikan Kata Sandi" 
+                                 x-show="!show" 
+                                 x-cloak 
+                                 class="h-5 w-5 block select-none pointer-events-none object-contain" />
                         </button>
                     </div>
                 </div>
@@ -133,31 +147,6 @@
             </form>
             
         </div>
-
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const toggleBtn = document.getElementById('toggle-password');
-                const passwordInput = document.getElementById('password');
-                const eyeIcon = document.getElementById('eye-icon');
-
-                if (toggleBtn && passwordInput && eyeIcon) {
-                    toggleBtn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-
-                        if (passwordInput.type === 'password') {
-                            passwordInput.type = 'text';
-                            eyeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858-5.908a8.97 8.97 0 013.122-.563c4.478 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.132 5.411m-4.09-4.09a3 3 0 00-4.243-4.243m4.242 4.242L9.88 9.88m-4.242 4.242L3 3l18 18"/>';
-                            toggleBtn.setAttribute('aria-label', 'Sembunyikan Kata Sandi');
-                        } else {
-                            passwordInput.type = 'password';
-                            eyeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>';
-                            toggleBtn.setAttribute('aria-label', 'Tampilkan Kata Sandi');
-                        }
-                    });
-                }
-            });
-        </script>
         
         <div class="text-center mt-6 text-xs text-stone-400 font-medium">
             &copy; {{ date('Y') }} SajiHUB Resto. Seluruh Hak Cipta Dilindungi.
