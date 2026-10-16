@@ -53,8 +53,10 @@ class StaffController extends Controller
             ->with('success', 'Akun staf "' . $validated['name'] . '" berhasil dibuat.');
     }
 
-    public function edit(User $user)
+    public function edit(User $staff)
     {
+        $user = $staff;
+
         if ($user->branch_id !== $this->branchId() || !in_array($user->role, ['supervisor', 'kasir', 'dapur', 'koki', 'waiter'])) {
             abort(403, 'Tidak dapat mengedit staf ini.');
         }
@@ -62,8 +64,10 @@ class StaffController extends Controller
         return view('admin.staff.edit', compact('user'));
     }
 
-    public function update(Request $request, User $user)
+    public function update(Request $request, User $staff)
     {
+        $user = $staff;
+
         if ($user->branch_id !== $this->branchId() || !in_array($user->role, ['supervisor', 'kasir', 'dapur', 'koki', 'waiter'])) {
             abort(403, 'Tidak dapat mengedit staf ini.');
         }
@@ -93,8 +97,10 @@ class StaffController extends Controller
             ->with('success', 'Akun staff "' . $user->name . '" berhasil diperbarui.');
     }
 
-    public function destroy(User $user)
+    public function destroy(User $staff)
     {
+        $user = $staff;
+
         if ($user->id === auth()->id()) {
             return redirect()->back()->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
         }

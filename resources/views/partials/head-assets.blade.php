@@ -125,18 +125,19 @@
         if (!inputId || !btn) return;
         const input = document.getElementById(inputId);
         if (!input) return;
-        const openSvg = btn.querySelector('.eye-open-svg');
-        const closedSvg = btn.querySelector('.eye-closed-svg');
+        const openEl = btn.querySelector('.eye-open-icon, .eye-open-svg');
+        const closedEl = btn.querySelector('.eye-closed-icon, .eye-closed-svg');
         if (input.type === 'password') {
             input.type = 'text';
-            if (openSvg) { openSvg.classList.add('hidden'); openSvg.classList.remove('block'); }
-            if (closedSvg) { closedSvg.classList.remove('hidden'); closedSvg.classList.add('block'); }
+            if (closedEl) { closedEl.classList.add('hidden'); closedEl.classList.remove('block'); }
+            if (openEl) { openEl.classList.remove('hidden'); openEl.classList.add('block'); }
             btn.setAttribute('aria-label', 'Sembunyikan Kata Sandi');
         } else {
             input.type = 'password';
-            if (closedSvg) { closedSvg.classList.add('hidden'); closedSvg.classList.remove('block'); }
-            if (openSvg) { openSvg.classList.remove('hidden'); openSvg.classList.add('block'); }
+            if (openEl) { openEl.classList.add('hidden'); openEl.classList.remove('block'); }
+            if (closedEl) { closedEl.classList.remove('hidden'); closedEl.classList.add('block'); }
             btn.setAttribute('aria-label', 'Tampilkan Kata Sandi');
         }
     };
 </script>
+
